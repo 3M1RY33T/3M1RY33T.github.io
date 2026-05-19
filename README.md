@@ -229,7 +229,7 @@ Security reporting guidance is available in `SECURITY.md`.
 
 The static site is designed for GitHub Pages. The included workflow in `.github/workflows/pages.yml` renders `_config.yml` from GitHub Actions variables inside the temporary Actions checkout before building the site.
 
-Add these repository variables in GitHub under `Settings > Secrets and variables > Actions > Variables`:
+Add these values in GitHub under `Settings > Secrets and variables > Actions`. Repository or environment **Variables** are preferred for public frontend config, but the workflow also supports **Secrets** if you already configured them there:
 
 - `SITE_TITLE`
 - `SITE_DESCRIPTION`
@@ -240,6 +240,8 @@ Add these repository variables in GitHub under `Settings > Secrets and variables
 - `CUSDIS_HOST`
 
 Then set GitHub Pages to deploy from GitHub Actions under `Settings > Pages`.
+
+If you use environment secrets, add them to the `github-pages` environment. The build job is configured to run in that environment so it can read those values before Jekyll builds the site.
 
 The likes API is deployed separately through Cloudflare Workers. If the Worker URL changes, update `LIKES_ENDPOINT` in `.env` and in the GitHub Actions variables.
 

@@ -31,7 +31,9 @@ def load_dotenv(path)
 end
 
 def q(name, default = "")
-  ENV.fetch(name, default).to_json
+  value = ENV.fetch(name, default)
+  value = default if value.nil? || value.empty?
+  value.to_json
 end
 
 load_dotenv(ENV_FILE)

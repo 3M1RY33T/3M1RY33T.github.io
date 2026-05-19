@@ -18,20 +18,31 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Render Jekyll config
         env:
-          SITE_TITLE: ${{ vars.SITE_TITLE }}
-          SITE_DESCRIPTION: ${{ vars.SITE_DESCRIPTION }}
-          SITE_BASEURL: ${{ vars.SITE_BASEURL }}
-          SITE_URL: ${{ vars.SITE_URL }}
-          LIKES_ENDPOINT: ${{ vars.LIKES_ENDPOINT }}
-          CUSDIS_APP_ID: ${{ vars.CUSDIS_APP_ID }}
-          CUSDIS_HOST: ${{ vars.CUSDIS_HOST }}
+          SITE_TITLE: ${{ vars.SITE_TITLE || secrets.SITE_TITLE }}
+          SITE_DESCRIPTION: ${{ vars.SITE_DESCRIPTION || secrets.SITE_DESCRIPTION }}
+          SITE_BASEURL: ${{ vars.SITE_BASEURL || secrets.SITE_BASEURL }}
+          SITE_URL: ${{ vars.SITE_URL || secrets.SITE_URL }}
+          LIKES_ENDPOINT: ${{ vars.LIKES_ENDPOINT || secrets.LIKES_ENDPOINT }}
+          CUSDIS_APP_ID: ${{ vars.CUSDIS_APP_ID || secrets.CUSDIS_APP_ID }}
+          CUSDIS_HOST: ${{ vars.CUSDIS_HOST || secrets.CUSDIS_HOST }}
         run: ruby scripts/render_config.rb _config.yml
+
+      - name: Verify rendered config
+        run: |
+          ruby -e '
+            config = File.read("_config.yml")
+            abort("LIKES_ENDPOINT was not rendered") unless config.match?(/endpoint:\s+".+"/)
+            abort("CUSDIS_APP_ID was not rendered") unless config.match?(/app_id:\s+".+"/)
+            puts "Rendered likes endpoint and Cusdis app ID into _config.yml"
+          '
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
