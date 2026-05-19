@@ -15,8 +15,8 @@ The site includes a portfolio landing page, project cards, a blog feed, individu
 .
 ├── .github/workflows/pages.yml # GitHub Pages deployment workflow
 ├── .env.example                # Safe example environment values
-├── _config.yml                 # Jekyll site settings and service endpoints
 ├── _config.template.yml        # Environment-backed config template
+├── _config.yml                 # Local/generated Jekyll config, ignored by Git
 ├── index.md                    # Home page: hero, feed preview, projects, skills, contact
 ├── blog.md                     # Blog listing/feed page
 ├── _layouts/
@@ -31,7 +31,7 @@ The site includes a portfolio landing page, project cards, a blog feed, individu
 │   ├── likes-worker.js         # Cloudflare Worker API for likes
 │   ├── schema.sql              # D1 table schema for likes
 │   └── README.md               # Worker-specific deployment notes
-├── scripts/render_config.rb    # Renders _config.yml from .env or GitHub variables
+├── scripts/render_config.rb    # Renders local/generated config from environment values
 ├── wrangler.toml.example       # Example Cloudflare Worker config
 ├── LICENSE                     # MIT license for reusable code
 ├── SECURITY.md                 # Security reporting guidance
@@ -82,7 +82,13 @@ bundle exec jekyll serve --config _config.yml,_config.local.yml
 
 ## Configuration
 
-The committed `_config.yml` contains safe placeholder defaults. Private local values are rendered into `_config.local.yml` from `_config.template.yml`.
+`_config.yml` is ignored by Git so you can keep local site values there without committing them. Private local values can also be rendered into `_config.local.yml` from `_config.template.yml`.
+
+If you are using this project as your own template, fill out `_config.template.yml` with your site values, then copy or rename it to `_config.yml` before running Jekyll:
+
+```sh
+cp _config.template.yml _config.yml
+```
 
 Local values live in `.env`, and the generated `_config.local.yml` is ignored by Git. The committed `.env.example` file documents the expected variables without exposing live app data.
 
@@ -204,6 +210,8 @@ This like system is intentionally lightweight. It prevents repeat likes with bro
 You are welcome to use this website as a starting template for your own portfolio or blog.
 
 Feel free to fork the repository, replace the personal content, swap the project cards, edit the styles, and configure your own comments or likes service. If you use the Cloudflare Worker, create your own D1 database and update `LIKES_ENDPOINT` in your local `.env` and GitHub Actions variables.
+
+Before running your version, fill out `_config.template.yml`, then copy or rename it to `_config.yml`. This gives Jekyll the config file it expects while keeping your personal config out of Git if you keep `_config.yml` ignored.
 
 Please remove or replace personal information, images, analytics/service IDs, comment app IDs, Worker URLs, and any project descriptions that are specific to this portfolio before publishing your version.
 
