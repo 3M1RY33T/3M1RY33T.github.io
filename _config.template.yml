@@ -28,7 +28,7 @@ likes:
 
 # Public frontend comments endpoint. Do not put admin keys here.
 comments:
-  endpoint: <%= q("COMMENTS_ENDPOINT", "") %>
+  endpoint: <%= q("COMMENTS_ENDPOINT", comments_endpoint_default) %>
 
 nav:
   - title: "Home"

@@ -38,7 +38,7 @@ SITE_DESCRIPTION="Your portfolio and blog description."
 SITE_BASEURL=""
 SITE_URL="https://your-username.github.io"
 LIKES_ENDPOINT="https://your-worker.your-subdomain.workers.dev/likes"
-COMMENTS_ENDPOINT="https://your-worker.your-subdomain.workers.dev/comments"
+COMMENTS_ENDPOINT=""
 ```
 
 3. Render the local Jekyll config:
@@ -96,14 +96,14 @@ Config variables:
 | `SITE_BASEURL` | Subpath if hosted below a domain path | `.env` | Actions variable or secret |
 | `SITE_URL` | Production site URL | `.env` | Actions variable or secret |
 | `LIKES_ENDPOINT` | Cloudflare Worker likes API URL | `.env` | Actions variable or secret |
-| `COMMENTS_ENDPOINT` | Cloudflare Worker comments API URL | `.env` | Actions variable or secret |
+| `COMMENTS_ENDPOINT` | Optional Cloudflare Worker comments API URL. Defaults to `LIKES_ENDPOINT` with `/likes` replaced by `/comments`. | `.env` | Actions variable or secret |
 
 Important fields:
 
 - `title`, `description`, `url`, and `baseurl` control site metadata and generated absolute URLs.
 - `permalink` controls blog post URL format.
 - `likes.endpoint` controls the Cloudflare Worker URL used by like buttons.
-- `comments.endpoint` controls the Cloudflare Worker URL used by comments.
+- `comments.endpoint` controls the Cloudflare Worker URL used by comments. If `COMMENTS_ENDPOINT` is blank, the render script derives it from `LIKES_ENDPOINT`.
 - `defaults` assigns the `post` layout to files in `_posts/`.
 
 After changing `.env`, run:
@@ -174,7 +174,7 @@ To approve a pending comment, run a D1 update such as:
 wrangler d1 execute portfolio-likes --remote --command "UPDATE post_comments SET status = 'approved', updated_at = CURRENT_TIMESTAMP WHERE id = 1"
 ```
 
-To disable comments, leave `COMMENTS_ENDPOINT` blank in `.env` or in the GitHub Actions variables.
+To disable comments, leave both `COMMENTS_ENDPOINT` and `LIKES_ENDPOINT` blank, or remove `comments.endpoint` from the rendered config.
 
 ## Engagement Worker
 
@@ -222,7 +222,7 @@ The like system is intentionally lightweight. It prevents repeat likes with brow
 
 You are welcome to use this website as a starting template for your own portfolio or blog.
 
-Feel free to fork the repository, replace the personal content, swap the project cards, edit the styles, and configure your own comments or likes service. If you use the Cloudflare Worker, create your own D1 database and update `LIKES_ENDPOINT` and `COMMENTS_ENDPOINT` in your local `.env` and GitHub Actions variables.
+Feel free to fork the repository, replace the personal content, swap the project cards, edit the styles, and configure your own comments or likes service. If you use the Cloudflare Worker, create your own D1 database and update `LIKES_ENDPOINT` in your local `.env` and GitHub Actions variables. Set `COMMENTS_ENDPOINT` only if comments use a different Worker URL.
 
 Before running your version, fill out `_config.template.yml`, then copy or rename it to `_config.yml`. This gives Jekyll the config file it expects while keeping your personal config out of Git if you keep `_config.yml` ignored.
 
@@ -256,13 +256,13 @@ Variables are preferred for public frontend config:
 - `SITE_BASEURL`
 - `SITE_URL`
 - `LIKES_ENDPOINT`
-- `COMMENTS_ENDPOINT`
+- `COMMENTS_ENDPOINT` if comments use a different Worker URL than likes
 
 The workflow also supports **Secrets** with the same names if you already configured them that way. If you use environment secrets, add them to the `github-pages` environment. The build job is configured to run in that environment so it can read those values before Jekyll builds the site.
 
-The workflow fails early if `LIKES_ENDPOINT` or `COMMENTS_ENDPOINT` are missing, so check the Actions log if likes or comments are not appearing after deployment.
+The workflow fails early if `LIKES_ENDPOINT` is missing. `COMMENTS_ENDPOINT` is derived from it when not set.
 
-The engagement API is deployed separately through Cloudflare Workers. If the Worker URL changes, update `LIKES_ENDPOINT` and `COMMENTS_ENDPOINT` in `.env` and in the GitHub Actions variables.
+The engagement API is deployed separately through Cloudflare Workers. If the Worker URL changes, update `LIKES_ENDPOINT` in `.env` and in the GitHub Actions variables.
 
 ## Removing Old Private History
 

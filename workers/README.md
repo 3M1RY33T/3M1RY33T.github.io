@@ -54,8 +54,10 @@ This Worker powers the no-account blog like buttons and the moderated comment se
 
    ```sh
    LIKES_ENDPOINT="https://portfolio-likes.your-subdomain.workers.dev/likes"
-   COMMENTS_ENDPOINT="https://portfolio-likes.your-subdomain.workers.dev/comments"
+   COMMENTS_ENDPOINT=""
    ```
+
+   `COMMENTS_ENDPOINT` is optional when comments use the same Worker as likes. The render script derives it from `LIKES_ENDPOINT` by replacing `/likes` with `/comments`.
 
    Then render the local Jekyll config:
 
@@ -63,7 +65,7 @@ This Worker powers the no-account blog like buttons and the moderated comment se
    ruby scripts/render_config.rb
    ```
 
-   For GitHub Pages, add the same values as `LIKES_ENDPOINT` and `COMMENTS_ENDPOINT` under `Settings > Secrets and variables > Actions > Variables` or in the `github-pages` environment.
+   For GitHub Pages, add `LIKES_ENDPOINT` under `Settings > Secrets and variables > Actions > Variables` or in the `github-pages` environment. Add `COMMENTS_ENDPOINT` only if comments use a different Worker URL.
 
    The rendered Jekyll config will contain:
 
@@ -99,7 +101,7 @@ wrangler d1 execute portfolio-likes --remote --command "UPDATE post_comments SET
 ## Troubleshooting
 
 - If the like buttons do not render, confirm `LIKES_ENDPOINT` is set before Jekyll builds.
-- If comments do not render, confirm `COMMENTS_ENDPOINT` is set before Jekyll builds.
+- If comments do not render, confirm `LIKES_ENDPOINT` is set before Jekyll builds, or set `COMMENTS_ENDPOINT` explicitly.
 - If the buttons render but disable themselves, check the Worker response in the browser console.
 - If the Worker returns `500` or Cloudflare `error code: 1101`, check that the D1 binding is named `DB`, the database ID is correct, and `workers/schema.sql` has been applied.
 - If `wrangler d1 execute` says `Resource location: local`, rerun it with `--remote`.

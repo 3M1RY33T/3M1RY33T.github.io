@@ -36,6 +36,13 @@ def q(name, default = "")
   value.to_json
 end
 
+def comments_endpoint_default
+  likes_endpoint = ENV.fetch("LIKES_ENDPOINT", "")
+  return "" if likes_endpoint.empty?
+
+  likes_endpoint.sub(%r{/likes/?\z}, "/comments")
+end
+
 load_dotenv(ENV_FILE)
 
 template = File.read(TEMPLATE_FILE)
