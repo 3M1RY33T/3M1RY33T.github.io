@@ -1,0 +1,41 @@
+# Security Policy
+
+## Supported Project
+
+This repository contains a static Jekyll portfolio/blog and an optional Cloudflare Worker used for blog post likes.
+
+Security reports are most useful for issues that affect the reusable template code, the frontend comment/like integrations, or the Cloudflare Worker implementation.
+
+## Reporting a Vulnerability
+
+Please do not open a public issue for sensitive security reports.
+
+To report a vulnerability, contact the maintainer through the contact information listed on the website or GitHub profile. Include:
+
+- A clear description of the issue.
+- Steps to reproduce the behavior.
+- The affected file, route, or service.
+- Any relevant browser console output, HTTP response, or Worker error message.
+
+I will review reports as soon as reasonably possible and follow up if more information is needed.
+
+## Scope
+
+In scope:
+
+- Bugs in the static site code that could expose visitor data or break browser security expectations.
+- Issues in the Cloudflare Worker likes API.
+- CORS or request handling problems related to the likes service.
+- Accidental exposure of deployment-specific configuration.
+
+Out of scope:
+
+- Attacks against third-party services such as GitHub Pages, Cloudflare, Cusdis, or Gravatar.
+- Spam, abuse, or repeated voting limitations caused by the intentionally lightweight no-account like system.
+- Social engineering or physical attacks.
+
+## For Template Users
+
+If you fork this site, replace all personal service IDs, Worker URLs, database IDs, profile links, and contact details before deploying your own version.
+
+Keep secrets and deployment-specific files out of version control. The included `.gitignore` excludes common local files such as `wrangler.toml`, `.env`, `.wrangler/`, and `_site/`.

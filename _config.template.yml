@@ -1,0 +1,39 @@
+title: <%= q("SITE_TITLE", "Your Name") %>
+description: <%= q("SITE_DESCRIPTION", "Your portfolio and blog description.") %>
+baseurl: <%= q("SITE_BASEURL", "") %>
+url: <%= q("SITE_URL", "https://your-username.github.io") %>
+markdown: kramdown
+permalink: /:categories/:year/:month/:day/:title.html
+paginate: 5
+paginate_path: "/blog/page:num"
+exclude:
+  - "Yigit_Yildiz_CV_Resume_2026.pdf"
+  - ".venv"
+  - "_site"
+  - ".env"
+  - ".env.*"
+  - "_config.template.yml"
+collections:
+  posts:
+    output: true
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+
+# Public frontend endpoint. Do not put secret keys here.
+likes:
+  endpoint: <%= q("LIKES_ENDPOINT", "") %>
+
+# Public frontend comment app identifier. Do not put admin keys here.
+cusdis:
+  app_id: <%= q("CUSDIS_APP_ID", "") %>
+  host: <%= q("CUSDIS_HOST", "https://cusdis.com") %>
+
+nav:
+  - title: "Home"
+    url: "/"
+  - title: "Blog"
+    url: "/blog/"

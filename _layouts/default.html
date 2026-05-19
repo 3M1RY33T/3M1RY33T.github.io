@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111827" />
+    <title>{{ page.title | default: site.title }}</title>
+    <meta name="description" content="{{ page.excerpt | strip_html | strip_newlines | default: site.description }}">
+    <link rel="stylesheet" href="/assets/css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <input class="nav-toggle" type="checkbox" id="nav-toggle" aria-label="Toggle navigation menu">
+        <label class="nav-toggle-label" for="nav-toggle" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </label>
+        <nav class="site-nav">
+          <a href="/">Home</a>
+          <a href="/#projects">Projects</a>
+          <a href="/#skills">Skills</a>
+          <a href="/blog/">Blog</a>
+          <a href="/#contact">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      {{ content }}
+    </main>
+
+    <footer class="site-footer">
+      <p>© {{ "now" | date: "%Y" }} Yigit Yildiz (3M1RY33T) · Built with GitHub Pages</p>
+    </footer>
+    <script>
+      const likesEndpoint = "{{ site.likes.endpoint | default: '' | escape }}";
+
+      document.querySelectorAll("[data-featured-blog]").forEach((section) => {
+        const items = Array.from(section.querySelectorAll("[data-featured-item]"));
+        const triggers = Array.from(section.querySelectorAll("[data-featured-trigger]"));
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        let activeIndex = 0;
+        let cycleTimer;
+
+        if (items.length < 2 || triggers.length < 2) return;
+
+        const setActivePost = (nextIndex) => {
+          activeIndex = nextIndex;
+          items.forEach((item, index) => {
+            item.classList.toggle("is-active", index === activeIndex);
+          });
+          triggers.forEach((trigger, index) => {
+            trigger.classList.toggle("is-active", index === activeIndex);
+            trigger.setAttribute("aria-pressed", String(index === activeIndex));
+          });
+        };
+
+        const startCycle = () => {
+          if (reduceMotion) return;
+          window.clearInterval(cycleTimer);
+          cycleTimer = window.setInterval(() => {
+            setActivePost((activeIndex + 1) % items.length);
+          }, 6000);
+        };
+
+        const stopCycle = () => {
+          window.clearInterval(cycleTimer);
+        };
+
+        triggers.forEach((trigger, index) => {
+          trigger.addEventListener("click", () => {
+            setActivePost(index);
+            startCycle();
+          });
+        });
+
+        section.addEventListener("mouseenter", stopCycle);
+        section.addEventListener("mouseleave", startCycle);
+        section.addEventListener("focusin", stopCycle);
+        section.addEventListener("focusout", (event) => {
+          if (!section.contains(event.relatedTarget)) startCycle();
+        });
+
+        startCycle();
+      });
+
+      if (likesEndpoint) {
+        const likeButtons = Array.from(document.querySelectorAll("[data-like-button]"));
+        const likedStoragePrefix = "portfolio-liked:";
+
+        const normalizeCount = (value) => {
+          const count = Number(value);
+          return Number.isFinite(count) && count >= 0 ? count : 0;
+        };
+
+        const setLikeButton = (button, count, liked) => {
+          const countElement = button.querySelector("[data-like-count]");
+          if (countElement) countElement.textContent = String(normalizeCount(count));
+          button.classList.toggle("is-liked", liked);
+          button.setAttribute("aria-pressed", String(liked));
+          button.disabled = liked;
+        };
+
+        const getLiked = (path) => {
+          try {
+            return window.localStorage.getItem(`${likedStoragePrefix}${path}`) === "true";
+          } catch (error) {
+            return false;
+          }
+        };
+
+        const setLiked = (path) => {
+          try {
+            window.localStorage.setItem(`${likedStoragePrefix}${path}`, "true");
+          } catch (error) {
+            // Likes still work without localStorage; this only prevents repeat clicks per browser.
+          }
+        };
+
+        const requestLikes = async (path, options = {}) => {
+          const url = new URL(likesEndpoint);
+          url.searchParams.set("path", path);
+          const response = await fetch(url, {
+            headers: {
+              Accept: "application/json",
+            },
+            ...options,
+          });
+
+          if (!response.ok) throw new Error("Unable to update likes.");
+          return response.json();
+        };
+
+        likeButtons.forEach(async (button) => {
+          const path = button.dataset.path;
+          if (!path) return;
+
+          const liked = getLiked(path);
+          setLikeButton(button, 0, liked);
+
+          try {
+            const payload = await requestLikes(path);
+            setLikeButton(button, payload.count, liked);
+          } catch (error) {
+            button.disabled = true;
+            button.title = "Likes are unavailable right now.";
+          }
+
+          button.addEventListener("click", async () => {
+            if (getLiked(path)) return;
+
+            const currentCount = normalizeCount(button.querySelector("[data-like-count]")?.textContent);
+            setLikeButton(button, currentCount + 1, true);
+
+            try {
+              const payload = await requestLikes(path, { method: "POST" });
+              setLiked(path);
+              setLikeButton(button, payload.count, true);
+            } catch (error) {
+              setLikeButton(button, currentCount, false);
+              button.title = "Your like could not be saved right now.";
+            }
+          });
+        });
+      }
+
+      document.querySelectorAll("[data-toronto-time]").forEach((timeElement) => {
+        const timeFormatter = new Intl.DateTimeFormat([], {
+          timeZone: "America/Toronto",
+          hour: "numeric",
+          minute: "2-digit",
+        });
+        const dateFormatter = new Intl.DateTimeFormat([], {
+          timeZone: "America/Toronto",
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+        });
+        const contactTime = timeElement.closest(".contact-time");
+        const dateElement = contactTime?.querySelector("[data-toronto-date]");
+        const periodElement = contactTime?.querySelector("[data-toronto-period]");
+        const timeWrapper = timeElement.closest("time");
+
+        const updateTorontoTime = () => {
+          const now = new Date();
+          const formattedTime = timeFormatter.format(now)
+            .replace(/\ba\.m\./i, "AM")
+            .replace(/\bp\.m\./i, "PM");
+          const timeMatch = formattedTime.match(/^(.+?)\s*(AM|PM)$/i);
+          timeElement.textContent = timeMatch ? timeMatch[1] : formattedTime;
+          if (periodElement) periodElement.textContent = timeMatch ? timeMatch[2].toUpperCase() : "";
+          if (timeWrapper) timeWrapper.dateTime = now.toISOString();
+          if (dateElement) dateElement.textContent = `${dateFormatter.format(now)} · Toronto, ON`;
+        };
+
+        updateTorontoTime();
+        window.setInterval(updateTorontoTime, 10000);
+      });
+
+      document.querySelectorAll("[data-feed-post]").forEach((post) => {
+        const content = post.querySelector("[data-feed-post-content]");
+        const button = post.querySelector("[data-show-more]");
+
+        if (!content || !button) return;
+
+        const canExpand = content.scrollHeight > content.clientHeight + 4;
+        if (!canExpand) {
+          button.hidden = true;
+          content.classList.add("has-no-overflow");
+          return;
+        }
+
+        button.addEventListener("click", () => {
+          const isExpanded = post.classList.toggle("is-expanded");
+          button.textContent = isExpanded ? "Show less" : "Show more";
+          button.setAttribute("aria-expanded", String(isExpanded));
+        });
+      });
+
+      document.querySelectorAll("[data-cusdis-comments]").forEach((section) => {
+        const draftForm = section.querySelector("[data-comment-draft-form]");
+        const identityForm = section.querySelector("[data-comment-identity-form]");
+        const modal = section.querySelector("[data-comment-modal]");
+        const cancelButton = section.querySelector("[data-comment-cancel]");
+        const status = section.querySelector("[data-comment-status]");
+        const list = section.querySelector("[data-comment-list]");
+        const contentField = draftForm?.elements.content;
+        const nicknameField = identityForm?.elements.nickname;
+        const sendButton = draftForm.querySelector(".comment-send-button");
+        let pendingContent = "";
+
+        if (!draftForm || !identityForm || !modal || !list) return;
+
+        const host = section.dataset.cusdisHost?.replace(/\/$/, "");
+        const appId = section.dataset.cusdisAppId;
+        const pageId = section.dataset.pageId;
+        const pageUrl = section.dataset.pageUrl;
+        const pageTitle = section.dataset.pageTitle;
+        const commentsEndpoint = `${host}/api/open/comments`;
+
+        const resizeCommentField = () => {
+          if (!contentField) return;
+          contentField.style.height = "auto";
+          contentField.style.height = `${contentField.scrollHeight}px`;
+        };
+
+        const updateSendButton = () => {
+          if (!sendButton || !contentField) return;
+          sendButton.disabled = contentField.value.trim() === "";
+        };
+
+        const setStatus = (message, isError = false) => {
+          if (!status) return;
+          status.textContent = message;
+          status.classList.toggle("is-error", isError);
+        };
+
+        const openModal = () => {
+          modal.hidden = false;
+          document.body.classList.add("comment-modal-open");
+          window.setTimeout(() => nicknameField?.focus(), 0);
+        };
+
+        const closeModal = () => {
+          modal.hidden = true;
+          document.body.classList.remove("comment-modal-open");
+        };
+
+        const makeComment = (comment) => {
+          const item = document.createElement("article");
+          item.className = "comment-item";
+
+          const meta = document.createElement("p");
+          meta.className = "comment-meta";
+          const author = comment.by_nickname || comment.moderator?.displayName || "Anonymous";
+          const createdAt = comment.parsedCreatedAt || "";
+          meta.textContent = createdAt ? `${author} · ${createdAt}` : author;
+
+          const content = document.createElement("p");
+          content.className = "comment-body";
+          content.textContent = comment.content || "";
+
+          item.append(meta, content);
+
+          const replies = comment.replies?.data || [];
+          if (replies.length > 0) {
+            const replyList = document.createElement("div");
+            replyList.className = "comment-replies";
+            replies.forEach((reply) => replyList.append(makeComment(reply)));
+            item.append(replyList);
+          }
+
+          return item;
+        };
+
+        const loadComments = async () => {
+          list.textContent = "Loading comments...";
+
+          try {
+            const timezoneOffset = String(new Date().getTimezoneOffset() / -60);
+            const url = new URL(commentsEndpoint);
+            url.searchParams.set("appId", appId);
+            url.searchParams.set("pageId", pageId);
+            url.searchParams.set("page", "1");
+
+            const response = await fetch(url, {
+              headers: {
+                Accept: "application/json",
+                "x-timezone-offset": timezoneOffset,
+              },
+            });
+
+            if (!response.ok) throw new Error("Unable to load comments.");
+
+            const payload = await response.json();
+            const comments = payload?.data?.data || [];
+            list.replaceChildren();
+
+            if (comments.length === 0) {
+              const empty = document.createElement("p");
+              empty.className = "comment-empty";
+              empty.textContent = "There are no comments for this post yet.";
+              list.append(empty);
+              return;
+            }
+
+            comments.forEach((comment) => list.append(makeComment(comment)));
+          } catch (error) {
+            list.textContent = "";
+            setStatus("Comments could not load right now.", true);
+          }
+        };
+
+        draftForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          pendingContent = contentField?.value.trim() || "";
+          if (!pendingContent) return;
+          setStatus("");
+          openModal();
+        });
+
+        contentField?.addEventListener("input", () => {
+          resizeCommentField();
+          updateSendButton();
+        });
+
+        identityForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const formData = new FormData(identityForm);
+          const submitButton = identityForm.querySelector("button[type='submit']");
+          const nickname = String(formData.get("nickname") || "").trim();
+          const email = String(formData.get("email") || "").trim();
+
+          if (!nickname || !pendingContent) return;
+
+          submitButton.disabled = true;
+          setStatus("Posting your comment...");
+
+          try {
+            const response = await fetch(commentsEndpoint, {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                appId,
+                pageId,
+                pageUrl,
+                pageTitle,
+                content: pendingContent,
+                nickname,
+                email,
+              }),
+            });
+
+            if (!response.ok) throw new Error("Unable to post comment.");
+
+            pendingContent = "";
+            draftForm.reset();
+            resizeCommentField();
+            updateSendButton();
+            identityForm.reset();
+            closeModal();
+            setStatus("Thanks. Your comment is awaiting approval.");
+            loadComments();
+          } catch (error) {
+            setStatus("Your comment could not be posted right now.", true);
+          } finally {
+            submitButton.disabled = false;
+          }
+        });
+
+        cancelButton?.addEventListener("click", closeModal);
+        modal.addEventListener("click", (event) => {
+          if (event.target === modal) closeModal();
+        });
+
+        loadComments();
+        resizeCommentField();
+        updateSendButton();
+      });
+    </script>
+  </body>
+</html>

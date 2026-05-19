@@ -1,0 +1,13 @@
+name = "portfolio-likes"
+main = "workers/likes-worker.js"
+compatibility_date = "2026-05-18"
+
+[vars]
+# Update this with your actual allowed origins
+ALLOWED_ORIGINS = "https://yourdomain.github.io,http://localhost:4000,http://127.0.0.1:4000"
+
+# Add your D1 database configuration below
+[[d1_databases]]
+binding = "DB"
+database_name = "portfolio-likes"
+database_id = "YOUR_DATABASE_ID_HERE"
