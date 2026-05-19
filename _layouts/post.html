@@ -27,21 +27,22 @@ layout: default
     {{ content }}
   </div>
 
-  {% assign cusdis_app_id = site.cusdis.app_id | default: "" %}
+  {% assign comments_endpoint = site.comments.endpoint | default: "" %}
+  {% if comments_endpoint == "" and likes_endpoint != "" %}
+    {% assign comments_endpoint = likes_endpoint | replace: "/likes", "/comments" %}
+  {% endif %}
   <section
     class="post-comments"
     aria-labelledby="comments-title"
-    {% if cusdis_app_id != "" %}
-      data-cusdis-comments
-      data-cusdis-host="{{ site.cusdis.host | default: 'https://cusdis.com' }}"
-      data-cusdis-app-id="{{ cusdis_app_id }}"
+    {% if comments_endpoint != "" %}
+      data-worker-comments
       data-page-id="{{ page.url }}"
       data-page-url="{{ page.url | absolute_url }}"
       data-page-title="{{ page.title | escape }}"
     {% endif %}
   >
     <h2 id="comments-title">Comments</h2>
-    {% if cusdis_app_id != "" %}
+    {% if comments_endpoint != "" %}
       <div class="comment-list" data-comment-list></div>
       <p class="comment-prompt">Make a comment below.</p>
       <form class="comment-draft-form{% if likes_endpoint != "" %} has-like-button{% endif %}" data-comment-draft-form>
@@ -76,6 +77,7 @@ layout: default
               Email <span>Optional</span>
               <input type="email" name="email" autocomplete="email" placeholder="you@example.com">
             </label>
+            <input type="text" name="website" class="form-honey" tabindex="-1" autocomplete="off" aria-hidden="true">
             <div class="comment-modal-actions">
               <button class="button button-secondary" type="button" data-comment-cancel>Cancel</button>
               <button class="button" type="submit">Post comment</button>

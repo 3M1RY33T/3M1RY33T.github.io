@@ -26,10 +26,9 @@ defaults:
 likes:
   endpoint: <%= q("LIKES_ENDPOINT", "") %>
 
-# Public frontend comment app identifier. Do not put admin keys here.
-cusdis:
-  app_id: <%= q("CUSDIS_APP_ID", "") %>
-  host: <%= q("CUSDIS_HOST", "https://cusdis.com") %>
+# Public frontend comments endpoint. Do not put admin keys here.
+comments:
+  endpoint: <%= q("COMMENTS_ENDPOINT", "") %>
 
 nav:
   - title: "Home"

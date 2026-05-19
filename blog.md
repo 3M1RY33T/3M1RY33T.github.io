@@ -7,7 +7,10 @@ excerpt: "Blog posts and technical updates from Yigit (Emir) Yildiz."
 
 <section class="section blog-section">
   {% assign likes_endpoint = site.likes.endpoint | default: "" %}
-  {% assign cusdis_app_id = site.cusdis.app_id | default: "" %}
+  {% assign comments_endpoint = site.comments.endpoint | default: "" %}
+  {% if comments_endpoint == "" and likes_endpoint != "" %}
+    {% assign comments_endpoint = likes_endpoint | replace: "/likes", "/comments" %}
+  {% endif %}
   <!-- <nav class="post-nav-links blog-nav-links" aria-label="Blog navigation">
     <a class="post-home-link post-home-link-back" href="/">Back to Home</a>
   </nav> -->
@@ -52,16 +55,14 @@ excerpt: "Blog posts and technical updates from Yigit (Emir) Yildiz."
         <section
           class="post-comments feed-comments"
           aria-label="Comments for {{ post.title | escape }}"
-          {% if cusdis_app_id != "" %}
-            data-cusdis-comments
-            data-cusdis-host="{{ site.cusdis.host | default: 'https://cusdis.com' }}"
-            data-cusdis-app-id="{{ cusdis_app_id }}"
+          {% if comments_endpoint != "" %}
+            data-worker-comments
             data-page-id="{{ post.url }}"
             data-page-url="{{ post.url | absolute_url }}"
             data-page-title="{{ post.title | escape }}"
           {% endif %}
         >
-          {% if cusdis_app_id != "" %}
+          {% if comments_endpoint != "" %}
             <div class="comment-list" data-comment-list></div>
             <p class="comment-prompt">Make a comment below.</p>
             <form class="comment-draft-form{% if likes_endpoint != "" %} has-like-button{% endif %}" data-comment-draft-form>
@@ -96,6 +97,7 @@ excerpt: "Blog posts and technical updates from Yigit (Emir) Yildiz."
                     Email <span>Optional</span>
                     <input type="email" name="email" autocomplete="email" placeholder="you@example.com">
                   </label>
+                  <input type="text" name="website" class="form-honey" tabindex="-1" autocomplete="off" aria-hidden="true">
                   <div class="comment-modal-actions">
                     <button class="button button-secondary" type="button" data-comment-cancel>Cancel</button>
                     <button class="button" type="submit">Post comment</button>

@@ -36,6 +36,8 @@
     </footer>
     <script>
       const likesEndpoint = "{{ site.likes.endpoint | default: '' | escape }}";
+      const configuredCommentsEndpoint = "{{ site.comments.endpoint | default: '' | escape }}";
+      const commentsEndpoint = configuredCommentsEndpoint || likesEndpoint.replace(/\/likes$/, "/comments");
 
       document.querySelectorAll("[data-featured-blog]").forEach((section) => {
         const items = Array.from(section.querySelectorAll("[data-featured-item]"));
@@ -219,7 +221,55 @@
         });
       });
 
-      document.querySelectorAll("[data-cusdis-comments]").forEach((section) => {
+      document.querySelectorAll("[data-contact-form]").forEach((form) => {
+        const status = form.querySelector("[data-contact-status]");
+        const submitButton = form.querySelector("button[type='submit']");
+
+        const setContactStatus = (message, isError = false) => {
+          if (!status) return;
+          status.textContent = message;
+          status.classList.toggle("is-error", isError);
+        };
+
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const formData = new FormData(form);
+          if (String(formData.get("_honey") || "").trim() !== "") return;
+
+          const endpoint = form.action.replace("https://formsubmit.co/", "https://formsubmit.co/ajax/");
+          setContactStatus("Sending your message...");
+          if (submitButton) submitButton.disabled = true;
+
+          try {
+            const payload = Object.fromEntries(formData.entries());
+            delete payload._honey;
+
+            const response = await fetch(endpoint, {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(payload),
+            });
+
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok || result.success === false) {
+              throw new Error(result.message || "Unable to send message.");
+            }
+
+            form.reset();
+            setContactStatus("Thanks. Your message has been sent.");
+          } catch (error) {
+            setContactStatus("Your message could not be sent right now. Please email me directly.", true);
+          } finally {
+            if (submitButton) submitButton.disabled = false;
+          }
+        });
+      });
+
+      document.querySelectorAll("[data-worker-comments]").forEach((section) => {
         const draftForm = section.querySelector("[data-comment-draft-form]");
         const identityForm = section.querySelector("[data-comment-identity-form]");
         const modal = section.querySelector("[data-comment-modal]");
@@ -228,17 +278,14 @@
         const list = section.querySelector("[data-comment-list]");
         const contentField = draftForm?.elements.content;
         const nicknameField = identityForm?.elements.nickname;
-        const sendButton = draftForm.querySelector(".comment-send-button");
+        const sendButton = draftForm?.querySelector(".comment-send-button");
         let pendingContent = "";
 
-        if (!draftForm || !identityForm || !modal || !list) return;
+        if (!commentsEndpoint || !draftForm || !identityForm || !modal || !list) return;
 
-        const host = section.dataset.cusdisHost?.replace(/\/$/, "");
-        const appId = section.dataset.cusdisAppId;
         const pageId = section.dataset.pageId;
         const pageUrl = section.dataset.pageUrl;
         const pageTitle = section.dataset.pageTitle;
-        const commentsEndpoint = `${host}/api/open/comments`;
 
         const resizeCommentField = () => {
           if (!contentField) return;
@@ -268,14 +315,25 @@
           document.body.classList.remove("comment-modal-open");
         };
 
+        const formatCommentDate = (value) => {
+          if (!value) return "";
+          const date = new Date(value);
+          if (Number.isNaN(date.getTime())) return "";
+          return new Intl.DateTimeFormat([], {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          }).format(date);
+        };
+
         const makeComment = (comment) => {
           const item = document.createElement("article");
           item.className = "comment-item";
 
           const meta = document.createElement("p");
           meta.className = "comment-meta";
-          const author = comment.by_nickname || comment.moderator?.displayName || "Anonymous";
-          const createdAt = comment.parsedCreatedAt || "";
+          const author = comment.authorName || "Anonymous";
+          const createdAt = formatCommentDate(comment.createdAt);
           meta.textContent = createdAt ? `${author} · ${createdAt}` : author;
 
           const content = document.createElement("p");
@@ -284,14 +342,6 @@
 
           item.append(meta, content);
 
-          const replies = comment.replies?.data || [];
-          if (replies.length > 0) {
-            const replyList = document.createElement("div");
-            replyList.className = "comment-replies";
-            replies.forEach((reply) => replyList.append(makeComment(reply)));
-            item.append(replyList);
-          }
-
           return item;
         };
 
@@ -299,23 +349,19 @@
           list.textContent = "Loading comments...";
 
           try {
-            const timezoneOffset = String(new Date().getTimezoneOffset() / -60);
             const url = new URL(commentsEndpoint);
-            url.searchParams.set("appId", appId);
-            url.searchParams.set("pageId", pageId);
-            url.searchParams.set("page", "1");
+            url.searchParams.set("path", pageId);
 
             const response = await fetch(url, {
               headers: {
                 Accept: "application/json",
-                "x-timezone-offset": timezoneOffset,
               },
             });
 
             if (!response.ok) throw new Error("Unable to load comments.");
 
             const payload = await response.json();
-            const comments = payload?.data?.data || [];
+            const comments = payload?.comments || [];
             list.replaceChildren();
 
             if (comments.length === 0) {
@@ -352,10 +398,11 @@
           const submitButton = identityForm.querySelector("button[type='submit']");
           const nickname = String(formData.get("nickname") || "").trim();
           const email = String(formData.get("email") || "").trim();
+          const website = String(formData.get("website") || "").trim();
 
           if (!nickname || !pendingContent) return;
 
-          submitButton.disabled = true;
+          if (submitButton) submitButton.disabled = true;
           setStatus("Posting your comment...");
 
           try {
@@ -366,13 +413,13 @@
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                appId,
-                pageId,
+                path: pageId,
                 pageUrl,
                 pageTitle,
                 content: pendingContent,
                 nickname,
                 email,
+                website,
               }),
             });
 
@@ -389,7 +436,7 @@
           } catch (error) {
             setStatus("Your comment could not be posted right now.", true);
           } finally {
-            submitButton.disabled = false;
+            if (submitButton) submitButton.disabled = false;
           }
         });
 

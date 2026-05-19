@@ -316,9 +316,11 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
         </ul>
       </div>
     </div>
-    <form class="contact-form" action="https://formsubmit.co/yigitgl@gmail.com" method="POST">
+    <form class="contact-form" action="https://formsubmit.co/yigitgl@gmail.com" method="POST" data-contact-form>
       <input type="hidden" name="_subject" value="New portfolio message">
       <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_template" value="table">
+      <input type="text" name="_honey" class="form-honey" tabindex="-1" autocomplete="off" aria-hidden="true">
       <label>
         Name
         <input type="text" name="name" required placeholder="Your name">
@@ -331,7 +333,8 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
         Message
         <textarea name="message" rows="6" required placeholder="Tell me about your project or question"></textarea>
       </label>
-      <button class="button">Send message</button>
+      <button class="button" type="submit">Send message</button>
+      <p class="form-status" data-contact-status role="status"></p>
       <p class="form-note">This form submits securely to my email via FormSubmit.co. Please verify the email if prompted after your first message.</p>
     </form>
   </div>

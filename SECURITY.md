@@ -2,7 +2,7 @@
 
 ## Supported Project
 
-This repository contains a static Jekyll portfolio/blog and an optional Cloudflare Worker used for blog post likes.
+This repository contains a static Jekyll portfolio/blog and an optional Cloudflare Worker used for blog post likes and comments.
 
 Security reports are most useful for issues that affect the reusable template code, the frontend comment/like integrations, or the Cloudflare Worker implementation.
 
@@ -24,13 +24,13 @@ I will review reports as soon as reasonably possible and follow up if more infor
 In scope:
 
 - Bugs in the static site code that could expose visitor data or break browser security expectations.
-- Issues in the Cloudflare Worker likes API.
-- CORS or request handling problems related to the likes service.
+- Issues in the Cloudflare Worker likes or comments API.
+- CORS or request handling problems related to the engagement service.
 - Accidental exposure of deployment-specific configuration.
 
 Out of scope:
 
-- Attacks against third-party services such as GitHub Pages, Cloudflare, Cusdis, or Gravatar.
+- Attacks against third-party services such as GitHub Pages, Cloudflare, or Gravatar.
 - Spam, abuse, or repeated voting limitations caused by the intentionally lightweight no-account like system.
 - Social engineering or physical attacks.
 
