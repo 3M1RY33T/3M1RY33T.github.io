@@ -156,7 +156,7 @@ SVG icons live in `assets/svg/`, and post/page images live in `assets/images/`.
 
 ## Comments
 
-Comments are powered by the Cloudflare Worker in `workers/likes-worker.js` and stored in Cloudflare D1. This keeps the site static while moving the comment data into a private backend you control.
+Comments are powered by [`urthreads`](https://github.com/3M1RY33T/urthreads), exposed through the Cloudflare Worker wrapper in `workers/urthreads-worker.js`, and stored in Cloudflare D1. This keeps the site static while moving comment data into a private backend you control.
 
 The comment UI is rendered in `blog.md` for the feed view and `_layouts/post.html` for individual post pages. The browser-side logic lives in `_layouts/default.html` and handles:
 
@@ -168,17 +168,30 @@ The comment UI is rendered in `blog.md` for the feed view and `_layouts/post.htm
 
 The Worker uses each post URL path as the page identifier, so comments stay attached to the correct blog post. New comments are stored as `pending` by default and only comments marked `approved` are returned to the public site.
 
-To approve a pending comment, run a D1 update such as:
+To approve a pending comment, use the `urthreads` moderation CLI:
 
 ```sh
-wrangler d1 execute portfolio-likes --remote --command "UPDATE post_comments SET status = 'approved', updated_at = CURRENT_TIMESTAMP WHERE id = 1"
+npx urthreads pending
+npx urthreads approve 1 --execute
+npx urthreads reject 1 --execute
 ```
+
+The legacy shorthand helper still works for common direct-D1 moderation tasks:
+
+```sh
+./comments pending
+./comments show 1
+./comments approve 1
+./comments reject 1
+```
+
+If you add the repository root to your shell `PATH`, the same helper can be run as `comments pending`.
 
 To disable comments, leave both `COMMENTS_ENDPOINT` and `LIKES_ENDPOINT` blank, or remove `comments.endpoint` from the rendered config.
 
 ## Engagement Worker
 
-Likes and comments are optional and are enabled when their endpoints are set in `.env` or in the GitHub Actions variables. The site uses a small Cloudflare Worker instead of a full backend server, which keeps the main website deployable as a static GitHub Pages site.
+Likes and comments are optional and are enabled when their endpoints are set in `.env` or in the GitHub Actions variables. The site uses `urthreads` on Cloudflare Workers instead of a full backend server, which keeps the main website deployable as a static GitHub Pages site.
 
 The frontend:
 
@@ -189,34 +202,39 @@ The frontend:
 - Disables the button after a successful like from that browser.
 - Shows a fallback unavailable state if the Worker cannot be reached.
 
-The backend lives in `workers/likes-worker.js` and exposes these routes:
+The backend is provided by `urthreads` through `workers/urthreads-worker.js` and exposes these public routes:
 
 ```text
 GET  /likes?path=/post-url
 POST /likes?path=/post-url
 GET  /comments?path=/post-url
 POST /comments
+GET  /comments/like?commentId=123
+POST /comments/like?commentId=123
 ```
 
-The Worker validates that `path` starts with `/`, reads or updates the like count, reads approved comments, and stores new comments as pending. Data is stored in Cloudflare D1 using the `post_likes` and `post_comments` tables from `workers/schema.sql`.
+The Worker validates that `path` starts with `/`, reads or updates the like count, reads approved comments, and stores new comments as pending. Data is stored in Cloudflare D1 using `urthreads` tables. Existing installations should run `npm run d1:backup` before `npm run d1:migrate:urthreads`; the migration is additive and keeps existing `post_likes` and `post_comments` rows.
 
 The Worker expects:
 
 - A Cloudflare D1 binding named `DB`.
 - An `ALLOWED_ORIGINS` variable containing the site origin, for example `https://3m1ry33t.github.io`.
-- The `post_likes` and `post_comments` tables created before deployment.
+- `ADMIN_API_KEY` stored as a Worker secret for the `urthreads` dashboard and admin routes.
+- The `urthreads` schema created or migrated before deployment.
 
 Basic deployment flow:
 
 ```sh
-wrangler d1 create portfolio-likes
-wrangler d1 execute portfolio-likes --remote --file=workers/schema.sql
-wrangler deploy
+npm install
+npm run d1:backup
+npm run d1:migrate:urthreads
+npx urthreads admin-key --expires never
+npx wrangler deploy
 ```
 
 Use `wrangler.toml.example` as the starting point for local Worker configuration. Keep the real `wrangler.toml` out of version control because it can contain deployment-specific IDs.
 
-The like system is intentionally lightweight. It prevents repeat likes with browser `localStorage`, but it is not meant to be abuse-proof like an account-based voting system. Comments are moderated through D1 status updates rather than a public admin dashboard.
+The like system is intentionally lightweight. It prevents repeat likes with browser `localStorage`, but it is not meant to be abuse-proof like an account-based voting system. Comments can be moderated through the `urthreads` CLI, direct D1 updates, or the `urthreads` dashboard.
 
 ## Use as a Template
 

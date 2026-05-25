@@ -1,28 +1,11 @@
-CREATE TABLE IF NOT EXISTS post_likes (
-  path TEXT PRIMARY KEY,
-  count INTEGER NOT NULL DEFAULT 0 CHECK (count >= 0),
-  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+-- Additive migration for moving this site's existing D1 data to urthreads.
+-- Run against the existing D1 database after taking a backup.
+-- Do not drop or recreate post_likes or post_comments; they contain live data.
 
-CREATE TABLE IF NOT EXISTS post_comments (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  path TEXT NOT NULL,
-  parent_id INTEGER,
-  page_url TEXT NOT NULL,
-  page_title TEXT NOT NULL,
-  author_name TEXT NOT NULL,
-  author_email TEXT,
-  author_website TEXT,
-  content TEXT NOT NULL,
-  likes_count INTEGER NOT NULL DEFAULT 0 CHECK (likes_count >= 0),
-  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
-  hidden_at TEXT,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX IF NOT EXISTS post_comments_path_status_created_idx
-  ON post_comments (path, status, created_at);
+ALTER TABLE post_comments ADD COLUMN parent_id INTEGER;
+ALTER TABLE post_comments ADD COLUMN author_website TEXT;
+ALTER TABLE post_comments ADD COLUMN likes_count INTEGER NOT NULL DEFAULT 0 CHECK (likes_count >= 0);
+ALTER TABLE post_comments ADD COLUMN hidden_at TEXT;
 
 CREATE INDEX IF NOT EXISTS post_comments_parent_idx
   ON post_comments (parent_id);

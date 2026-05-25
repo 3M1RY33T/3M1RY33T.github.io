@@ -1,31 +1,41 @@
 # Blog Engagement Worker
 
-This Worker powers the no-account blog like buttons and the moderated comment section. It exposes:
+This Worker uses [`urthreads`](https://github.com/3M1RY33T/urthreads) to power no-account blog like buttons, moderated comments, threaded replies, comment likes, and admin tooling. The local wrapper is `workers/urthreads-worker.js`. It exposes:
 
 - `GET /likes?path=/post-url`
 - `POST /likes?path=/post-url`
 - `GET /comments?path=/post-url`
 - `POST /comments`
+- `GET /comments/like?commentId=123`
+- `POST /comments/like?commentId=123`
 
 ## Deploy
 
-1. Create the D1 database:
+1. Install dependencies:
+
+   ```sh
+   npm install
+   ```
+
+2. Create the D1 database for a new site:
 
    ```sh
    wrangler d1 create portfolio-likes
    ```
 
-2. Copy `wrangler.toml.example` to `wrangler.toml`:
+   For an existing site, keep the current D1 database so likes and comments remain intact.
+
+3. Copy `wrangler.toml.example` to `wrangler.toml`:
 
    ```sh
    cp wrangler.toml.example wrangler.toml
    ```
 
-3. Copy the returned `database_id` into `wrangler.toml`.
+4. Copy the returned or existing `database_id` into `wrangler.toml`.
 
-   The D1 binding must be named `DB`, because `workers/likes-worker.js` reads `env.DB`.
+   The D1 binding must be named `DB`, because `urthreads` reads `env.DB`.
 
-4. Set `ALLOWED_ORIGINS` in `wrangler.toml`.
+5. Set `ALLOWED_ORIGINS` in `wrangler.toml`.
 
    Include your production site and local Jekyll URL:
 
@@ -34,21 +44,38 @@ This Worker powers the no-account blog like buttons and the moderated comment se
    ALLOWED_ORIGINS = "https://your-username.github.io,http://localhost:4000,http://127.0.0.1:4000"
    ```
 
-5. Create the tables:
+6. Create or migrate the tables.
+
+   For a new database, use the schema shipped by `urthreads`:
 
    ```sh
-   wrangler d1 execute portfolio-likes --remote --file=workers/schema.sql
+   wrangler d1 execute portfolio-likes --remote --file=node_modules/urthreads/src/schema.sql
    ```
 
-   The `--remote` flag is important. Without it, Wrangler may create the table only in your local development D1 database, while the deployed Worker continues to fail against the remote database.
-
-6. Deploy the Worker:
+   For an existing database, back up the current rows and apply the additive migration:
 
    ```sh
-   wrangler deploy
+   npm run d1:backup
+   npm run d1:migrate:urthreads
    ```
 
-7. Add the Worker URL to your site config.
+   The `--remote` flag is important. Without it, Wrangler may change only your local development D1 database, while the deployed Worker continues to use the remote database.
+
+7. Generate and store an admin key:
+
+   ```sh
+   npx urthreads admin-key --expires never
+   ```
+
+   When prompted, store `ADMIN_API_KEY` as a Worker secret. The raw key is written only to the ignored `.env` file and copied to your clipboard when available.
+
+8. Deploy the Worker:
+
+   ```sh
+   npx wrangler deploy
+   ```
+
+9. Add the Worker URL to your site config.
 
    For local development, set this in `.env`:
 
@@ -80,6 +107,25 @@ This Worker powers the no-account blog like buttons and the moderated comment se
 
 New comments are saved with `pending` status. The public API only returns `approved` comments.
 
+Use the `urthreads` CLI for common moderation actions:
+
+```sh
+npx urthreads pending
+npx urthreads approve 1 --execute
+npx urthreads reject 1 --execute
+```
+
+The legacy local helper still works for direct-D1 moderation:
+
+```sh
+./comments pending
+./comments show 1
+./comments approve 1
+./comments reject 1
+```
+
+If you add the repository root to your shell `PATH`, the same helper can be run as `comments pending`.
+
 List pending comments:
 
 ```sh
@@ -103,7 +149,7 @@ wrangler d1 execute portfolio-likes --remote --command "UPDATE post_comments SET
 - If the like buttons do not render, confirm `LIKES_ENDPOINT` is set before Jekyll builds.
 - If comments do not render, confirm `LIKES_ENDPOINT` is set before Jekyll builds, or set `COMMENTS_ENDPOINT` explicitly.
 - If the buttons render but disable themselves, check the Worker response in the browser console.
-- If the Worker returns `500` or Cloudflare `error code: 1101`, check that the D1 binding is named `DB`, the database ID is correct, and `workers/schema.sql` has been applied.
+- If the Worker returns `500` or Cloudflare `error code: 1101`, check that the D1 binding is named `DB`, the database ID is correct, and the `urthreads` schema or migration has been applied.
 - If `wrangler d1 execute` says `Resource location: local`, rerun it with `--remote`.
 - If the browser reports a CORS error, add your site origin to `ALLOWED_ORIGINS`.
 

@@ -1,0 +1,15 @@
+{
+  "name": "3m1ry33t-github-io",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "d1:backup": "node scripts/backup-d1.js",
+    "d1:migrate:urthreads": "node scripts/migrate-urthreads-d1.js"
+  },
+  "dependencies": {
+    "urthreads": "^1.0.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.18.0"
+  }
+}
