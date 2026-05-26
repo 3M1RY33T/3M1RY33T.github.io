@@ -25,7 +25,7 @@ tensor-serve config set-search-profile balanced
 
 # Production (enterprise servers, large-scale)
 tensor-serve config set-search-profile production
-```
+```Y
 
 ### View Available Profiles
 

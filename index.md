@@ -9,7 +9,7 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
     <h1>About <span class="accent">Me</span></h1>
     <!-- <h1>Yigit <span class="accent">(Emir)</span> Yildiz</h1> -->
     <p class="eyebrow">Software Engineer · Full-stack · AI · Mobile</p>
-    <p class="intro">I build full-stack web and mobile applications, AI-powered tools, and developer-focused services. My work combines Go, Vue.js, React, .NET, Flutter, PostgreSQL, and practical AI integrations.</p>
+    <p class="intro">I'm a Software Engineer from Istanbul, Turkey living in Toronto, Ontario with a passion for building scalable, open-source solutions free for everyone to use. I have a diverse tech stack spanning full-stack development, AI/ML systems, and mobile applications.</p>
     <a class="hero-gravatar-compact" href="https://gravatar.com/pleasantwitchcd83be3d56" target="_blank" rel="noopener noreferrer" aria-label="View Yigit Yildiz on Gravatar">
       <img src="https://1.gravatar.com/avatar/acbc4f96261335fc2e541a294927b481a49ec1fa62bf3bf14fc2239b2ae7ac9d?s=160" alt="Yigit Yildiz">
       <span>
@@ -64,11 +64,20 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
             {% for line in post_lines %}
               {% assign trimmed_line = line | strip %}
               {% assign first_char = trimmed_line | slice: 0 %}
-              {% unless trimmed_line == "" or first_char == "#" %}
-                {% assign featured_content = featured_content | append: " " | append: trimmed_line %}
+              {% unless trimmed_line == "" %}
+                {% if first_char == "#" %}
+                  {% assign heading_text = trimmed_line | remove: "#" | strip %}
+                  {% assign featured_content = featured_content | append: " <strong>" | append: heading_text | append: ":</strong>" %}
+                {% elsif trimmed_line contains "<h1" or trimmed_line contains "<h2" or trimmed_line contains "<h3" or trimmed_line contains "<h4" or trimmed_line contains "<h5" or trimmed_line contains "<h6" %}
+                  {% assign heading_text = trimmed_line | strip_html | strip %}
+                  {% assign featured_content = featured_content | append: " <strong>" | append: heading_text | append: ":</strong>" %}
+                {% else %}
+                  {% assign line_text = trimmed_line | strip_html %}
+                  {% assign featured_content = featured_content | append: " " | append: line_text %}
+                {% endif %}
               {% endunless %}
             {% endfor %}
-            <p>{{ featured_content | markdownify | strip_html | normalize_whitespace | truncate: 220 }}</p>
+            <div class="featured-post-excerpt">{{ featured_content | normalize_whitespace }}</div>
           {% if likes_endpoint != "" %}
             <div class="post-engagement">
               <button class="like-button" type="button" data-like-button data-path="{{ post.url }}" aria-label="Like {{ post.title | escape }}" aria-pressed="false">
@@ -106,17 +115,17 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
   <h2>Projects</h2>
   <div class="card-grid">
     <article class="card project-card">
-      <h3>TSRC</h3>
-      <p class="meta">Coming Soon</p>
-      <p>Tensor-powered code editor / browser. Fetch any website domain, build a local semantic database from it, and your AI will be fine-tuned for the specific skills you need.</p>
-      <a class="project-card-link" target="_blank" rel="noopener noreferrer" aria-label="Soon on GitHub">
+      <h3>urthreads</h3>
+      <p class="meta">May 2026</p>
+      <p>urthreads is self-hosted software for adding engagement features to static websites. Simply deploy the Worker to your own Cloudflare account, connect it to your own D1 database, and manage the dashboard with your own admin key.</p>
+      <a class="project-card-link" href="https://github.com/3M1RY33T/urthreads" target="_blank" rel="noopener noreferrer" aria-label="View urthreads on GitHub">
         <img src="/assets/svg/github.svg" alt="" aria-hidden="true">
-        <span>Soon available on GitHub</span>
+        <span>View Project on GitHub</span>
       </a>
     </article>
     <article class="card project-card">
       <h3>Tensor (Serve)</h3>
-      <p class="meta">May 2026</p>
+      <p class="meta">April 2026</p>
       <p>ZIM-based retrieval-augmented proxy for OpenAI-compatible AI models. Downloads ZIM documentation, builds a semantic vector database, and combines keyword + semantic search for more accurate AI responses.</p>
       <a class="project-card-link" href="https://github.com/3M1RY33T/tensor-serve" target="_blank" rel="noopener noreferrer" aria-label="View Tensor Serve on GitHub">
         <img src="/assets/svg/github.svg" alt="" aria-hidden="true">
@@ -158,93 +167,117 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
   <input class="skills-toggle" type="checkbox" id="skills-toggle" aria-label="Toggle full skills list">
   <div class="skills-grid">
     <div>
-      <img class="icon" src="/assets/svg/flutter.svg" width="100" height="100"> 
-      <h3 class="skill-header">Flutter</h3>
-    </div>
-    <div>
-      <img class="icon" src="/assets/svg/android-studio.svg" width="100" height="100"> 
-      <h3 class="skill-header">Android Studio</h3>
-    </div>
-    <div>
-      <img class="icon" src="/assets/svg/react-native.svg" width="100" height="100"> 
-      <h3 class="skill-header">React Native</h3>
-    </div>
-    <div>
-      <img class="cropped-icon" src="/assets/svg/go.svg" width="100" height="100"> 
-      <h3 class="skill-header">Go</h3>
-    </div>
-    <div>
-      <img class="icon" src="/assets/svg/c.svg" width="100" height="100"> 
-      <h3 class="skill-header">C/C++</h3>
-    </div>
-    <div>
-      <img class="icon" src="/assets/svg/python.svg" width="100" height="100"> 
+      <img class="icon" src="/assets/svg/python.svg" width="100" height="100">
       <h3 class="skill-header">Python</h3>
     </div>
     <div>
-      <img class="icon" src="/assets/svg/java.svg" width="100" height="100"> 
-      <h3 class="skill-header">Java</h3>
-    </div>
-    <div>
-      <img class="icon" src="/assets/svg/js.svg" width="100" height="100"> 
+      <img class="icon" src="/assets/svg/js.svg" width="100" height="100">
       <h3 class="skill-header">JavaScript</h3>
     </div>
     <div>
-      <img class="icon" src="/assets/svg/vue.svg" width="100" height="100"> 
-      <h3 class="skill-header">Vue</h3>
-    </div>
-    <div>
-      <img class="icon" src="/assets/svg/react.svg" width="100" height="100"> 
-      <h3 class="skill-header">React</h3>
-    </div>
-    <div>
-      <img class="icon" src="/assets/svg/angular.svg" width="100" height="100"> 
-      <h3 class="skill-header">Angular</h3>
-    </div>
-    <div>
-      <img class="icon" src="/assets/svg/typescript.svg" width="100" height="100"> 
+      <img class="icon" src="/assets/svg/typescript.svg" width="100" height="100">
       <h3 class="skill-header">TypeScript</h3>
     </div>
     <div>
-      <img class="icon" src="/assets/svg/dotnet.svg" width="100" height="100"> 
-      <h3 class="skill-header">.Net</h3>
+      <img class="icon" src="/assets/svg/java.svg" width="100" height="100">
+      <h3 class="skill-header">Java</h3>
     </div>
     <div>
-      <img class="icon" src="/assets/svg/postgre.svg" width="100" height="100"> 
-      <h3 class="skill-header">PostgreSQL</h3>
+      <img class="icon" src="/assets/svg/c.svg" width="100" height="100">
+      <h3 class="skill-header">C/C++</h3>
     </div>
     <div>
-      <img class="icon" src="/assets/svg/mssql.svg" width="100" height="100"> 
-      <h3 class="skill-header">Microsoft SQL Server</h3>
+      <img class="icon" src="/assets/svg/csharp.svg" width="100" height="100">
+      <h3 class="skill-header">C#</h3>
     </div>
     <div>
-      <img class="icon" src="/assets/svg/mysql.svg" width="100" height="100"> 
-      <h3 class="skill-header">MySQL</h3>
+      <img class="cropped-icon" src="/assets/svg/go.svg" width="100" height="100">
+      <h3 class="skill-header">Go</h3>
     </div>
     <div>
-      <img class="icon" src="/assets/svg/mongo.svg" width="100" height="100"> 
-      <h3 class="skill-header">MongoDB</h3>
+      <img class="cropped-icon" src="/assets/svg/kotlin.svg" width="180" height="100">
+      <h3 class="skill-header">Kotlin</h3>
     </div>
     <div>
-      <img class="icon" src="/assets/svg/firebase.svg" width="100" height="100"> 
+      <img class="icon" src="/assets/svg/flutter.svg" width="100" height="100">
+      <h3 class="skill-header">Flutter</h3>
+    </div>
+    <div>
+      <img class="icon" src="/assets/svg/react-native.svg" width="100" height="100">
+      <h3 class="skill-header">React Native</h3>
+    </div>
+    <div>
+      <img class="icon" src="/assets/svg/android-studio.svg" width="100" height="100">
+      <h3 class="skill-header">Android Studio</h3>
+    </div>
+    <div>
+      <img class="icon" src="/assets/svg/firebase.svg" width="100" height="100">
       <h3 class="skill-header">Firebase</h3>
     </div>
     <div>
-      <img class="icon" src="/assets/svg/git.svg" width="100" height="100"> 
+      <img class="icon" src="/assets/svg/react.svg" width="100" height="100">
+      <h3 class="skill-header">React</h3>
+    </div>
+    <div>
+      <img class="icon" src="/assets/svg/angular.svg" width="100" height="100">
+      <h3 class="skill-header">Angular</h3>
+    </div>
+    <div>
+      <img class="icon" src="/assets/svg/vue.svg" width="100" height="100">
+      <h3 class="skill-header">Vue</h3>
+    </div>
+    <div>
+      <img class="icon" src="/assets/svg/dotnet.svg" width="100" height="100">
+      <h3 class="skill-header">.Net</h3>
+    </div>
+    <div>
+      <img class="icon" src="/assets/svg/git.svg" width="100" height="100">
       <h3 class="skill-header">Git</h3>
     </div>
-    <!-- <div>
-      <img class="icon" src="/assets/svg/microsoft.svg" width="100" height="100"> 
+    <div>
+      <img class="icon" src="/assets/svg/postgre.svg" width="100" height="100">
+      <h3 class="skill-header">PostgreSQL</h3>
+    </div>
+    <div>
+      <img class="icon" src="/assets/svg/mysql.svg" width="100" height="100">
+      <h3 class="skill-header">MySQL</h3>
+    </div>
+    <div>
+      <img class="icon" src="/assets/svg/mssql.svg" width="100" height="100">
+      <h3 class="skill-header">Microsoft SQL Server</h3>
+    </div>
+    <div>
+      <img class="icon" src="/assets/svg/mongo.svg" width="100" height="100">
+      <h3 class="skill-header">MongoDB</h3>
+    </div>
+    <div>
+      <img class="icon" src="/assets/svg/docker.svg" width="100" height="100">
+      <h3 class="skill-header">Docker</h3>
+    </div>
+    <div>
+      <img class="icon" src="/assets/svg/aws.svg" width="100" height="100">
+      <h3 class="skill-header">AWS</h3>
+    </div>
+    <div>
+      <img class="icon" src="/assets/svg/cloudflare.svg" width="100" height="100">
+      <h3 class="skill-header">Cloudflare</h3>
+    </div>
+    <div>
+      <img class="icon" src="/assets/svg/shopify.svg" width="100" height="100">
+      <h3 class="skill-header">Shopify</h3>
+    </div>
+    <div>
+      <img class="icon" src="/assets/svg/microsoft.svg" width="100" height="100">
       <h3 class="skill-header">Windows</h3>
     </div>
     <div>
-      <img class="icon" src="/assets/svg/apple.svg" width="100" height="100"> 
+      <img class="icon" src="/assets/svg/apple.svg" width="100" height="100">
       <h3 class="skill-header">MacOS</h3>
     </div>
     <div>
-      <img class="icon" src="/assets/svg/linux.svg" width="100" height="100"> 
+      <img class="icon" src="/assets/svg/linux.svg" width="100" height="100">
       <h3 class="skill-header">Linux</h3>
-    </div> -->
+    </div>
   </div>
   <label class="skills-toggle-control" for="skills-toggle">
     <span class="skills-toggle-more">Show more skills</span>

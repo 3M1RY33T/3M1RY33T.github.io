@@ -44,7 +44,6 @@ layout: default
     <h2 id="comments-title">Comments</h2>
     {% if comments_endpoint != "" %}
       <div class="comment-list" data-comment-list></div>
-      <p class="comment-prompt">Make a comment below.</p>
       <form class="comment-draft-form{% if likes_endpoint != "" %} has-like-button{% endif %}" data-comment-draft-form>
         <label class="sr-only" for="comment-content">Comment</label>
         {% if likes_endpoint != "" %}

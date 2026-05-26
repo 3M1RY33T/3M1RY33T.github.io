@@ -26,22 +26,27 @@ excerpt: "Blog posts and technical updates from Yigit (Emir) Yildiz."
       <article class="feed-post" data-feed-post>
         <header class="feed-post-header">
           <img class="feed-avatar" src="https://1.gravatar.com/avatar/acbc4f96261335fc2e541a294927b481a49ec1fa62bf3bf14fc2239b2ae7ac9d?s=96" alt="Yigit Yildiz">
-          <div>
-            <p class="feed-author">Yigit Yildiz</p>
-            <p class="post-meta">{{ post.date | date: "%B %-d, %Y" }}</p>
+          <div class="feed-post-header-content">
+            <div class="feed-post-titlebar">
+              <div>
+                <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+                <p class="feed-author">By Yigit Yildiz</p>
+              </div>
+              <div class="feed-post-meta-stack">
+                <p class="post-meta">{{ post.date | date: "%B %-d, %Y" }}</p>
+                {% if post.tags %}
+                  <ul class="post-tags" aria-label="Post tags">
+                    {% for tag in post.tags %}
+                      <li class="tag-{{ tag | slugify }}">{{ tag | capitalize }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+            </div>
           </div>
         </header>
 
         <div class="feed-post-body">
-          <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
-          {% if post.tags %}
-            <ul class="post-tags" aria-label="Post tags">
-              {% for tag in post.tags %}
-                <li class="tag-{{ tag | slugify }}">{{ tag | capitalize }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-
           <div class="feed-post-content" data-feed-post-content>
             {{ post.content }}
           </div>
@@ -64,7 +69,6 @@ excerpt: "Blog posts and technical updates from Yigit (Emir) Yildiz."
         >
           {% if comments_endpoint != "" %}
             <div class="comment-list" data-comment-list></div>
-            <p class="comment-prompt">Make a comment below.</p>
             <form class="comment-draft-form{% if likes_endpoint != "" %} has-like-button{% endif %}" data-comment-draft-form>
               <label class="sr-only" for="comment-content-{{ forloop.index }}">Comment</label>
               {% if likes_endpoint != "" %}

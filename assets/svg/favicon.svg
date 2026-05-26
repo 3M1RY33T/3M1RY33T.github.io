@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="My">
+  <style>
+    .my-text {
+      fill: #2563eb;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .my-text {
+        fill: #60a5fa;
+      }
+    }
+  </style>
+  <path class="my-text" d="M12 44V20h7.2l6.9 10.7L33 20h7.2v24h-7V31.1L27.9 39h-3.6L19 31.1V44h-7Z"/>
+  <path class="my-text" d="M43.7 50.2c2.6 0 4.1-1.2 5-3.7l.3-.8-7.5-18.9h7.3l3.7 11.3 3.4-11.3h7L55.3 47c-2 5.4-5.2 8-10.6 8-2 0-3.8-.4-5.1-1.1l1.8-5.2c.7.4 1.5.7 2.3.7Z"/>
+</svg>

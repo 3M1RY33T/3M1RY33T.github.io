@@ -6,6 +6,8 @@
     <meta name="theme-color" content="#111827" />
     <title>{{ page.title | default: site.title }}</title>
     <meta name="description" content="{{ page.excerpt | strip_html | strip_newlines | default: site.description }}">
+    <link rel="icon" href="/assets/svg/favicon.svg" type="image/svg+xml" />
+    <link rel="mask-icon" href="/assets/svg/favicon.svg" color="#2563eb" />
     <link rel="stylesheet" href="/assets/css/style.css" />
   </head>
   <body>
@@ -27,7 +29,7 @@
       </div>
     </header>
 
-    <main class="container">
+    <main class="container{% if page.url == '/blog/' %} blog-container{% endif %}">
       {{ content }}
     </main>
 
@@ -92,6 +94,17 @@
         const likeButtons = Array.from(document.querySelectorAll("[data-like-button]"));
         const likedStoragePrefix = "portfolio-liked:";
 
+        const normalizeLikePath = (value) => {
+          const rawPath = String(value || "").trim();
+          if (!rawPath) return "";
+
+          try {
+            return new URL(rawPath, window.location.origin).pathname || rawPath;
+          } catch (error) {
+            return rawPath;
+          }
+        };
+
         const normalizeCount = (value) => {
           const count = Number(value);
           return Number.isFinite(count) && count >= 0 ? count : 0;
@@ -105,6 +118,14 @@
           button.disabled = liked;
         };
 
+        const setLikeButtonsForPath = (path, count, liked) => {
+          likeButtons.forEach((button) => {
+            if (button.dataset.normalizedPath === path) {
+              setLikeButton(button, count, liked);
+            }
+          });
+        };
+
         const getLiked = (path) => {
           try {
             return window.localStorage.getItem(`${likedStoragePrefix}${path}`) === "true";
@@ -113,9 +134,13 @@
           }
         };
 
-        const setLiked = (path) => {
+        const setLiked = (path, liked = true) => {
           try {
-            window.localStorage.setItem(`${likedStoragePrefix}${path}`, "true");
+            if (liked) {
+              window.localStorage.setItem(`${likedStoragePrefix}${path}`, "true");
+            } else {
+              window.localStorage.removeItem(`${likedStoragePrefix}${path}`);
+            }
           } catch (error) {
             // Likes still work without localStorage; this only prevents repeat clicks per browser.
           }
@@ -136,15 +161,16 @@
         };
 
         likeButtons.forEach(async (button) => {
-          const path = button.dataset.path;
+          const path = normalizeLikePath(button.dataset.path);
           if (!path) return;
+          button.dataset.normalizedPath = path;
 
           const liked = getLiked(path);
           setLikeButton(button, 0, liked);
 
           try {
             const payload = await requestLikes(path);
-            setLikeButton(button, payload.count, liked);
+            setLikeButton(button, payload.count, getLiked(path));
           } catch (error) {
             button.disabled = true;
             button.title = "Likes are unavailable right now.";
@@ -154,14 +180,15 @@
             if (getLiked(path)) return;
 
             const currentCount = normalizeCount(button.querySelector("[data-like-count]")?.textContent);
-            setLikeButton(button, currentCount + 1, true);
+            setLiked(path);
+            setLikeButtonsForPath(path, currentCount + 1, true);
 
             try {
               const payload = await requestLikes(path, { method: "POST" });
-              setLiked(path);
-              setLikeButton(button, payload.count, true);
+              setLikeButtonsForPath(path, payload.count, true);
             } catch (error) {
-              setLikeButton(button, currentCount, false);
+              setLiked(path, false);
+              setLikeButtonsForPath(path, currentCount, false);
               button.title = "Your like could not be saved right now.";
             }
           });
@@ -204,8 +231,85 @@
       document.querySelectorAll("[data-feed-post]").forEach((post) => {
         const content = post.querySelector("[data-feed-post-content]");
         const button = post.querySelector("[data-show-more]");
+        const actions = post.querySelector(".feed-post-actions");
 
         if (!content || !button) return;
+
+        const mediaItems = [];
+        const hiddenMediaElements = new Set();
+        const isSliderImage = (image) => {
+          const source = image.currentSrc || image.src || image.getAttribute("src") || "";
+          const path = source.split("?")[0].split("#")[0].toLowerCase();
+          return /\.(avif|gif|jpe?g|png|webp)$/.test(path);
+        };
+
+        content.querySelectorAll("img").forEach((image) => {
+          if (image.closest(".feed-post-media")) return;
+          if (!isSliderImage(image)) return;
+
+          mediaItems.push({
+            alt: image.alt || "",
+            caption: image.getAttribute("title") || image.dataset.caption || "",
+            src: image.currentSrc || image.src || image.getAttribute("src") || "",
+          });
+
+          const slider = image.closest("[data-post-slider]");
+          const figure = image.closest("figure");
+          const paragraph = image.closest("p");
+          const wrapper = slider || figure || (
+            paragraph && paragraph.textContent.trim() === "" && paragraph.querySelectorAll("img").length === 1
+              ? paragraph
+              : image
+          );
+
+          hiddenMediaElements.add(wrapper);
+        });
+
+        hiddenMediaElements.forEach((element) => {
+          element.classList.add("feed-post-inline-media");
+        });
+
+        if (mediaItems.length === 1 && actions) {
+          const item = mediaItems[0];
+          const media = document.createElement("figure");
+          media.className = "feed-post-media feed-post-single-media";
+
+          const mediaFrame = document.createElement("div");
+          mediaFrame.className = "post-slider-media";
+
+          const image = document.createElement("img");
+          image.src = item.src;
+          image.alt = item.alt;
+          image.loading = "lazy";
+          mediaFrame.append(image);
+          media.append(mediaFrame);
+
+          if (item.caption) {
+            const figcaption = document.createElement("figcaption");
+            figcaption.textContent = item.caption;
+            media.append(figcaption);
+          }
+
+          content.before(media);
+        } else if (mediaItems.length > 1 && actions) {
+          const media = document.createElement("figure");
+          media.className = "feed-post-media";
+          media.dataset.postSlider = "";
+          media.setAttribute("aria-label", `${post.querySelector("h2")?.textContent || "Post"} media`);
+          media.tabIndex = 0;
+
+          mediaItems.forEach((item) => {
+            if (!item.src) return;
+            const image = document.createElement("img");
+            image.src = item.src;
+            image.alt = item.alt;
+            image.loading = "lazy";
+            if (item.caption) image.title = item.caption;
+            media.append(image);
+          });
+
+          content.before(media);
+        }
 
         const canExpand = content.scrollHeight > content.clientHeight + 4;
         if (!canExpand) {
@@ -219,6 +323,190 @@
           button.textContent = isExpanded ? "Show less" : "Show more";
           button.setAttribute("aria-expanded", String(isExpanded));
         });
+      });
+
+      document.querySelectorAll("[data-post-slider]").forEach((slider) => {
+        const buildSliderFromImages = () => {
+          if (slider.querySelector("[data-slider-slide]")) return;
+
+          const images = Array.from(slider.querySelectorAll("img"));
+          if (images.length === 0) return;
+
+          const viewport = document.createElement("div");
+          viewport.className = "post-slider-viewport";
+
+          const track = document.createElement("div");
+          track.className = "post-slider-track";
+          track.dataset.sliderTrack = "";
+
+          images.forEach((image, index) => {
+            const slide = document.createElement("div");
+            slide.className = "post-slider-slide";
+            slide.dataset.sliderSlide = "";
+            slide.hidden = index !== 0;
+
+            const media = document.createElement("div");
+            media.className = "post-slider-media";
+            const clonedImage = image.cloneNode(true);
+            clonedImage.loading = clonedImage.loading || "lazy";
+            media.append(clonedImage);
+            slide.append(media);
+
+            const caption = image.getAttribute("title") || image.dataset.caption || "";
+            if (caption) {
+              const figcaption = document.createElement("figcaption");
+              figcaption.textContent = caption;
+              slide.append(figcaption);
+            }
+
+            track.append(slide);
+          });
+
+          const prevButton = document.createElement("button");
+          prevButton.className = "post-slider-control post-slider-prev";
+          prevButton.type = "button";
+          prevButton.dataset.sliderPrev = "";
+          prevButton.setAttribute("aria-label", "Previous image");
+          prevButton.innerHTML = '<span aria-hidden="true"></span>';
+
+          const nextButton = document.createElement("button");
+          nextButton.className = "post-slider-control post-slider-next";
+          nextButton.type = "button";
+          nextButton.dataset.sliderNext = "";
+          nextButton.setAttribute("aria-label", "Next image");
+          nextButton.innerHTML = '<span aria-hidden="true"></span>';
+
+          const footer = document.createElement("div");
+          footer.className = "post-slider-footer";
+
+          const dots = document.createElement("div");
+          dots.className = "post-slider-dots";
+          dots.dataset.sliderDots = "";
+          dots.setAttribute("aria-label", `${slider.getAttribute("aria-label") || "Image gallery"} navigation`);
+
+          const status = document.createElement("p");
+          status.className = "post-slider-status";
+          status.dataset.sliderStatus = "";
+          status.setAttribute("aria-live", "polite");
+
+          viewport.append(track, prevButton, nextButton);
+          footer.append(dots, status);
+          slider.classList.add("post-slider");
+          if (!slider.hasAttribute("tabindex")) slider.tabIndex = 0;
+          slider.replaceChildren(viewport, footer);
+        };
+
+        buildSliderFromImages();
+
+        const slides = Array.from(slider.querySelectorAll("[data-slider-slide]"));
+        const prevButton = slider.querySelector("[data-slider-prev]");
+        const nextButton = slider.querySelector("[data-slider-next]");
+        const dots = slider.querySelector("[data-slider-dots]");
+        const status = slider.querySelector("[data-slider-status]");
+        const viewport = slider.querySelector(".post-slider-viewport");
+        let activeIndex = 0;
+
+        if (slides.length === 0) return;
+
+        const setActiveSlide = (nextIndex) => {
+          activeIndex = (nextIndex + slides.length) % slides.length;
+          slides.forEach((slide, index) => {
+            slide.hidden = index !== activeIndex;
+          });
+          dots?.querySelectorAll("[data-slider-dot]").forEach((dot, index) => {
+            const isActive = index === activeIndex;
+            dot.classList.toggle("is-active", isActive);
+            dot.setAttribute("aria-current", isActive ? "true" : "false");
+          });
+          if (status) {
+            status.textContent = `${activeIndex + 1} of ${slides.length}`;
+          }
+        };
+
+        if (slides.length < 2) {
+          prevButton?.setAttribute("hidden", "");
+          nextButton?.setAttribute("hidden", "");
+          if (status) status.textContent = "1 of 1";
+          return;
+        }
+
+        slides.forEach((slide, index) => {
+          const dot = document.createElement("button");
+          dot.className = "post-slider-dot";
+          dot.type = "button";
+          dot.dataset.sliderDot = String(index);
+          dot.setAttribute("aria-label", `Show image ${index + 1}`);
+          dot.addEventListener("click", () => setActiveSlide(index));
+          dots?.append(dot);
+        });
+
+        prevButton?.addEventListener("click", () => setActiveSlide(activeIndex - 1));
+        nextButton?.addEventListener("click", () => setActiveSlide(activeIndex + 1));
+
+        if (viewport) {
+          let dragStartX = 0;
+          let dragStartY = 0;
+          let dragCurrentX = 0;
+          let dragPointerId = null;
+          let isDragging = false;
+
+          const resetDrag = () => {
+            dragPointerId = null;
+            isDragging = false;
+            viewport.classList.remove("is-dragging");
+          };
+
+          viewport.addEventListener("pointerdown", (event) => {
+            if (!event.isPrimary || event.target.closest("button")) return;
+
+            dragPointerId = event.pointerId;
+            dragStartX = event.clientX;
+            dragStartY = event.clientY;
+            dragCurrentX = event.clientX;
+            isDragging = false;
+            viewport.setPointerCapture?.(event.pointerId);
+          });
+
+          viewport.addEventListener("pointermove", (event) => {
+            if (dragPointerId !== event.pointerId) return;
+
+            dragCurrentX = event.clientX;
+            const deltaX = dragCurrentX - dragStartX;
+            const deltaY = event.clientY - dragStartY;
+
+            if (!isDragging && Math.abs(deltaX) < 10) return;
+            if (!isDragging && Math.abs(deltaY) > Math.abs(deltaX)) {
+              resetDrag();
+              return;
+            }
+
+            isDragging = true;
+            viewport.classList.add("is-dragging");
+            event.preventDefault();
+          });
+
+          viewport.addEventListener("pointerup", (event) => {
+            if (dragPointerId !== event.pointerId) return;
+
+            const deltaX = dragCurrentX - dragStartX;
+            const threshold = Math.max(44, viewport.clientWidth * 0.14);
+
+            if (isDragging && Math.abs(deltaX) >= threshold) {
+              setActiveSlide(activeIndex + (deltaX < 0 ? 1 : -1));
+            }
+
+            resetDrag();
+          });
+
+          viewport.addEventListener("pointercancel", resetDrag);
+        }
+
+        slider.addEventListener("keydown", (event) => {
+          if (event.key === "ArrowLeft") setActiveSlide(activeIndex - 1);
+          if (event.key === "ArrowRight") setActiveSlide(activeIndex + 1);
+        });
+
+        setActiveSlide(0);
       });
 
       document.querySelectorAll("[data-contact-form]").forEach((form) => {

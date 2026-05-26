@@ -1,0 +1,35 @@
+{% assign slider_slides = include.slides | split: ";" %}
+{% assign slider_label = include.label | default: "Image gallery" %}
+
+<figure class="post-slider" data-post-slider aria-label="{{ slider_label | escape }}" tabindex="0">
+  <div class="post-slider-viewport">
+    <div class="post-slider-track" data-slider-track>
+      {% for slide in slider_slides %}
+        {% assign slide_parts = slide | strip | split: "|" %}
+        {% assign slide_src = slide_parts[0] | strip %}
+        {% assign slide_alt = slide_parts[1] | default: "" | strip %}
+        {% assign slide_caption = slide_parts[2] | default: "" | strip %}
+        {% if slide_src != "" %}
+          <div class="post-slider-slide" data-slider-slide {% unless forloop.first %}hidden{% endunless %}>
+            <div class="post-slider-media">
+              <img src="{{ slide_src }}" alt="{{ slide_alt | escape }}" loading="lazy">
+            </div>
+            {% if slide_caption != "" %}
+              <figcaption>{{ slide_caption }}</figcaption>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <button class="post-slider-control post-slider-prev" type="button" data-slider-prev aria-label="Previous image">
+      <span aria-hidden="true"></span>
+    </button>
+    <button class="post-slider-control post-slider-next" type="button" data-slider-next aria-label="Next image">
+      <span aria-hidden="true"></span>
+    </button>
+  </div>
+  <div class="post-slider-footer">
+    <div class="post-slider-dots" data-slider-dots aria-label="{{ slider_label | escape }} navigation"></div>
+    <p class="post-slider-status" data-slider-status aria-live="polite"></p>
+  </div>
+</figure>

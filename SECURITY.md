@@ -2,9 +2,9 @@
 
 ## Supported Project
 
-This repository contains a static Jekyll portfolio/blog and an optional Cloudflare Worker used for blog post likes and comments.
+This repository contains the source for a personal static Jekyll portfolio/blog and an optional Cloudflare Worker used for blog post likes and comments.
 
-Security reports are most useful for issues that affect the reusable template code, the frontend comment/like integrations, or the Cloudflare Worker implementation.
+Security reports are most useful for issues that affect the frontend comment/like integrations, the Cloudflare Worker implementation, or accidental exposure of deployment-specific configuration.
 
 ## Reporting a Vulnerability
 
@@ -34,8 +34,8 @@ Out of scope:
 - Spam, abuse, or repeated voting limitations caused by the intentionally lightweight no-account like system.
 - Social engineering or physical attacks.
 
-## For Template Users
+## Repository Use
 
-If you fork this site, replace all personal service IDs, Worker URLs, database IDs, profile links, and contact details before deploying your own version.
+This repository may be used as a website template under the restrictions in `LICENSE`. Replace all personal content, branding, profile links, contact details, images, posts, project descriptions, service endpoints, and deployment-specific configuration before publishing your own version.
 
 Keep secrets and deployment-specific files out of version control. The included `.gitignore` excludes common local files such as `wrangler.toml`, `.env`, `.wrangler/`, and `_site/`.
