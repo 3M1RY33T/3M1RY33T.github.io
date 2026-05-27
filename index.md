@@ -22,18 +22,6 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
       <a class="button button-secondary" href="/blog/"><span class="accent">My</span>Blog</a>
     </div>
   </div>
-  <!-- Custom Gravatar banner option:
-  <a class="hero-gravatar-banner" href="https://gravatar.com/pleasantwitchcd83be3d56" target="_blank" rel="noopener noreferrer" aria-label="View Yigit Yildiz on Gravatar">
-    <div class="hero-gravatar-profile">
-      <img src="https://1.gravatar.com/avatar/acbc4f96261335fc2e541a294927b481a49ec1fa62bf3bf14fc2239b2ae7ac9d?s=220" alt="Yigit Yildiz">
-      <div>
-        <p class="hero-gravatar-name">Yigit Yildiz</p>
-        <p>Software Engineer</p>
-        <p>Toronto, Ontario, Canada</p>
-      </div>
-    </div>
-  </a>
-  -->
   <iframe class="hero-gravatar-card" src="https://gravatar.com/pleasantwitchcd83be3d56.card" title="Yigit Yildiz Gravatar profile card" width="415" height="228" loading="lazy"></iframe>
 </section>
 
