@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+  schedule:
+    - cron: "17 */6 * * *"
+  repository_dispatch:
+    types:
+      - blog-posts-updated
   workflow_dispatch:
 
 permissions:
@@ -33,6 +38,13 @@ jobs:
           LIKES_ENDPOINT: ${{ vars.LIKES_ENDPOINT || secrets.LIKES_ENDPOINT }}
           COMMENTS_ENDPOINT: ${{ vars.COMMENTS_ENDPOINT || secrets.COMMENTS_ENDPOINT }}
         run: ruby scripts/render_config.rb _config.yml
+
+      - name: Sync external blog posts
+        env:
+          BLOG_POSTS_REPOSITORY: ${{ vars.BLOG_POSTS_REPOSITORY || secrets.BLOG_POSTS_REPOSITORY || '3M1RY33T/MyBlog' }}
+          BLOG_POSTS_REF: ${{ vars.BLOG_POSTS_REF || secrets.BLOG_POSTS_REF || 'main' }}
+          BLOG_POSTS_PATH: ${{ vars.BLOG_POSTS_PATH || secrets.BLOG_POSTS_PATH || '.' }}
+        run: ruby scripts/sync_external_posts.rb
 
       - name: Verify rendered config
         run: |
