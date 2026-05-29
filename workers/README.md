@@ -107,6 +107,31 @@ This Worker uses [`urthreads`](https://github.com/3M1RY33T/urthreads) to power n
 
 New comments are saved with `pending` status. The public API only returns `approved` comments.
 
+## Updating the Dashboard
+
+This site hosts the static urthreads dashboard at `/urthreads/`. The local `.env` stores:
+
+```sh
+DASHBOARD_LOCAL_PATH="/path/to/this/repository"
+DASHBOARD_ENDPOINT="urthreads"
+```
+
+Point the urthreads CLI at the existing site root and dashboard endpoint:
+
+```sh
+npx urthreads dashboard set . urthreads
+```
+
+Refresh the installed dashboard after updating the `urthreads` package:
+
+```sh
+npx urthreads dashboard build
+```
+
+The dashboard is rebuilt from `node_modules/urthreads/web`. If you want it to prefill the Worker URL, add the `urthreads:admin:workerUrl` `sessionStorage` snippet to `urthreads/index.html` after rebuilding.
+
+The deployed dashboard origin must be present in `ALLOWED_ORIGINS`, for example `https://yigityildiz.dev`. The origin does not include `/urthreads/`.
+
 Use the `urthreads` CLI for common moderation actions:
 
 ```sh

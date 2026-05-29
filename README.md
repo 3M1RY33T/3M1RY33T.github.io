@@ -51,6 +51,20 @@ The skills section reflects the technologies I work with across mobile developme
 
 The blog supports likes and moderated comments without requiring visitor accounts. That system is powered by urthreads, my self-hosted static-site engagement service for Cloudflare Workers and D1.
 
+## External Blog Posts
+
+The site can pull Jekyll posts from another public GitHub repository at build time. Set these GitHub Actions variables or secrets in this repository:
+
+- `BLOG_POSTS_REPOSITORY`: public repository in `owner/repo` format. This site defaults to `3M1RY33T/MyBlog`.
+- `BLOG_POSTS_REF`: branch or tag to read from. Defaults to `main`.
+- `BLOG_POSTS_PATH`: directory containing the post files. Defaults to the repository root.
+
+The external repository should contain normal Jekyll post files, such as `2026-05-28-my-post.md` or `_posts/2026-05-28-my-post.md`, with front matter. During the Pages build, `scripts/sync_external_posts.rb` copies those files into this site's `_posts` directory before Jekyll runs.
+
+Referenced post assets are copied too. Put images and icons in the external repository with the same paths used by the posts, such as `assets/img/example.png` or `assets/svg/github.svg`, and reference them as `/assets/img/example.png` in the post body.
+
+The Pages workflow also runs on a six-hour schedule and supports a `blog-posts-updated` `repository_dispatch` event, so the post repository can trigger a rebuild immediately after publishing.
+
 ## Built With
 
 - Jekyll
