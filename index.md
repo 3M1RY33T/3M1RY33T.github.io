@@ -115,6 +115,24 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
   <h2>Projects</h2>
   <div class="card-grid">
     <article class="card project-card">
+      <h3>Delroy</h3>
+      <p class="meta">July 2026</p>
+      <p>Local, on-device AI assistant that keeps project context between sessions. Builds a knowledge graph of your codebase and pairs it with a multi-agent architecture, desktop control, voice chat, browser automation, and scheduled workflows.</p>
+      <a class="project-card-link" href="/assets/Delroy-Project-Document.pdf" target="_blank" rel="noopener noreferrer" aria-label="Read the Delroy project document (PDF)">
+        <img src="/assets/svg/document.svg" alt="" aria-hidden="true">
+        <span>Read Project Document</span>
+      </a>
+    </article>
+    <article class="card project-card">
+      <h3>Brewery</h3>
+      <p class="meta">June 2026</p>
+      <p>Native SwiftUI macOS client for Homebrew. Loads installed formulae and casks, flags outdated packages, maps dependency and dependent relationships, browses the official catalog, and confirms before running any mutating command.</p>
+      <a class="project-card-link" href="https://github.com/3M1RY33T/brewery" target="_blank" rel="noopener noreferrer" aria-label="View Brewery on GitHub">
+        <img src="/assets/svg/github.svg" alt="" aria-hidden="true">
+        <span>View Project on GitHub</span>
+      </a>
+    </article>
+    <article class="card project-card">
       <h3>urthreads</h3>
       <p class="meta">May 2026</p>
       <p>urthreads is self-hosted software for adding engagement features to static websites. Simply deploy the Worker to your own Cloudflare account, connect it to your own D1 database, and manage the dashboard with your own admin key.</p>
