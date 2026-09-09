@@ -1,12 +1,13 @@
 {
-  "0": "2026-08-30-loci-scoped-memory-for-coding-agents.md",
+  "0": "dashboard.js",
   "1": "<img src=\"../assets/img/urthreads.png\" alt=\"\" width=\"40\" height=\"40\" align=\"left\" style=\"margin-right: 20px;\" /> Dashboard",
-  "2": "dashboard.js",
+  "2": "parseDateInputValue",
   "3": "backup-d1.js",
   "4": "likes-worker.js",
   "5": "package.json",
   "6": "comments.rb",
   "7": "2026-05-11-tensor-serve-v0.2.0.md",
+  "8": "setStatus",
   "9": "Security Policy",
   "10": "Blog Engagement Worker",
   "11": "2026-05-26-website-updates-urthreads.md",
@@ -22,5 +23,7 @@
   "21": "2026-07-11-introducing-delroy.md",
   "22": "refreshAll",
   "23": "makeCommentItem",
-  "24": "What Changed"
+  "24": "What Changed",
+  "25": "updateComment",
+  "26": "loadLikes"
 }

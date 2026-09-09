@@ -103,6 +103,15 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
   <h2>Projects</h2>
   <div class="card-grid">
     <article class="card project-card">
+      <h3>loci</h3>
+      <p class="meta">August 2026</p>
+      <p>Scoped memory for coding agents. Works out which project a question is about before it searches anything, pairing a structure store for what calls what with an episode store for what happened and why, and abstains instead of guessing when it has no material. No model in the query path.</p>
+      <a class="project-card-link" href="https://github.com/3M1RY33T/loci" target="_blank" rel="noopener noreferrer" aria-label="View loci on GitHub">
+        <img src="/assets/svg/github.svg" alt="" aria-hidden="true">
+        <span>View Project on GitHub</span>
+      </a>
+    </article>
+    <article class="card project-card">
       <h3>Delroy</h3>
       <p class="meta">July 2026</p>
       <p>Local, on-device AI assistant that keeps project context between sessions. Builds a knowledge graph of your codebase and pairs it with a multi-agent architecture, desktop control, voice chat, browser automation, and scheduled workflows.</p>
