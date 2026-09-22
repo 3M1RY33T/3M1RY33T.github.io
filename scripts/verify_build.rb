@@ -61,7 +61,10 @@ else
   fail!("missing stylesheet: assets/css/style.css")
 end
 
-# --- Task 3 onward appends assertions below this line --------------------
+# --- Task 3: the collection renders --------------------------------------
+must_render("projects/loci/index.html")
+must_contain("projects/loci/index.html", "Scoped memory for coding agents")
+must_have_assets("projects/loci/index.html")
 
 if $failures.empty?
   puts "verify_build: OK"

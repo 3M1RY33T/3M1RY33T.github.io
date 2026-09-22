@@ -1,0 +1,42 @@
+---
+layout: default
+---
+<article class="project-page">
+
+  <nav class="project-crumb" aria-label="Breadcrumb">
+    <a href="/projects/">Projects</a>
+    <span aria-hidden="true">/</span>
+    <span>{{ page.title }}</span>
+  </nav>
+
+  <header class="project-hero">
+    <div class="project-hero-copy">
+      <h1>{{ page.title }}</h1>
+      <p class="project-tagline">{{ page.tagline }}</p>
+      {% if page.stack %}
+      <ul class="project-chips" aria-label="Built with">
+        {% for item in page.stack %}<li>{{ item }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+      <p class="project-summary">{{ page.summary }}</p>
+      <div class="project-cta">
+        {% if page.install %}
+          <a class="button" href="#quickstart">Install</a>
+        {% elsif page.links.download %}
+          <a class="button" href="{{ page.links.download }}" target="_blank" rel="noopener noreferrer">Download for macOS</a>
+        {% elsif page.links.document %}
+          <a class="button" href="{{ page.links.document }}" target="_blank" rel="noopener noreferrer">Read the project document</a>
+        {% elsif page.links.github %}
+          <a class="button" href="{{ page.links.github }}" target="_blank" rel="noopener noreferrer">View the source</a>
+        {% endif %}
+        {% if page.links.github %}<a class="button button-secondary" href="{{ page.links.github }}" target="_blank" rel="noopener noreferrer">GitHub</a>{% endif %}
+        {% if page.links.document and page.install %}<a class="button button-secondary" href="{{ page.links.document }}" target="_blank" rel="noopener noreferrer">Project document</a>{% endif %}
+        {% if page.links.package %}<a class="button button-secondary" href="{{ page.links.package }}" target="_blank" rel="noopener noreferrer">{{ page.links.package_label | default: "Package" }}</a>{% endif %}
+      </div>
+      {% unless page.install %}{% if page.install_note %}
+      <p class="project-install-note">{{ page.install_note }}</p>
+      {% endif %}{% endunless %}
+    </div>
+  </header>
+
+</article>

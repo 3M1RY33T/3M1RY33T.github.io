@@ -19,12 +19,20 @@ exclude:
 collections:
   posts:
     output: true
+  projects:
+    output: true
+    permalink: /projects/:name/
 defaults:
   - scope:
       path: ""
       type: "posts"
     values:
       layout: "post"
+  - scope:
+      path: ""
+      type: "projects"
+    values:
+      layout: "project"
 
 # Public frontend endpoint. Do not put secret keys here.
 likes:
