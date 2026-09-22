@@ -2418,13 +2418,26 @@ body { line-height: 1.7; }
   padding: 4.5rem 0 3.5rem;
 }
 
+.hero-head {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+}
+
 .hero-avatar {
-  width: 64px;
-  height: 64px;
+  flex-shrink: 0;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   border: 2px solid var(--border);
-  box-shadow: 0 0 0 4px var(--accent-a08), 0 12px 30px var(--shadow-soft);
-  margin-bottom: 1.5rem;
+  box-shadow: 0 0 0 5px var(--accent-a08), 0 12px 30px var(--shadow-soft);
+}
+
+.hero-title .eyebrow { margin-top: 0; }
+
+@media (max-width: 600px) {
+  .hero-head { gap: 1.1rem; }
+  .hero-avatar { width: 64px; height: 64px; }
 }
 
 .hero-social {
