@@ -24,6 +24,7 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
       <a href="https://gravatar.com/pleasantwitchcd83be3d56" target="_blank" rel="noopener noreferrer">gravatar</a>
     </p>
   </div>
+  {% include activity-panel.html %}
 </section>
 
 {% if site.posts.size > 0 %}

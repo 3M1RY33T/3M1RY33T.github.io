@@ -46,6 +46,9 @@ jobs:
           BLOG_POSTS_PATH: ${{ vars.BLOG_POSTS_PATH || secrets.BLOG_POSTS_PATH || '.' }}
         run: ruby scripts/sync_external_posts.rb
 
+      - name: Fetch public activity
+        run: ruby scripts/fetch_activity.rb
+
       - name: Verify rendered config
         run: |
           ruby -e '

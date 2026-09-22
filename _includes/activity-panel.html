@@ -1,0 +1,37 @@
+{% assign act = site.data.activity %}
+{% if act.weeks %}
+<aside class="hero-activity" aria-label="Public development activity">
+  <div class="hero-activity-head">
+    <span class="hero-activity-total">{{ act.total_formatted | default: act.total_last_year }}</span>
+    <span class="hero-activity-label">contributions, last year</span>
+    {% if act.streak >= 2 %}
+    <span class="hero-activity-streak">{{ act.streak }}-day streak</span>
+    {% endif %}
+  </div>
+
+  {% assign n = act.weeks | size %}
+  {% assign start = n | minus: 26 %}
+  {% if start < 0 %}{% assign start = 0 %}{% endif %}
+  <div class="activity-graph" role="img" aria-label="Contribution calendar for the last 26 weeks">
+    {%- for week in act.weeks offset: start -%}
+      {%- for day in week -%}
+        <span class="act-{{ day.level }}" title="{{ day.date }}"></span>
+      {%- endfor -%}
+    {%- endfor -%}
+  </div>
+
+  {% if act.events %}
+  <ul class="activity-log">
+    {% for e in act.events limit: 4 %}
+    <li>
+      <span class="activity-log-verb">{{ e.verb }}</span>
+      <span class="activity-log-detail">{{ e.detail }}</span>
+      <time datetime="{{ e.date }}">{{ e.date | date: "%-d %b" }}</time>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <p class="hero-activity-note">public github activity &middot; refreshed {{ act.fetched_at | date: "%-d %b %Y" }}</p>
+</aside>
+{% endif %}

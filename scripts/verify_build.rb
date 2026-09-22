@@ -48,6 +48,8 @@ must_render("blog/index.html")
 must_have_assets("index.html")
 must_contain("index.html", "data-theme-toggle")
 must_contain("index.html", "theme-icon-moon")
+must_contain("index.html", "activity-graph")
+must_contain("index.html", "contributions, last year")
 
 # --- Task 2: no CSS custom property is referenced but never declared -----
 # A typo like var(--acent) is not a CSS error: it resolves to nothing and the
