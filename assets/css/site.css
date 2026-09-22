@@ -2481,15 +2481,34 @@ body { line-height: 1.7; }
   .hero-avatar { width: 64px; height: 64px; }
 }
 
+/* Icon buttons at the far end of the hero-links row. */
 .hero-social {
-  display: flex;
-  gap: 1.1rem;
-  margin: 1.5rem 0 0;
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
+  display: inline-flex;
+  gap: 0.75rem;
+  margin-left: auto;
 }
-.hero-social a { color: var(--ink-subtle); text-decoration: none; }
-.hero-social a:hover { color: var(--accent-strong); }
+.hero-social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.2rem;
+  min-height: 3.2rem;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: var(--surface-sunken);
+  color: var(--ink-muted);
+  text-decoration: none;
+  transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+.hero-social a:hover {
+  color: var(--accent-strong);
+  border-color: var(--accent-a28);
+  background: var(--accent-wash);
+}
+.hero-social svg {
+  width: 1.35rem;
+  height: 1.35rem;
+}
 
 .hero .eyebrow {
   font-family: var(--font-mono);
