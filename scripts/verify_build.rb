@@ -109,6 +109,37 @@ fail!("nav still points at the #projects anchor") if home&.include?('href="/#pro
 fail!("Earlier work block missing") unless home&.include?("Earlier work")
 must_have_assets("projects/index.html")
 
+# --- Task 10: whole-site invariants --------------------------------------
+
+# No page may ship unrendered Liquid or an instruction comment.
+Dir.glob(File.join(SITE, "**", "*.html")).each do |file|
+  rel = file.sub(SITE + "/", "")
+  html = File.read(file)
+  fail!("unrendered Liquid in #{rel}") if html.include?("{%") || html.include?("{{")
+  fail!("instruction comment shipped in #{rel}") if html =~ /<!--\s*(Adapt|From|TODO|TBD)/
+end
+
+# All five project pages must exist. Jekyll logs a YAML exception and still
+# exits 0, silently dropping the document, so this is the only thing that
+# catches a malformed front matter.
+SLUGS = %w[loci delroy urthreads tensor-serve brewery].freeze
+built = Dir.glob(File.join(SITE, "projects", "*", "index.html")).map { |f| File.basename(File.dirname(f)) }
+(SLUGS - built).each { |s| fail!("project page never built: #{s}") }
+
+SLUGS.each do |slug|
+  html = page("projects/#{slug}/index.html")
+  next if html.nil?
+  fail!("#{slug} has metrics with no verified date") if html.include?("project-metrics") && !html.include?("Measured from the repository on")
+  fail!("#{slug} page has no outbound rail") unless html.include?("project-rail")
+end
+
+# Em dashes and en dashes are not used on this site.
+Dir.glob(File.join(SITE, "projects", "**", "*.html")).each do |file|
+  html = File.read(file)
+  rel = file.sub(SITE + "/", "")
+  fail!("em or en dash in #{rel}") if html =~ /[\u2013\u2014]/
+end
+
 if $failures.empty?
   puts "verify_build: OK"
   exit 0

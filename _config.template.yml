@@ -13,6 +13,8 @@ exclude:
   - ".env.*"
   - "_config.template.yml"
   - "docs"
+  - "node_modules"
+  - ".playwright-mcp"
   - "vendor"
   - "Gemfile"
   - "Gemfile.lock"
