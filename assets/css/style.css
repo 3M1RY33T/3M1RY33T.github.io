@@ -1,10 +1,39 @@
+/* Design tokens. Every colour used more than three times lives here.
+   Added 22 September 2026 so the project pages, and any later redesign,
+   change one value rather than two hundred. */
+:root {
+  --accent: #2563eb;
+  --accent-strong: #1d4ed8;
+  --accent-ring: #93c5fd;
+  --accent-wash: #eef2ff;
+  --accent-a08: rgba(37, 99, 235, 0.08);
+  --accent-a16: rgba(37, 99, 235, 0.16);
+  --accent-a28: rgba(37, 99, 235, 0.28);
+  --accent-a65: rgba(37, 99, 235, 0.65);
+
+  --ink: #0f172a;
+  --ink-deep: #111827;
+  --ink-soft: #334155;
+  --ink-muted: #475569;
+  --ink-subtle: #64748b;
+
+  --surface-sunken: #f8fafc;
+  --border: #e2e8f0;
+  --border-soft: rgba(148, 163, 184, 0.24);
+  --border-softer: rgba(148, 163, 184, 0.22);
+  --shadow-soft: rgba(15, 23, 42, 0.12);
+
+  --radius-card: 18px;
+  --radius-pill: 999px;
+}
+
 :root {
   color-scheme: light;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: radial-gradient(circle at top left, rgba(37,99,235,0.18), transparent 22%),
     radial-gradient(circle at bottom right, rgba(59,130,246,0.16), transparent 18%),
     #f7f7fb;
-  color: #111827;
+  color: var(--ink-deep);
   font-size: 16px;
 }
 
@@ -42,12 +71,12 @@ svg {
 }
 
 a {
-  color: #2563eb;
+  color: var(--accent);
   transition: color 180ms ease;
 }
 
 a:hover {
-  color: #1d4ed8;
+  color: var(--accent-strong);
 }
 
 button,
@@ -105,7 +134,7 @@ textarea {
 
 .site-nav a:focus-visible,
 .nav-toggle:focus-visible + .nav-toggle-label {
-  outline: 3px solid #93c5fd;
+  outline: 3px solid var(--accent-ring);
   outline-offset: 3px;
 }
 
@@ -137,7 +166,7 @@ textarea {
   text-transform: uppercase;
   letter-spacing: 0.24em;
   font-size: 0.8rem;
-  color: #475569;
+  color: var(--ink-muted);
   margin-bottom: 1rem;
 }
 
@@ -148,13 +177,13 @@ textarea {
 }
 
 .accent {
-  color: #2563eb;
+  color: var(--accent);
 }
 
 .intro {
   max-width: 680px;
   margin: 1.2rem 0 1.8rem;
-  color: #475569;
+  color: var(--ink-muted);
   font-size: 1.05rem;
 }
 
@@ -170,11 +199,11 @@ textarea {
   justify-content: center;
   min-height: 3.2rem;
   padding: 0 1.6rem;
-  border: 1px solid rgba(37,99,235,0.28);
+  border: 1px solid var(--accent-a28);
   border-radius: 0.85rem;
-  box-shadow: 0 10px 24px rgba(37,99,235,0.16);
+  box-shadow: 0 10px 24px var(--accent-a16);
   text-decoration: none;
-  background: #2563eb;
+  background: var(--accent);
   color: white;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -187,13 +216,13 @@ textarea {
 }
 
 .button-secondary {
-  background: #f8fafc;
-  color: #111827;
-  border: 1px solid #e2e8f0;
+  background: var(--surface-sunken);
+  color: var(--ink-deep);
+  border: 1px solid var(--border);
 }
 
 .button-secondary:hover {
-  background: #eef2ff;
+  background: var(--accent-wash);
 }
 
 .card,
@@ -235,7 +264,7 @@ textarea {
 }
 
 .hero-gravatar-banner:focus-visible {
-  outline: 3px solid #93c5fd;
+  outline: 3px solid var(--accent-ring);
   outline-offset: 4px;
 }
 
@@ -311,7 +340,7 @@ textarea {
   overscroll-behavior-inline: contain;
   scroll-padding-inline: 0.25rem;
   scroll-snap-type: x mandatory;
-  scrollbar-color: rgba(37,99,235,0.65) transparent;
+  scrollbar-color: var(--accent-a65) transparent;
   scrollbar-width: thin;
   transition: scrollbar-color 180ms ease;
   -webkit-overflow-scrolling: touch;
@@ -329,7 +358,7 @@ textarea {
 .card-grid::-webkit-scrollbar-thumb {
   border: 2px solid rgba(247,247,251,0.92);
   border-radius: 999px;
-  background: rgba(37,99,235,0.65);
+  background: var(--accent-a65);
 }
 
 .card-grid:hover::-webkit-scrollbar-track,
@@ -342,7 +371,7 @@ textarea {
     grid-auto-columns: calc((100% - 3rem) / 3);
     overflow-x: scroll;
     padding-bottom: 1.25rem;
-    scrollbar-color: rgba(37,99,235,0.65) transparent;
+    scrollbar-color: var(--accent-a65) transparent;
     scrollbar-gutter: stable;
   }
 
@@ -351,7 +380,7 @@ textarea {
   }
 
   .card-grid::-webkit-scrollbar-thumb {
-    background: rgba(37,99,235,0.65);
+    background: var(--accent-a65);
   }
 }
 
@@ -370,13 +399,13 @@ textarea {
 .project-card:hover {
   transform: translateY(-3px);
   border-color: rgba(37,99,235,0.32);
-  box-shadow: 0 26px 65px rgba(15,23,42,0.12);
+  box-shadow: 0 26px 65px var(--shadow-soft);
 }
 
 .project-card:has(.project-card-link:focus-visible) {
   transform: translateY(-3px);
   border-color: rgba(37,99,235,0.32);
-  box-shadow: 0 26px 65px rgba(15,23,42,0.12);
+  box-shadow: 0 26px 65px var(--shadow-soft);
 }
 
 .project-card-link {
@@ -411,14 +440,14 @@ textarea {
 }
 
 .project-card-link:focus-visible {
-  outline: 3px solid #93c5fd;
+  outline: 3px solid var(--accent-ring);
   outline-offset: -8px;
 }
 
 .section-intro {
   max-width: 640px;
   margin: 0.25rem 0 0;
-  color: #475569;
+  color: var(--ink-muted);
 }
 
 .featured-blog-header {
@@ -458,7 +487,7 @@ textarea {
   border-radius: 1.1rem;
   background: white;
   box-shadow: 0 22px 55px rgba(15,23,42,0.06);
-  color: #475569;
+  color: var(--ink-muted);
   text-decoration: none;
 }
 
@@ -477,20 +506,20 @@ textarea {
 
 .featured-post h3 {
   margin: 0;
-  color: #0f172a;
+  color: var(--ink);
   font-size: clamp(1.65rem, 3vw, 2.4rem);
   line-height: 1.08;
 }
 
 .featured-post p {
   margin: 0;
-  color: #475569;
+  color: var(--ink-muted);
 }
 
 .featured-post-excerpt {
   display: -webkit-box;
   overflow: hidden;
-  color: #475569;
+  color: var(--ink-muted);
   line-height: 1.55;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -501,22 +530,22 @@ textarea {
 }
 
 .featured-post-excerpt strong {
-  color: #0f172a;
+  color: var(--ink);
   font-weight: 800;
 }
 
 .featured-post .post-meta {
   margin: 0;
-  color: #64748b;
+  color: var(--ink-subtle);
 }
 
 .featured-post:hover h3,
 .featured-post-link:focus-visible h3 {
-  color: #2563eb;
+  color: var(--accent);
 }
 
 .featured-post-link:focus-visible {
-  outline: 3px solid #93c5fd;
+  outline: 3px solid var(--accent-ring);
   outline-offset: 4px;
 }
 
@@ -532,10 +561,10 @@ textarea {
   align-items: center;
   width: 100%;
   padding: 0.95rem;
-  border: 1px solid rgba(148,163,184,0.22);
+  border: 1px solid var(--border-softer);
   border-radius: 1rem;
   background: rgba(248,250,252,0.78);
-  color: #334155;
+  color: var(--ink-soft);
   cursor: pointer;
   text-align: left;
   transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
@@ -550,7 +579,7 @@ textarea {
 }
 
 .featured-playlist button:focus-visible {
-  outline: 3px solid #93c5fd;
+  outline: 3px solid var(--accent-ring);
   outline-offset: 3px;
 }
 
@@ -567,7 +596,7 @@ textarea {
   padding: 0 0.55rem;
   border-radius: 0.75rem;
   background: #e0edff;
-  color: #2563eb;
+  color: var(--accent);
   font-size: 0.82rem;
   font-weight: 800;
 }
@@ -579,12 +608,12 @@ textarea {
 }
 
 .featured-playlist strong {
-  color: #0f172a;
+  color: var(--ink);
   line-height: 1.25;
 }
 
 .featured-playlist button > span:last-child span {
-  color: #64748b;
+  color: var(--ink-subtle);
   font-size: 0.9rem;
 }
 
@@ -593,10 +622,10 @@ textarea {
   width: fit-content;
   margin: 1.25rem auto 0;
   padding: 0.75rem 1.25rem;
-  /* border: 1px solid #e2e8f0; */
+  /* border: 1px solid var(--border); */
   border-radius: 999px;
-  /* background: #f8fafc; */
-  color: #111827;
+  /* background: var(--surface-sunken); */
+  color: var(--ink-deep);
   font-weight: 700;
   text-decoration: none;
   transition: transform 180ms ease, background 180ms ease;
@@ -604,13 +633,13 @@ textarea {
 
 .featured-blog-see-all:hover,
 .featured-blog-see-all:focus-visible {
-  /* background: #eef2ff;
+  /* background: var(--accent-wash);
   color: #1b253c; */
   transform: translateY(-1px);
 }
 
 .featured-blog-see-all:focus-visible {
-  outline: 3px solid #93c5fd;
+  outline: 3px solid var(--accent-ring);
   outline-offset: 3px;
 }
 
@@ -621,7 +650,7 @@ textarea {
 
 .card p,
 .contact-copy p {
-  color: #475569;
+  color: var(--ink-muted);
 }
 
 .icon {
@@ -643,7 +672,7 @@ textarea {
 
 .meta,
 .post-meta {
-  color: #64748b;
+  color: var(--ink-subtle);
   font-size: 0.95rem;
   margin-top: 20px;
 }
@@ -713,11 +742,11 @@ textarea {
   margin: 1.25rem auto 0;
   padding: 0 1.3rem;
   border-radius: 999px;
-  /* background: #2563eb;
+  /* background: var(--accent);
   color: white; */
-  background: #f8fafc;
-  color: #111827;
-  border: 1px solid #e2e8f0;
+  background: var(--surface-sunken);
+  color: var(--ink-deep);
+  border: 1px solid var(--border);
   cursor: pointer;
   font-weight: 700;
   text-align: center;
@@ -726,11 +755,11 @@ textarea {
 
 .skills-toggle-control:hover {
   transform: translateY(-1px);
-  background: #eef2ff;
+  background: var(--accent-wash);
 }
 
 .skills-toggle:focus-visible ~ .skills-toggle-control {
-  outline: 3px solid #93c5fd;
+  outline: 3px solid var(--accent-ring);
   outline-offset: 3px;
 }
 
@@ -798,13 +827,13 @@ textarea {
   justify-items: start;
   gap: 0.25rem;
   padding: 1.15rem 0 1rem;
-  color: #0f172a;
+  color: var(--ink);
   text-align: left;
 }
 
 .contact-details li {
   margin: 0;
-  color: #334155;
+  color: var(--ink-soft);
 }
 
 .contact-details a {
@@ -813,10 +842,10 @@ textarea {
   gap: 0.85rem;
   align-items: center;
   padding: 0.85rem;
-  border: 1px solid rgba(148,163,184,0.22);
+  border: 1px solid var(--border-softer);
   border-radius: 1rem;
   background: rgba(248,250,252,0.78);
-  color: #334155;
+  color: var(--ink-soft);
   text-decoration: none;
   transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
@@ -824,13 +853,13 @@ textarea {
 .contact-details a:hover,
 .contact-details a:focus-visible {
   border-color: rgba(37,99,235,0.36);
-  color: #1d4ed8;
+  color: var(--accent-strong);
   box-shadow: 0 14px 32px rgba(15,23,42,0.08);
   transform: translateY(-1px);
 }
 
 .contact-details a:focus-visible {
-  outline: 3px solid #93c5fd;
+  outline: 3px solid var(--accent-ring);
   outline-offset: 3px;
 }
 
@@ -840,7 +869,7 @@ textarea {
   padding: 0.48rem;
   border-radius: 0.8rem;
   background: #e0edff;
-  color: #2563eb;
+  color: var(--accent);
   fill: currentColor;
 }
 
@@ -851,13 +880,13 @@ textarea {
 }
 
 .contact-details li strong {
-  color: #0f172a;
+  color: var(--ink);
 }
 
 .lockscreen-clock {
   display: inline-flex;
   align-items: baseline;
-  color: #0f172a;
+  color: var(--ink);
   gap: 0.2rem;
   font-size: clamp(3.6rem, 11vw, 3.2rem);
   font-weight: 800;
@@ -867,13 +896,13 @@ textarea {
 }
 
 .clock-period {
-  color: #2563eb;
+  color: var(--accent);
   font-size: 0.8em;
   font-weight: 200;
 }
 
 .contact-time > span {
-  color: #475569;
+  color: var(--ink-muted);
   font-size: 0.98rem;
   font-weight: 700;
 }
@@ -888,7 +917,7 @@ textarea {
   display: grid;
   gap: 0.75rem;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--ink);
 }
 
 .contact-form input,
@@ -896,8 +925,8 @@ textarea {
   width: 100%;
   border: 1px solid #cbd5e1;
   border-radius: 1rem;
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--surface-sunken);
+  color: var(--ink);
   padding: 0.95rem 1rem;
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
@@ -905,7 +934,7 @@ textarea {
 .contact-form input:focus,
 .contact-form textarea:focus {
   outline: none;
-  border-color: #2563eb;
+  border-color: var(--accent);
   box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
 }
 
@@ -931,14 +960,14 @@ textarea {
 
 .form-note {
   margin: 0;
-  color: #64748b;
+  color: var(--ink-subtle);
   font-size: 0.95rem;
 }
 
 .site-footer {
   text-align: center;
   padding: 2rem 0 1rem;
-  color: #64748b;
+  color: var(--ink-subtle);
 }
 
 .blog-section,
@@ -955,7 +984,7 @@ textarea {
 
 .blog-heading .eyebrow {
   margin: 1rem 0 0.85rem;
-  color: #475569;
+  color: var(--ink-muted);
   font-size: 0.8rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -964,7 +993,7 @@ textarea {
 .blog-heading h1,
 .post-header h1 {
   margin: 0;
-  color: #0f172a;
+  color: var(--ink);
   font-size: clamp(2.5rem, 4vw, 4.2rem);
   line-height: 0.98;
 }
@@ -973,7 +1002,7 @@ textarea {
 .post-excerpt {
   max-width: 680px;
   margin: 1rem 0 0;
-  color: #475569;
+  color: var(--ink-muted);
   font-size: 1.05rem;
 }
 
@@ -983,7 +1012,7 @@ textarea {
 
 .post-header .post-meta {
   margin: 0;
-  color: #64748b;
+  color: var(--ink-subtle);
 }
 
 .post-tags {
@@ -999,8 +1028,8 @@ textarea {
   padding: 0.2rem 0.65rem;
   border: 1px solid rgba(37,99,235,0.18);
   border-radius: 999px;
-  background: rgba(37,99,235,0.08);
-  color: #1d4ed8;
+  background: var(--accent-a08);
+  color: var(--accent-strong);
   font-size: 0.82rem;
   font-weight: 700;
   line-height: 1.4;
@@ -1013,7 +1042,7 @@ textarea {
 }
 
 .post-read-link:hover {
-  color: #2563eb;
+  color: var(--accent);
 }
 
 .social-feed {
@@ -1026,11 +1055,11 @@ textarea {
   display: grid;
   gap: 1rem;
   padding: 1.25rem 0;
-  border-top: 1px solid rgba(148,163,184,0.24);
+  border-top: 1px solid var(--border-soft);
 }
 
 .feed-post:last-child {
-  border-bottom: 1px solid rgba(148,163,184,0.24);
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .feed-post-titlebar {
@@ -1047,13 +1076,13 @@ textarea {
 }
 
 .feed-post-titlebar h2 a {
-  color: #0f172a;
+  color: var(--ink);
   text-decoration: none;
 }
 
 .feed-post-titlebar h2 a:hover,
 .feed-post-titlebar h2 a:focus-visible {
-  color: #2563eb;
+  color: var(--accent);
 }
 
 .feed-post-titlebar .post-tags {
@@ -1083,9 +1112,9 @@ textarea {
   display: block;
   width: clamp(3rem, 5.5vw, 3.75rem);
   height: clamp(3rem, 5.5vw, 3.75rem);
-  border: 2px solid #2563eb;
+  border: 2px solid var(--accent);
   border-radius: 50%;
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.16);
+  box-shadow: 0 0 0 3px var(--accent-a16);
   object-fit: cover;
 }
 
@@ -1103,14 +1132,14 @@ textarea {
 
 .feed-author {
   margin: 0;
-  color: #64748b;
+  color: var(--ink-subtle);
   font-weight: 500;
   line-height: 1.25;
 }
 
 .feed-post .post-meta {
   margin: 0;
-  color: #64748b;
+  color: var(--ink-subtle);
   font-size: 0.9rem;
   line-height: 1.35;
 }
@@ -1143,7 +1172,7 @@ textarea {
   position: relative;
   max-height: 18rem;
   overflow: hidden;
-  color: #334155;
+  color: var(--ink-soft);
 }
 
 .feed-post:not(.is-expanded) .feed-post-content:not(.has-no-overflow) {
@@ -1168,7 +1197,7 @@ textarea {
 
 .feed-post-content h2,
 .feed-post-content h3 {
-  color: #0f172a;
+  color: var(--ink);
   line-height: 1.25;
 }
 
@@ -1179,7 +1208,7 @@ textarea {
 
 .feed-post-content p,
 .feed-post-content li {
-  color: #475569;
+  color: var(--ink-muted);
 }
 
 .feed-post-content a {
@@ -1194,15 +1223,15 @@ textarea {
 .feed-post-content blockquote {
   margin: 1.5rem 0;
   padding: 0.2rem 0 0.2rem 1rem;
-  border-left: 4px solid #93c5fd;
-  color: #475569;
+  border-left: 4px solid var(--accent-ring);
+  color: var(--ink-muted);
 }
 
 .feed-post-content :not(pre) > code {
   padding: 0.16rem 0.36rem;
-  border: 1px solid rgba(37,99,235,0.16);
+  border: 1px solid var(--accent-a16);
   border-radius: 0.35rem;
-  background: rgba(37,99,235,0.08);
+  background: var(--accent-a08);
   color: #1e3a8a;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 0.92em;
@@ -1211,7 +1240,7 @@ textarea {
 .feed-post-content pre,
 .feed-post-content .highlight {
   margin: 0.9rem 0;
-  border: 1px solid rgba(37,99,235,0.28);
+  border: 1px solid var(--accent-a28);
   border-radius: 0.75rem;
   background: linear-gradient(135deg, #102a56, #123f7a);
   box-shadow: 0 12px 30px rgba(37,99,235,0.12);
@@ -1258,10 +1287,10 @@ textarea {
 
 .feed-post-single-media {
   overflow: hidden;
-  border: 1px solid rgba(148,163,184,0.22);
+  border: 1px solid var(--border-softer);
   border-radius: 1rem;
-  background: #0f172a;
-  box-shadow: 0 18px 48px rgba(15,23,42,0.12);
+  background: var(--ink);
+  box-shadow: 0 18px 48px var(--shadow-soft);
 }
 
 .feed-post-single-media img {
@@ -1269,7 +1298,7 @@ textarea {
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
-  background: #e2e8f0;
+  background: var(--border);
 }
 
 .feed-post-single-media figcaption {
@@ -1286,18 +1315,18 @@ textarea {
   border: 0;
   padding: 0;
   background: transparent;
-  color: #2563eb;
+  color: var(--accent);
   cursor: pointer;
   font-weight: 800;
 }
 
 .show-more-button:hover,
 .show-more-button:focus-visible {
-  color: #1d4ed8;
+  color: var(--accent-strong);
 }
 
 .show-more-button:focus-visible {
-  outline: 3px solid #93c5fd;
+  outline: 3px solid var(--accent-ring);
   outline-offset: 3px;
 }
 
@@ -1323,8 +1352,8 @@ textarea {
   padding: 0 0.95rem;
   border: 1px solid rgba(37,99,235,0.18);
   border-radius: 0.75rem;
-  background: rgba(37,99,235,0.08);
-  color: #1d4ed8;
+  background: var(--accent-a08);
+  color: var(--accent-strong);
   cursor: pointer;
   font-weight: 800;
   line-height: 1;
@@ -1335,13 +1364,13 @@ textarea {
 .like-button:focus-visible,
 .like-button.is-liked {
   border-color: rgba(37,99,235,0.3);
-  background: #eef2ff;
-  color: #1d4ed8;
+  background: var(--accent-wash);
+  color: var(--accent-strong);
   transform: translateY(-1px);
 }
 
 .like-button:focus-visible {
-  outline: 3px solid #93c5fd;
+  outline: 3px solid var(--accent-ring);
   outline-offset: 3px;
 }
 
@@ -1373,7 +1402,7 @@ textarea {
   gap: 0.45rem;
   width: fit-content;
   margin-top: 0.45rem;
-  color: #2563eb;
+  color: var(--accent);
   font-weight: 700;
   text-decoration: none;
 }
@@ -1429,12 +1458,12 @@ textarea {
 
 .post-content {
   padding: 0;
-  color: #334155;
+  color: var(--ink-soft);
 }
 
 .post-content h2,
 .post-content h3 {
-  color: #0f172a;
+  color: var(--ink);
   line-height: 1.25;
 }
 
@@ -1445,7 +1474,7 @@ textarea {
 
 .post-content p,
 .post-content li {
-  color: #475569;
+  color: var(--ink-muted);
 }
 
 .post-content a {
@@ -1460,14 +1489,14 @@ textarea {
 .post-content blockquote {
   margin: 1.5rem 0;
   padding: 0.2rem 0 0.2rem 1rem;
-  border-left: 4px solid #93c5fd;
-  color: #475569;
+  border-left: 4px solid var(--accent-ring);
+  color: var(--ink-muted);
 }
 
 .post-comments {
   margin-top: 1rem;
   padding-top: 2rem;
-  border-top: 1px solid rgba(148,163,184,0.24);
+  border-top: 1px solid var(--border-soft);
 }
 
 .post-comments.feed-comments {
@@ -1478,13 +1507,13 @@ textarea {
 
 .post-comments h2 {
   margin: 0 0 1rem;
-  color: #0f172a;
+  color: var(--ink);
   font-size: 1.65rem;
 }
 
 .comment-prompt {
   margin: 1.25rem 0 1rem;
-  color: #475569;
+  color: var(--ink-muted);
   font-weight: 700;
 }
 
@@ -1506,7 +1535,7 @@ textarea {
   border: 1px solid #cbd5e1;
   border-radius: 0.85rem;
   background: white;
-  color: #0f172a;
+  color: var(--ink);
   transition: border-color 180ms ease, box-shadow 180ms ease;
 }
 
@@ -1542,7 +1571,7 @@ textarea {
 
 .comment-draft-form textarea:focus,
 .comment-modal input:focus {
-  border-color: #2563eb;
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(37,99,235,0.14);
   outline: none;
 }
@@ -1566,14 +1595,14 @@ textarea {
 
 .comment-empty {
   margin: 0;
-  color: #64748b;
+  color: var(--ink-subtle);
 }
 
 .comment-item {
   display: grid;
   gap: 0.4rem;
   padding: 1rem 0;
-  border-top: 1px solid rgba(148,163,184,0.24);
+  border-top: 1px solid var(--border-soft);
 }
 
 .feed-comments .comment-item {
@@ -1592,14 +1621,14 @@ textarea {
 
 .comment-meta {
   margin: 0;
-  color: #64748b;
+  color: var(--ink-subtle);
   font-size: 0.9rem;
   font-weight: 700;
 }
 
 .comment-body {
   margin: 0;
-  color: #334155;
+  color: var(--ink-soft);
   white-space: pre-wrap;
 }
 
@@ -1633,7 +1662,7 @@ textarea {
 .comment-modal-panel {
   width: min(100%, 430px);
   padding: 1.5rem;
-  border: 1px solid rgba(148,163,184,0.24);
+  border: 1px solid var(--border-soft);
   border-radius: 1rem;
   background: white;
   box-shadow: 0 28px 70px rgba(15,23,42,0.24);
@@ -1641,14 +1670,14 @@ textarea {
 
 .comment-modal-panel h3 {
   margin: 0;
-  color: #0f172a;
+  color: var(--ink);
   font-size: 1.45rem;
   line-height: 1.2;
 }
 
 .comment-modal-panel p {
   margin: 0.45rem 0 1rem;
-  color: #475569;
+  color: var(--ink-muted);
 }
 
 .comment-modal-panel form {
@@ -1659,12 +1688,12 @@ textarea {
 .comment-modal label {
   display: grid;
   gap: 0.35rem;
-  color: #0f172a;
+  color: var(--ink);
   font-weight: 800;
 }
 
 .comment-modal label span {
-  color: #64748b;
+  color: var(--ink-subtle);
   font-size: 0.85rem;
   font-weight: 700;
 }
@@ -1684,9 +1713,9 @@ textarea {
 
 .post-content :not(pre) > code {
   padding: 0.16rem 0.36rem;
-  border: 1px solid rgba(37,99,235,0.16);
+  border: 1px solid var(--accent-a16);
   border-radius: 0.35rem;
-  background: rgba(37,99,235,0.08);
+  background: var(--accent-a08);
   color: #1e3a8a;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 0.92em;
@@ -1695,7 +1724,7 @@ textarea {
 .post-content pre,
 .post-content .highlight {
   margin: 1rem 0;
-  border: 1px solid rgba(37,99,235,0.28);
+  border: 1px solid var(--accent-a28);
   border-radius: 0.8rem;
   background: linear-gradient(135deg, #102a56, #123f7a);
   box-shadow: 0 12px 32px rgba(37,99,235,0.12);
@@ -1783,10 +1812,10 @@ textarea {
 .post-slider-viewport {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(148,163,184,0.22);
+  border: 1px solid var(--border-softer);
   border-radius: 1rem;
-  background: #0f172a;
-  box-shadow: 0 18px 48px rgba(15,23,42,0.12);
+  background: var(--ink);
+  box-shadow: 0 18px 48px var(--shadow-soft);
   touch-action: pan-y;
   user-select: none;
 }
@@ -1845,7 +1874,7 @@ textarea {
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
-  background: #e2e8f0;
+  background: var(--border);
 }
 
 .post-slider figcaption {
@@ -1884,7 +1913,7 @@ textarea {
 }
 
 .post-slider-control:focus-visible {
-  outline: 3px solid #93c5fd;
+  outline: 3px solid var(--accent-ring);
   outline-offset: -5px;
 }
 
@@ -1940,24 +1969,24 @@ textarea {
 }
 
 .post-slider-dot.is-active {
-  background: #2563eb;
+  background: var(--accent);
 }
 
 .post-slider-dot:focus-visible {
-  outline: 3px solid #93c5fd;
+  outline: 3px solid var(--accent-ring);
   outline-offset: 3px;
 }
 
 .post-slider-status {
   margin: 0;
-  color: #2563eb;
+  color: var(--accent);
   font-size: 0.9rem;
   font-weight: 700;
 }
 
 .post-content .post-slider-status,
 .feed-post-content .post-slider-status {
-  color: #2563eb;
+  color: var(--accent);
 }
 
 @media (min-width: 1100px) {
@@ -2070,10 +2099,10 @@ textarea {
     padding: 1rem;
     overflow: hidden;
     border-radius: 1.1rem;
-    background: linear-gradient(138deg, #1e3b7a 0%, #2563eb 58%, #60a5fa 100%);
+    background: linear-gradient(138deg, #1e3b7a 0%, var(--accent) 58%, #60a5fa 100%);
     color: white;
     text-decoration: none;
-    box-shadow: 0 18px 45px rgba(15,23,42,0.12);
+    box-shadow: 0 18px 45px var(--shadow-soft);
   }
 
   .hero-gravatar-compact:hover,
@@ -2082,7 +2111,7 @@ textarea {
   }
 
   .hero-gravatar-compact:focus-visible {
-    outline: 3px solid #93c5fd;
+    outline: 3px solid var(--accent-ring);
     outline-offset: 4px;
   }
 
