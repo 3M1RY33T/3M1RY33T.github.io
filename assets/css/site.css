@@ -2961,6 +2961,9 @@ body { line-height: 1.7; }
   color: var(--ink-subtle);
 }
 
-:root[data-theme="light"] .hero-activity {
+:root[data-theme="light"] .hero-activity,
+:root[data-theme="light"] .skills-grid div,
+:root[data-theme="light"] .contact-form,
+:root[data-theme="light"] .featured-post {
   box-shadow: 0 22px 55px rgba(15, 23, 42, 0.08);
 }
