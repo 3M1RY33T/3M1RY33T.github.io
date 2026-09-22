@@ -75,6 +75,11 @@ must_contain("projects/loci/index.html", "project-terminal")
 must_contain("projects/loci/index.html", "pip install loci-mem")
 must_contain("projects/loci/index.html", "Built with")
 
+# --- Task 5: Delroy ------------------------------------------------------
+must_render("projects/delroy/index.html")
+must_contain("projects/delroy/index.html", "7,503 collected across 9 tiers")
+must_have_assets("projects/delroy/index.html")
+
 if $failures.empty?
   puts "verify_build: OK"
   exit 0
