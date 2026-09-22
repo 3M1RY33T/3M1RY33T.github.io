@@ -15,7 +15,7 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
     </div>
     <p class="intro">I'm a Software Engineer from Istanbul, Turkey living in Toronto, Ontario with a passion for building scalable, open-source solutions free for everyone to use. I have a diverse tech stack spanning full-stack development, AI/ML systems, and mobile applications.</p>
     <div class="hero-links">
-      <a class="button" href="/projects/">View projects</a>
+      <a class="button" href="#projects">View projects</a>
       <a class="button button-secondary" href="#contact">Contact</a>
     </div>
     <p class="hero-social">

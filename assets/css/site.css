@@ -2325,9 +2325,21 @@ textarea {
 /* --- Project tiles and earlier work -------------------------------------- */
 
 .project-tiles {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.25rem; margin-bottom: 2.5rem;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(280px, 78vw, 340px);
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  overflow-x: auto;
+  padding: 0.25rem 0.25rem 1rem;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-a65) transparent;
 }
+.project-tiles::-webkit-scrollbar { height: 8px; }
+.project-tiles::-webkit-scrollbar-track { background: var(--border-softer); border-radius: var(--radius-pill); }
+.project-tiles::-webkit-scrollbar-thumb { background: var(--accent-a65); border-radius: var(--radius-pill); }
+.project-tile { scroll-snap-align: start; }
 .project-tile {
   display: flex; flex-direction: column; text-decoration: none; color: inherit;
   border: 1px solid var(--border-soft); border-radius: var(--radius-card);
@@ -2527,7 +2539,6 @@ body { line-height: 1.7; }
 
 /* --- homepage tiles --------------------------------------------------------- */
 
-.project-tiles { gap: 1rem; }
 
 .project-tile {
   background: var(--surface);

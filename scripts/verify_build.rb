@@ -103,16 +103,16 @@ must_have_assets("projects/brewery/index.html")
 brewery = page("projects/brewery/index.html")
 fail!("brewery unexpectedly has a writeup section") if brewery && brewery.include?("project-writeup")
 
-# --- Task 9: homepage, index, nav ----------------------------------------
-must_render("projects/index.html")
+# --- Task 9: homepage and nav ---------------------------------------------
+# The /projects/ index was removed on request: the nav anchors to the
+# homepage section, and only individual project pages have URLs.
 home = page("index.html")
 %w[loci delroy urthreads tensor-serve brewery].each do |slug|
   fail!("homepage does not link /projects/#{slug}/") unless home&.include?("/projects/#{slug}/")
-  fail!("projects index does not link /projects/#{slug}/") unless page("projects/index.html")&.include?("/projects/#{slug}/")
 end
-fail!("nav still points at the #projects anchor") if home&.include?('href="/#projects"')
+fail!("nav does not point at the #projects anchor") unless home&.include?('href="/#projects"')
+fail!("a page still links the removed /projects/ index") if Dir.glob(File.join(SITE, "**", "*.html")).any? { |f| File.read(f).include?('href="/projects/"') }
 fail!("Earlier work block missing") unless home&.include?("Earlier work")
-must_have_assets("projects/index.html")
 
 # --- Task 10: whole-site invariants --------------------------------------
 
