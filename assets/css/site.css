@@ -2327,14 +2327,27 @@ textarea {
 .project-tiles {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: clamp(280px, 78vw, 340px);
+  /* one card per view, the next peeking */
+  grid-auto-columns: calc(100% - 2.5rem);
   gap: 1rem;
   margin-bottom: 2.5rem;
   overflow-x: auto;
   padding: 0.25rem 0.25rem 1rem;
-  scroll-snap-type: x proximity;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 0.25rem;
   scrollbar-width: thin;
   scrollbar-color: var(--accent-a65) transparent;
+}
+
+@media (min-width: 640px) {
+  /* two per view: width = (100% - 1 gap) / 2 */
+  .project-tiles { grid-auto-columns: calc((100% - 1rem) / 2); }
+}
+
+@media (min-width: 1000px) {
+  /* exactly three per view: width = (100% - 2 gaps) / 3, so a rest
+     position always shows three whole cards */
+  .project-tiles { grid-auto-columns: calc((100% - 2rem) / 3); }
 }
 .project-tiles::-webkit-scrollbar { height: 8px; }
 .project-tiles::-webkit-scrollbar-track { background: var(--border-softer); border-radius: var(--radius-pill); }
