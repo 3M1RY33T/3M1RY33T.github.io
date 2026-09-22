@@ -14,6 +14,8 @@ problem: >
   a separate dial entirely.
 accent: "#60A5FA"
 accent_wash: "rgba(96,165,250,0.14)"
+icon: "/assets/img/projects/delroy.png"
+icon_rounded: true
 order: 2
 date: 2026-06-18
 status: active

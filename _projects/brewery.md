@@ -12,6 +12,7 @@ problem: >
   the only place that answer is any use.
 accent: "#FBBF24"
 accent_wash: "rgba(251,191,36,0.14)"
+icon: "/assets/img/projects/brewery.png"
 order: 5
 date: 2026-06-01
 status: active

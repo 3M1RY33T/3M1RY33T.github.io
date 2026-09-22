@@ -15,6 +15,7 @@ problem: >
   while being badly broken.
 accent: "#A78BFA"
 accent_wash: "rgba(167,139,250,0.14)"
+icon: "/assets/img/projects/loci.svg"
 order: 1
 date: 2026-08-27
 status: active

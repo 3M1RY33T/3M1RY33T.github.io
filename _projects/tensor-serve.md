@@ -14,6 +14,7 @@ problem: >
   answer that", and act on it.
 accent: "#FB7185"
 accent_wash: "rgba(251,113,133,0.14)"
+icon: "/assets/img/projects/tensor-serve.png"
 order: 4
 date: 2026-04-25
 status: active

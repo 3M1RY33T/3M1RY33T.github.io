@@ -2545,6 +2545,16 @@ body { line-height: 1.7; }
     var(--panel);
   border-bottom: 1px solid var(--border-softer);
 }
+.project-tile-media img.project-tile-icon {
+  width: auto;
+  height: 84px;
+  max-width: 60%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.45));
+}
+.project-tile-media img.project-tile-icon.is-rounded { border-radius: 22%; }
+.project-tile:hover .project-tile-media img.project-tile-icon { filter: drop-shadow(0 10px 28px var(--p-wash, var(--accent-a16))); }
+
 .project-tile-wordmark {
   font-family: var(--font-display);
   font-size: clamp(1.6rem, 3vw, 2.2rem);

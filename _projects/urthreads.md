@@ -13,6 +13,7 @@ problem: >
   which is the only deployment test that counts.
 accent: "#2DD4BF"
 accent_wash: "rgba(45,212,191,0.14)"
+icon: "/assets/img/projects/urthreads.png"
 order: 3
 date: 2026-05-19
 status: active

@@ -3,14 +3,14 @@
   {% for p in tiles %}
   <a class="project-tile" href="{{ p.url }}"{% if p.accent %} style="--p: {{ p.accent }}; --p-wash: {{ p.accent_wash }};"{% endif %}>
     <span class="project-tile-media">
-      {% if p.card.thumbnail %}
-        <img src="{{ p.card.thumbnail }}" alt="" loading="lazy">
+      {% if p.icon %}
+        <img class="project-tile-icon{% if p.icon_rounded %} is-rounded{% endif %}" src="{{ p.icon }}" alt="" loading="lazy">
       {% else %}
         <span class="project-tile-wordmark">{{ p.title }}</span>
       {% endif %}
     </span>
     <span class="project-tile-body">
-      {% if p.card.thumbnail %}<strong class="project-tile-name">{{ p.title }}</strong>{% endif %}
+      <strong class="project-tile-name">{{ p.title }}</strong>
       <span class="project-tile-tagline">{{ p.tagline }}</span>
       {% if p.stack %}
       <span class="project-chips">
