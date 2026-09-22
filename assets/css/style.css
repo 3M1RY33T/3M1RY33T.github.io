@@ -225,7 +225,6 @@ textarea {
   background: var(--accent-wash);
 }
 
-.card,
 .skills-grid div,
 .contact-form {
   background: white;
@@ -328,44 +327,6 @@ textarea {
   gap: 1.5rem;
 }
 
-.card-grid {
-  grid-auto-columns: calc((100% - 4.5rem) / 4);
-  grid-auto-flow: column;
-  grid-template-columns: none;
-  align-items: stretch;
-  margin: -0.25rem -0.25rem 0;
-  padding: 0.25rem 0.25rem 1rem;
-  overflow-x: auto;
-  overflow-y: hidden;
-  overscroll-behavior-inline: contain;
-  scroll-padding-inline: 0.25rem;
-  scroll-snap-type: x mandatory;
-  scrollbar-color: var(--accent-a65) transparent;
-  scrollbar-width: thin;
-  transition: scrollbar-color 180ms ease;
-  -webkit-overflow-scrolling: touch;
-}
-
-.card-grid::-webkit-scrollbar {
-  height: 0.7rem;
-}
-
-.card-grid::-webkit-scrollbar-track {
-  border-radius: 999px;
-  background: transparent;
-}
-
-.card-grid::-webkit-scrollbar-thumb {
-  border: 2px solid rgba(247,247,251,0.92);
-  border-radius: 999px;
-  background: var(--accent-a65);
-}
-
-.card-grid:hover::-webkit-scrollbar-track,
-.card-grid:focus-within::-webkit-scrollbar-track {
-  background: transparent;
-}
-
 @media (max-width: 1144px) {
   .card-grid {
     grid-auto-columns: calc((100% - 3rem) / 3);
@@ -382,66 +343,6 @@ textarea {
   .card-grid::-webkit-scrollbar-thumb {
     background: var(--accent-a65);
   }
-}
-
-.card {
-  padding: 1.75rem;
-}
-
-.project-card {
-  position: relative;
-  overflow: hidden;
-  min-height: 100%;
-  scroll-snap-align: start;
-  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
-}
-
-.project-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(37,99,235,0.32);
-  box-shadow: 0 26px 65px var(--shadow-soft);
-}
-
-.project-card:has(.project-card-link:focus-visible) {
-  transform: translateY(-3px);
-  border-color: rgba(37,99,235,0.32);
-  box-shadow: 0 26px 65px var(--shadow-soft);
-}
-
-.project-card-link {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.8rem;
-  padding: 1.75rem;
-  background: rgba(30,59,122,0.92);
-  color: white;
-  font-weight: 800;
-  text-align: center;
-  text-decoration: none;
-  opacity: 0;
-  transition: opacity 180ms ease;
-}
-
-.project-card-link img {
-  width: 2.4rem;
-  height: 2.4rem;
-  filter: brightness(0) invert(1);
-}
-
-.project-card:hover .project-card-link,
-.project-card-link:focus-visible {
-  color: white;
-  opacity: 1;
-}
-
-.project-card-link:focus-visible {
-  outline: 3px solid var(--accent-ring);
-  outline-offset: -8px;
 }
 
 .section-intro {
@@ -643,12 +544,6 @@ textarea {
   outline-offset: 3px;
 }
 
-.card h3 {
-  margin-top: 0;
-  font-size: 1.2rem;
-}
-
-.card p,
 .contact-copy p {
   color: var(--ink-muted);
 }
@@ -670,7 +565,6 @@ textarea {
   margin-right: auto; 
 }
 
-.meta,
 .post-meta {
   color: var(--ink-subtle);
   font-size: 0.95rem;
