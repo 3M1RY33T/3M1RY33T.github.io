@@ -90,6 +90,14 @@ must_render("projects/tensor-serve/index.html")
 must_contain("projects/tensor-serve/index.html", "152 passed, 17 skipped in 13s")
 must_have_assets("projects/tensor-serve/index.html")
 
+# --- Task 8: Brewery, product half only ----------------------------------
+must_render("projects/brewery/index.html")
+must_contain("projects/brewery/index.html", "what breaks if this goes")
+must_have_assets("projects/brewery/index.html")
+# The engineering half is deliberately absent until it is written.
+brewery = page("projects/brewery/index.html")
+fail!("brewery unexpectedly has a writeup section") if brewery && brewery.include?("project-writeup")
+
 if $failures.empty?
   puts "verify_build: OK"
   exit 0
