@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0A0C12" />
+    <script>
+      (function () {
+        try {
+          if (window.localStorage.getItem("theme") === "light") {
+            document.documentElement.dataset.theme = "light";
+          }
+        } catch (error) {}
+      })();
+    </script>
     <title>{{ page.title | default: site.title }}</title>
     <meta name="description" content="{{ page.excerpt | strip_html | strip_newlines | default: site.description }}">
     <link rel="icon" href="/assets/svg/favicon.svg" type="image/svg+xml" />
@@ -30,6 +39,22 @@
           <a href="/blog/">Blog</a>
           <a href="/#contact">Contact</a>
         </nav>
+        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch to light theme" title="Switch to light theme">
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"></path>
+          </svg>
+        </button>
       </div>
     </header>
 
@@ -41,6 +66,34 @@
       <p><span class="footer-mono">© {{ "now" | date: "%Y" }}</span> Yigit Yildiz <span class="footer-mono">· 3M1RY33T · Toronto</span></p>
     </footer>
     <script>
+      (function () {
+        const toggle = document.querySelector("[data-theme-toggle]");
+        if (!toggle) return;
+        const themeColor = document.querySelector('meta[name="theme-color"]');
+
+        function applyTheme(theme) {
+          const next = theme === "light" ? "light" : "dark";
+          if (next === "light") {
+            document.documentElement.dataset.theme = "light";
+          } else {
+            delete document.documentElement.dataset.theme;
+          }
+          const label = next === "light" ? "Switch to dark theme" : "Switch to light theme";
+          toggle.setAttribute("aria-label", label);
+          toggle.title = label;
+          if (themeColor) themeColor.content = next === "light" ? "#111827" : "#0A0C12";
+          try {
+            window.localStorage.setItem("theme", next);
+          } catch (error) {}
+        }
+
+        if (document.documentElement.dataset.theme === "light") applyTheme("light");
+
+        toggle.addEventListener("click", function () {
+          applyTheme(document.documentElement.dataset.theme === "light" ? "dark" : "light");
+        });
+      })();
+
       const likesEndpoint = "{{ site.likes.endpoint | default: '' | escape }}";
       const configuredCommentsEndpoint = "{{ site.comments.endpoint | default: '' | escape }}";
       const commentsEndpoint = configuredCommentsEndpoint || likesEndpoint.replace(/\/likes$/, "/comments");

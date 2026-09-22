@@ -46,6 +46,8 @@ end
 must_render("index.html")
 must_render("blog/index.html")
 must_have_assets("index.html")
+must_contain("index.html", "data-theme-toggle")
+must_contain("index.html", "theme-icon-moon")
 
 # --- Task 2: no CSS custom property is referenced but never declared -----
 # A typo like var(--acent) is not a CSS error: it resolves to nothing and the
@@ -57,6 +59,7 @@ if File.file?(css_path)
   declared = css.scan(/(--[a-z0-9-]+)\s*:/).flatten.uniq
   used = css.scan(/var\((--[a-z0-9-]+)\)/).flatten.uniq
   (used - declared).each { |t| fail!("site.css uses undeclared token #{t}") }
+  fail!("light theme block missing from site.css") unless css.include?('[data-theme="light"]')
 else
   fail!("missing stylesheet: assets/css/site.css")
 end
