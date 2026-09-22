@@ -12,6 +12,8 @@ problem: >
   hard this should try, and what it is allowed to touch. Delroy asks how
   hard instead, derives the budgets from the answer, and keeps permission on
   a separate dial entirely.
+accent: "#60A5FA"
+accent_wash: "rgba(96,165,250,0.14)"
 order: 2
 date: 2026-06-18
 status: active
@@ -23,10 +25,10 @@ links:
 
 metrics_verified: 2026-09-22
 metrics:
-  - { label: Tests, value: "7,503 collected across 9 tiers" }
-  - { label: Default tier, value: "5,895 passed, 0 failed, 0 skipped" }
-  - { label: Surface, value: "225 HTTP endpoints, 19 SQLite tables" }
-  - { label: History, value: "564 commits since 18 June 2026" }
+  - { label: Tests, value: "7,503", detail: "collected across 9 tiers" }
+  - { label: Default tier, value: "5,895", detail: "passed, 0 failed, 0 skipped" }
+  - { label: HTTP surface, value: "225", detail: "endpoints, 19 SQLite tables" }
+  - { label: Commits, value: "564", detail: "since 18 June 2026" }
 
 capabilities:
   - title: An effort ladder, not a model picker

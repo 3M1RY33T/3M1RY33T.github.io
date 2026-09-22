@@ -10,6 +10,8 @@ problem: >
   builds the dependent graph in memory from Homebrew's own JSON and puts
   "what breaks if this goes" directly beside the Uninstall button, which is
   the only place that answer is any use.
+accent: "#FBBF24"
+accent_wash: "rgba(251,191,36,0.14)"
 order: 5
 date: 2026-06-01
 status: active
@@ -27,10 +29,10 @@ install_note: >
 
 metrics_verified: 2026-09-22
 metrics:
-  - { label: Release, value: "v1.0.0" }
-  - { label: Source, value: "5,499 lines Swift across 32 files" }
-  - { label: Tests, value: "45 defined, 820 lines" }
-  - { label: Requires, value: "macOS, with Homebrew installed" }
+  - { label: Release, value: "v1.0.0", detail: "27 commits since 1 June" }
+  - { label: Source, value: "5,499", detail: "lines of Swift, 32 files" }
+  - { label: Tests, value: "45", detail: "defined, 820 lines" }
+  - { label: Requires, value: "macOS", detail: "with Homebrew installed" }
 
 capabilities:
   - title: The catalog as shelves

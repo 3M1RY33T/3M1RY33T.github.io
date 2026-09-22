@@ -12,6 +12,8 @@ problem: >
   every candidate the whole way through the pipeline, which is what lets it
   tell the difference between "here is the answer" and "this corpus cannot
   answer that", and act on it.
+accent: "#FB7185"
+accent_wash: "rgba(251,113,133,0.14)"
 order: 4
 date: 2026-04-25
 status: active
@@ -31,10 +33,10 @@ install_note: >
 
 metrics_verified: 2026-09-22
 metrics:
-  - { label: Tests, value: "152 passed, 17 skipped in 13s" }
-  - { label: Keyword latency, value: "0.85ms at 80,000 chunks, from 104.86ms" }
-  - { label: Torn reads, value: "34,704 of 34,709, then 0" }
-  - { label: Releases, value: "4, across 68 commits" }
+  - { label: Tests, value: "152", detail: "passed, 17 skipped, in 13.1s" }
+  - { label: Keyword latency, value: "0.85ms", detail: "at 80,000 chunks, from 104.86ms" }
+  - { label: Torn reads, value: "0", detail: "was 34,704 of 34,709" }
+  - { label: Releases, value: "4", detail: "across 68 commits" }
 
 capabilities:
   - title: Three retrievers, one chunk numbering

@@ -3,12 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#111827" />
+    <meta name="theme-color" content="#0A0C12" />
     <title>{{ page.title | default: site.title }}</title>
     <meta name="description" content="{{ page.excerpt | strip_html | strip_newlines | default: site.description }}">
     <link rel="icon" href="/assets/svg/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" />
     <link rel="mask-icon" href="/assets/svg/favicon.svg" color="#2563eb" />
-    <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/assets/css/site.css" />
   </head>
   <body>
     <header class="site-header">
@@ -19,6 +22,7 @@
           <span></span>
           <span></span>
         </label>
+        <a class="site-wordmark" href="/" aria-label="Home">yigit<span>.dev</span></a>
         <nav class="site-nav">
           <a href="/">Home</a>
           <a href="/projects/">Projects</a>
@@ -34,7 +38,7 @@
     </main>
 
     <footer class="site-footer">
-      <p>© {{ "now" | date: "%Y" }} Yigit Yildiz (3M1RY33T) · Built with GitHub Pages</p>
+      <p><span class="footer-mono">© {{ "now" | date: "%Y" }}</span> Yigit Yildiz <span class="footer-mono">· 3M1RY33T · Toronto</span></p>
     </footer>
     <script>
       const likesEndpoint = "{{ site.likes.endpoint | default: '' | escape }}";

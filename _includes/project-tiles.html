@@ -1,23 +1,26 @@
 <div class="project-tiles">
   {% assign tiles = site.projects | sort: "order" %}
   {% for p in tiles %}
-  <a class="project-tile" href="{{ p.url }}">
+  <a class="project-tile" href="{{ p.url }}"{% if p.accent %} style="--p: {{ p.accent }}; --p-wash: {{ p.accent_wash }};"{% endif %}>
     <span class="project-tile-media">
       {% if p.card.thumbnail %}
         <img src="{{ p.card.thumbnail }}" alt="" loading="lazy">
       {% else %}
-        <span class="project-tile-monogram" aria-hidden="true">{{ p.title | slice: 0 }}</span>
+        <span class="project-tile-wordmark">{{ p.title }}</span>
       {% endif %}
     </span>
     <span class="project-tile-body">
-      <strong class="project-tile-name">{{ p.title }}</strong>
+      {% if p.card.thumbnail %}<strong class="project-tile-name">{{ p.title }}</strong>{% endif %}
       <span class="project-tile-tagline">{{ p.tagline }}</span>
       {% if p.stack %}
       <span class="project-chips">
         {% for s in p.stack limit: 3 %}<span>{{ s }}</span>{% endfor %}
       </span>
       {% endif %}
-      <span class="project-tile-cta">View project</span>
+      {% if p.metrics and p.metrics.size > 1 %}
+      <span class="project-tile-stats">{{ p.metrics[0].value | escape }} {{ p.metrics[0].label | downcase }} &middot; {{ p.metrics[1].value | escape }} {{ p.metrics[1].label | downcase }}</span>
+      {% endif %}
+      <span class="project-tile-cta">View project &rarr;</span>
     </span>
   </a>
   {% endfor %}

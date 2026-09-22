@@ -5,24 +5,27 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
 ---
 
 <section class="hero">
-  <div>
-    <h1>About <span class="accent">Me</span></h1>
-    <!-- <h1>Yigit <span class="accent">(Emir)</span> Yildiz</h1> -->
-    <p class="eyebrow">Software Engineer · Full-stack · AI · Mobile</p>
+  <div class="hero-copy">
+    <p class="eyebrow">Software Engineer &middot; Full-stack &middot; AI &middot; Mobile</p>
+    <h1>Yigit Yildiz<span class="accent">.</span></h1>
     <p class="intro">I'm a Software Engineer from Istanbul, Turkey living in Toronto, Ontario with a passion for building scalable, open-source solutions free for everyone to use. I have a diverse tech stack spanning full-stack development, AI/ML systems, and mobile applications.</p>
-    <a class="hero-gravatar-compact" href="https://gravatar.com/pleasantwitchcd83be3d56" target="_blank" rel="noopener noreferrer" aria-label="View Yigit Yildiz on Gravatar">
-      <img src="https://1.gravatar.com/avatar/acbc4f96261335fc2e541a294927b481a49ec1fa62bf3bf14fc2239b2ae7ac9d?s=160" alt="Yigit Yildiz">
-      <span>
-        <strong>Yigit Yildiz</strong>
-        <span>Software Engineer · Toronto, Ontario</span>
-      </span>
-    </a>
     <div class="hero-links">
-      <a class="button" href="#contact">Contact</a>
-      <a class="button button-secondary" href="/blog/"><span class="accent">My</span>Blog</a>
+      <a class="button" href="/projects/">View projects</a>
+      <a class="button button-secondary" href="#contact">Contact</a>
+      <a class="button button-secondary" href="https://github.com/3M1RY33T" target="_blank" rel="noopener noreferrer">GitHub &#8599;</a>
     </div>
   </div>
-  <iframe class="hero-gravatar-card" src="https://gravatar.com/pleasantwitchcd83be3d56.card" title="Yigit Yildiz Gravatar profile card" width="415" height="228" loading="lazy"></iframe>
+  <aside class="hero-id" aria-label="Identity">
+    <img src="https://1.gravatar.com/avatar/acbc4f96261335fc2e541a294927b481a49ec1fa62bf3bf14fc2239b2ae7ac9d?s=160" alt="Yigit Yildiz" width="80" height="80">
+    <p class="hero-id-name">Yigit Yildiz</p>
+    <p class="hero-id-role">Software Engineer</p>
+    <p class="hero-id-loc">Toronto, Ontario, Canada</p>
+    <div class="hero-id-links">
+      <a href="https://github.com/3M1RY33T" target="_blank" rel="noopener noreferrer">github</a>
+      <a href="https://www.linkedin.com/in/yigitt-yildizz" target="_blank" rel="noopener noreferrer">linkedin</a>
+      <a href="https://gravatar.com/pleasantwitchcd83be3d56" target="_blank" rel="noopener noreferrer">gravatar</a>
+    </div>
+  </aside>
 </section>
 
 {% if site.posts.size > 0 %}

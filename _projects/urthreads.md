@@ -11,6 +11,8 @@ problem: >
   is the same feature set, self-hosted end to end, with nothing in the
   runtime dependency tree at all. It is also running on this site's blog,
   which is the only deployment test that counts.
+accent: "#2DD4BF"
+accent_wash: "rgba(45,212,191,0.14)"
 order: 3
 date: 2026-05-19
 status: active
@@ -31,10 +33,10 @@ install_note: >
 
 metrics_verified: 2026-09-22
 metrics:
-  - { label: Tests, value: "229 passed in 444ms, 0 skipped" }
-  - { label: Runtime dependencies, value: "0" }
-  - { label: Worker, value: "2,204 lines, 20 routed endpoints" }
-  - { label: Published, value: "npm 1.2.2, MIT" }
+  - { label: Tests, value: "229", detail: "passed in 444ms, 0 skipped" }
+  - { label: Runtime deps, value: "0", detail: "WebCrypto, fetch, D1, node builtins" }
+  - { label: Worker, value: "2,204", detail: "lines, 20 routed endpoints" }
+  - { label: Published, value: "1.2.2", detail: "on npm, MIT licence" }
 
 capabilities:
   - title: Your account, your database, your key

@@ -51,14 +51,14 @@ must_have_assets("index.html")
 # A typo like var(--acent) is not a CSS error: it resolves to nothing and the
 # property silently falls back. This is the one failure mode the tokenization
 # introduced, so it is checked on every build from here on.
-css_path = File.join(SITE, "assets/css/style.css")
+css_path = File.join(SITE, "assets/css/site.css")
 if File.file?(css_path)
   css = File.read(css_path)
   declared = css.scan(/(--[a-z0-9-]+)\s*:/).flatten.uniq
   used = css.scan(/var\((--[a-z0-9-]+)\)/).flatten.uniq
-  (used - declared).each { |t| fail!("style.css uses undeclared token #{t}") }
+  (used - declared).each { |t| fail!("site.css uses undeclared token #{t}") }
 else
-  fail!("missing stylesheet: assets/css/style.css")
+  fail!("missing stylesheet: assets/css/site.css")
 end
 
 # --- Task 3: the collection renders --------------------------------------
@@ -67,7 +67,7 @@ must_contain("projects/loci/index.html", "Scoped memory for coding agents")
 must_have_assets("projects/loci/index.html")
 
 # --- Task 4: every band renders from loci's data -------------------------
-must_contain("projects/loci/index.html", "400 passed, 14 skipped in 37s")
+must_contain("projects/loci/index.html", "passed, 14 skipped, in 37.2s")
 must_contain("projects/loci/index.html", "Measured from the repository on 22 September 2026")
 must_contain("projects/loci/index.html", "An agent that remembers everything")
 must_contain("projects/loci/index.html", "Routes before it searches")
@@ -77,17 +77,17 @@ must_contain("projects/loci/index.html", "Built with")
 
 # --- Task 5: Delroy ------------------------------------------------------
 must_render("projects/delroy/index.html")
-must_contain("projects/delroy/index.html", "7,503 collected across 9 tiers")
+must_contain("projects/delroy/index.html", "collected across 9 tiers")
 must_have_assets("projects/delroy/index.html")
 
 # --- Task 6: urthreads ---------------------------------------------------
 must_render("projects/urthreads/index.html")
-must_contain("projects/urthreads/index.html", "229 passed in 444ms")
+must_contain("projects/urthreads/index.html", "passed in 444ms")
 must_have_assets("projects/urthreads/index.html")
 
 # --- Task 7: Tensor ------------------------------------------------------
 must_render("projects/tensor-serve/index.html")
-must_contain("projects/tensor-serve/index.html", "152 passed, 17 skipped in 13s")
+must_contain("projects/tensor-serve/index.html", "passed, 17 skipped, in 13.1s")
 must_have_assets("projects/tensor-serve/index.html")
 
 # --- Task 8: Brewery, product half only ----------------------------------

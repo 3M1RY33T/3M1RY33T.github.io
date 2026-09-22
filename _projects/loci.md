@@ -13,6 +13,8 @@ problem: >
   index scores 98% whenever the answer happens to live in the largest
   corpus, so a merged index tested on a few questions can look excellent
   while being badly broken.
+accent: "#A78BFA"
+accent_wash: "rgba(167,139,250,0.14)"
 order: 1
 date: 2026-08-27
 status: active
@@ -34,10 +36,10 @@ install_note: >
 
 metrics_verified: 2026-09-22
 metrics:
-  - { label: Tests, value: "400 passed, 14 skipped in 37s" }
-  - { label: Routing, value: "sub-millisecond, flat from 25 to 100 scopes" }
-  - { label: Source, value: "8,234 lines Python, 2,000 lines Rust" }
-  - { label: Releases, value: "6, across 99 commits" }
+  - { label: Tests, value: "400", detail: "passed, 14 skipped, in 37.2s" }
+  - { label: Routing, value: "<1ms", detail: "flat from 25 to 100 scopes" }
+  - { label: Source, value: "10,234", detail: "lines, Python and Rust" }
+  - { label: Releases, value: "6", detail: "across 99 commits" }
 
 capabilities:
   - title: Routes before it searches

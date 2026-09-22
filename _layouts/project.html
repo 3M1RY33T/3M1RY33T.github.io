@@ -1,7 +1,7 @@
 ---
 layout: default
 ---
-<article class="project-page">
+<article class="project-page"{% if page.accent %} style="--p: {{ page.accent }}; --p-wash: {{ page.accent_wash }};"{% endif %}>
 
   <nav class="project-crumb" aria-label="Breadcrumb">
     <a href="/projects/">Projects</a>
@@ -57,7 +57,7 @@ layout: default
   <section class="project-metrics" aria-label="Verified metrics">
     <dl>
       {% for m in page.metrics %}
-      <div><dt>{{ m.label }}</dt><dd>{{ m.value }}</dd></div>
+      <div><dt>{{ m.label }}</dt><dd><span class="project-metric-value">{{ m.value | escape }}</span>{% if m.detail %}<span class="project-metric-detail">{{ m.detail }}</span>{% endif %}</dd></div>
       {% endfor %}
     </dl>
     {% if page.metrics_verified %}
