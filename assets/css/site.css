@@ -2493,17 +2493,16 @@ body { line-height: 1.7; }
   justify-content: center;
   width: 3.2rem;
   min-height: 3.2rem;
-  border: 1px solid var(--border);
-  border-radius: 0.85rem;
-  background: var(--surface-sunken);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
   color: var(--ink-muted);
   text-decoration: none;
-  transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
+  transition: color 180ms ease, background 180ms ease;
 }
 .hero-social a:hover {
   color: var(--accent-strong);
-  border-color: var(--accent-a28);
-  background: var(--accent-wash);
+  background: var(--accent-a08);
 }
 .hero-social svg {
   width: 1.35rem;
