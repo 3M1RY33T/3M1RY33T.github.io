@@ -66,6 +66,15 @@ must_render("projects/loci/index.html")
 must_contain("projects/loci/index.html", "Scoped memory for coding agents")
 must_have_assets("projects/loci/index.html")
 
+# --- Task 4: every band renders from loci's data -------------------------
+must_contain("projects/loci/index.html", "400 passed, 14 skipped in 37s")
+must_contain("projects/loci/index.html", "Measured from the repository on 22 September 2026")
+must_contain("projects/loci/index.html", "An agent that remembers everything")
+must_contain("projects/loci/index.html", "Routes before it searches")
+must_contain("projects/loci/index.html", "project-terminal")
+must_contain("projects/loci/index.html", "pip install loci-mem")
+must_contain("projects/loci/index.html", "Built with")
+
 if $failures.empty?
   puts "verify_build: OK"
   exit 0

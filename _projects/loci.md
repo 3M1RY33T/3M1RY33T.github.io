@@ -87,7 +87,7 @@ terminal:
         no project holds a distinctive term from this question
         -- `loci doctor` shows what is not indexed.
 
-post_tags: [loci]
+post_match: [loci]
 ---
 
 ## How it works
