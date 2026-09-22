@@ -80,6 +80,16 @@ must_render("projects/delroy/index.html")
 must_contain("projects/delroy/index.html", "7,503 collected across 9 tiers")
 must_have_assets("projects/delroy/index.html")
 
+# --- Task 6: urthreads ---------------------------------------------------
+must_render("projects/urthreads/index.html")
+must_contain("projects/urthreads/index.html", "229 passed in 444ms")
+must_have_assets("projects/urthreads/index.html")
+
+# --- Task 7: Tensor ------------------------------------------------------
+must_render("projects/tensor-serve/index.html")
+must_contain("projects/tensor-serve/index.html", "152 passed, 17 skipped in 13s")
+must_have_assets("projects/tensor-serve/index.html")
+
 if $failures.empty?
   puts "verify_build: OK"
   exit 0
