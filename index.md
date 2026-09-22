@@ -6,26 +6,20 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
 
 <section class="hero">
   <div class="hero-copy">
+    <img class="hero-avatar" src="https://1.gravatar.com/avatar/acbc4f96261335fc2e541a294927b481a49ec1fa62bf3bf14fc2239b2ae7ac9d?s=160" alt="" width="64" height="64">
     <p class="eyebrow">Software Engineer &middot; Full-stack &middot; AI &middot; Mobile</p>
     <h1>Yigit Yildiz<span class="accent">.</span></h1>
     <p class="intro">I'm a Software Engineer from Istanbul, Turkey living in Toronto, Ontario with a passion for building scalable, open-source solutions free for everyone to use. I have a diverse tech stack spanning full-stack development, AI/ML systems, and mobile applications.</p>
     <div class="hero-links">
       <a class="button" href="/projects/">View projects</a>
       <a class="button button-secondary" href="#contact">Contact</a>
-      <a class="button button-secondary" href="https://github.com/3M1RY33T" target="_blank" rel="noopener noreferrer">GitHub &#8599;</a>
     </div>
-  </div>
-  <aside class="hero-id" aria-label="Identity">
-    <img src="https://1.gravatar.com/avatar/acbc4f96261335fc2e541a294927b481a49ec1fa62bf3bf14fc2239b2ae7ac9d?s=160" alt="Yigit Yildiz" width="80" height="80">
-    <p class="hero-id-name">Yigit Yildiz</p>
-    <p class="hero-id-role">Software Engineer</p>
-    <p class="hero-id-loc">Toronto, Ontario, Canada</p>
-    <div class="hero-id-links">
+    <p class="hero-social">
       <a href="https://github.com/3M1RY33T" target="_blank" rel="noopener noreferrer">github</a>
       <a href="https://www.linkedin.com/in/yigitt-yildizz" target="_blank" rel="noopener noreferrer">linkedin</a>
       <a href="https://gravatar.com/pleasantwitchcd83be3d56" target="_blank" rel="noopener noreferrer">gravatar</a>
-    </div>
-  </aside>
+    </p>
+  </div>
 </section>
 
 {% if site.posts.size > 0 %}
