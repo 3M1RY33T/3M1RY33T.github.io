@@ -98,6 +98,17 @@ must_have_assets("projects/brewery/index.html")
 brewery = page("projects/brewery/index.html")
 fail!("brewery unexpectedly has a writeup section") if brewery && brewery.include?("project-writeup")
 
+# --- Task 9: homepage, index, nav ----------------------------------------
+must_render("projects/index.html")
+home = page("index.html")
+%w[loci delroy urthreads tensor-serve brewery].each do |slug|
+  fail!("homepage does not link /projects/#{slug}/") unless home&.include?("/projects/#{slug}/")
+  fail!("projects index does not link /projects/#{slug}/") unless page("projects/index.html")&.include?("/projects/#{slug}/")
+end
+fail!("nav still points at the #projects anchor") if home&.include?('href="/#projects"')
+fail!("Earlier work block missing") unless home&.include?("Earlier work")
+must_have_assets("projects/index.html")
+
 if $failures.empty?
   puts "verify_build: OK"
   exit 0

@@ -2479,3 +2479,59 @@ textarea {
   .project-hero { grid-template-columns: 1fr; }
   .project-metrics dl { gap: 2rem; }
 }
+
+/* --- Project tiles and earlier work -------------------------------------- */
+
+.project-tiles {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem; margin-bottom: 2.5rem;
+}
+.project-tile {
+  display: flex; flex-direction: column; text-decoration: none; color: inherit;
+  border: 1px solid var(--border-soft); border-radius: var(--radius-card);
+  overflow: hidden; background: var(--surface-sunken);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+.project-tile:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-a28);
+  box-shadow: 0 12px 28px var(--shadow-soft);
+}
+.project-tile:focus-visible { outline: 3px solid var(--accent-ring); outline-offset: 3px; }
+
+.project-tile-media {
+  display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 16 / 9; overflow: hidden;
+  background: linear-gradient(135deg, var(--accent-a16), var(--accent-a08));
+  border-bottom: 1px solid var(--border-soft);
+}
+.project-tile-media img { width: 100%; height: 100%; object-fit: cover; }
+.project-tile-monogram {
+  font-size: 3rem; font-weight: 700; color: var(--accent-strong); line-height: 1;
+}
+
+.project-tile-body { display: flex; flex-direction: column; flex: 1; gap: 0.5rem; padding: 1.1rem 1.25rem 1.25rem; }
+.project-tile-name { font-size: 1.15rem; }
+.project-tile-tagline { color: var(--ink-muted); font-size: 0.95rem; }
+.project-tile .project-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0; }
+.project-tile .project-chips span {
+  font-size: 0.74rem; font-weight: 600; padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-pill); background: var(--accent-a08);
+  color: var(--accent-strong); border: 1px solid var(--accent-a16);
+}
+.project-tile-cta { margin-top: auto; padding-top: 0.35rem; font-weight: 600; color: var(--accent); font-size: 0.92rem; }
+.project-tile:hover .project-tile-cta { color: var(--accent-strong); }
+
+.earlier-work { border-top: 1px solid var(--border); padding-top: 1.75rem; }
+.earlier-work h3 {
+  font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--ink-subtle); margin: 0 0 1rem;
+}
+.earlier-work ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.75rem; }
+.earlier-work li { display: grid; grid-template-columns: minmax(0, 12rem) 6rem 1fr; gap: 0.75rem; align-items: baseline; }
+.earlier-work-year { color: var(--ink-subtle); font-size: 0.85rem; }
+.earlier-work-note { color: var(--ink-muted); font-size: 0.9rem; }
+
+@media (max-width: 680px) {
+  .earlier-work li { grid-template-columns: 1fr; gap: 0.2rem; }
+}

@@ -101,79 +101,28 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
 
 <section id="projects" class="section">
   <h2>Projects</h2>
-  <div class="card-grid">
-    <article class="card project-card">
-      <h3>loci</h3>
-      <p class="meta">August 2026</p>
-      <p>Scoped memory for coding agents. Works out which project a question is about before it searches anything, pairing a structure store for what calls what with an episode store for what happened and why, and abstains instead of guessing when it has no material. No model in the query path.</p>
-      <a class="project-card-link" href="https://github.com/3M1RY33T/loci" target="_blank" rel="noopener noreferrer" aria-label="View loci on GitHub">
-        <img src="/assets/svg/github.svg" alt="" aria-hidden="true">
-        <span>View Project on GitHub</span>
-      </a>
-    </article>
-    <article class="card project-card">
-      <h3>Delroy</h3>
-      <p class="meta">July 2026</p>
-      <p>Local, on-device AI assistant that keeps project context between sessions. Builds a knowledge graph of your codebase and pairs it with a multi-agent architecture, desktop control, voice chat, browser automation, and scheduled workflows.</p>
-      <a class="project-card-link" href="/assets/Delroy-Project-Document.pdf" target="_blank" rel="noopener noreferrer" aria-label="Read the Delroy project document (PDF)">
-        <img src="/assets/svg/document.svg" alt="" aria-hidden="true">
-        <span>Read Project Document</span>
-      </a>
-    </article>
-    <article class="card project-card">
-      <h3>Brewery</h3>
-      <p class="meta">June 2026</p>
-      <p>Native SwiftUI macOS client for Homebrew. Loads installed formulae and casks, flags outdated packages, maps dependency and dependent relationships, browses the official catalog, and confirms before running any mutating command.</p>
-      <a class="project-card-link" href="https://github.com/3M1RY33T/brewery" target="_blank" rel="noopener noreferrer" aria-label="View Brewery on GitHub">
-        <img src="/assets/svg/github.svg" alt="" aria-hidden="true">
-        <span>View Project on GitHub</span>
-      </a>
-    </article>
-    <article class="card project-card">
-      <h3>urthreads</h3>
-      <p class="meta">May 2026</p>
-      <p>urthreads is self-hosted software for adding engagement features to static websites. Simply deploy the Worker to your own Cloudflare account, connect it to your own D1 database, and manage the dashboard with your own admin key.</p>
-      <a class="project-card-link" href="https://github.com/3M1RY33T/urthreads" target="_blank" rel="noopener noreferrer" aria-label="View urthreads on GitHub">
-        <img src="/assets/svg/github.svg" alt="" aria-hidden="true">
-        <span>View Project on GitHub</span>
-      </a>
-    </article>
-    <article class="card project-card">
-      <h3>Tensor (Serve)</h3>
-      <p class="meta">April 2026</p>
-      <p>ZIM-based retrieval-augmented proxy for OpenAI-compatible AI models. Downloads ZIM documentation, builds a semantic vector database, and combines keyword + semantic search for more accurate AI responses.</p>
-      <a class="project-card-link" href="https://github.com/3M1RY33T/tensor-serve" target="_blank" rel="noopener noreferrer" aria-label="View Tensor Serve on GitHub">
-        <img src="/assets/svg/github.svg" alt="" aria-hidden="true">
-        <span>View Project on GitHub</span>
-      </a>
-    </article>
-    <article class="card project-card">
-      <h3>E-Commerce Website</h3>
-      <p class="meta">Aug 2025</p>
-      <p>Full-stack retail site built with Vue, Quasar, .NET, C#, and MSSQL. Includes signup/login, order processing, and inventory tracking using the MVC pattern.</p>
-      <a class="project-card-link" href="https://github.com/3M1RY33T/E-CommerceWebsite" target="_blank" rel="noopener noreferrer" aria-label="View E-Commerce Website on GitHub">
-        <img src="/assets/svg/github.svg" alt="" aria-hidden="true">
-        <span>View Project on GitHub</span>
-      </a>
-    </article>
-    <article class="card project-card">
-      <h3>TextRoom</h3>
-      <p class="meta">Feb 2025</p>
-      <p>React + Express chatroom application with Socket.IO for real-time messaging, typing indicators, and group collaboration.</p>
-      <a class="project-card-link" href="https://github.com/3M1RY33T/TextRoom" target="_blank" rel="noopener noreferrer" aria-label="View TextRoom on GitHub">
-        <img src="/assets/svg/github.svg" alt="" aria-hidden="true">
-        <span>View Project on GitHub</span>
-      </a>
-    </article>
-        <article class="card project-card">
-      <h3>Pandemic Modeller</h3>
-      <p class="meta">Sep 2024</p>
-      <p>The pandemic modeler project presents the interface to the user in order the handle simulation parameters, such as: population size, infection rate, recovery time,immunity levels (1 to 5), simulation speed.</p>
-      <a class="project-card-link" href="https://github.com/3M1RY33T/PandemicModeller" target="_blank" rel="noopener noreferrer" aria-label="View Pandemic Modeller on GitHub">
-        <img src="/assets/svg/github.svg" alt="" aria-hidden="true">
-        <span>View Project on GitHub</span>
-      </a>
-    </article>
+  <p class="section-intro">Five shipped products. Each has its own page.</p>
+  {% include project-tiles.html %}
+
+  <div class="earlier-work">
+    <h3>Earlier work</h3>
+    <ul>
+      <li>
+        <a href="https://github.com/3M1RY33T/E-CommerceWebsite" target="_blank" rel="noopener noreferrer">E-Commerce Website</a>
+        <span class="earlier-work-year">Aug 2025</span>
+        <span class="earlier-work-note">Full-stack retail site in Vue, Quasar, .NET and MSSQL.</span>
+      </li>
+      <li>
+        <a href="https://github.com/3M1RY33T/TextRoom" target="_blank" rel="noopener noreferrer">TextRoom</a>
+        <span class="earlier-work-year">Feb 2025</span>
+        <span class="earlier-work-note">React and Express chatroom over Socket.IO.</span>
+      </li>
+      <li>
+        <a href="https://github.com/3M1RY33T/PandemicModeller" target="_blank" rel="noopener noreferrer">Pandemic Modeller</a>
+        <span class="earlier-work-year">Sep 2024</span>
+        <span class="earlier-work-note">Simulation with tunable population, infection rate and immunity.</span>
+      </li>
+    </ul>
   </div>
 </section>
 
