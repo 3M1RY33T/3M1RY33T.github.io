@@ -12,6 +12,10 @@ exclude:
   - ".env"
   - ".env.*"
   - "_config.template.yml"
+  - "docs"
+  - "vendor"
+  - "Gemfile"
+  - "Gemfile.lock"
 collections:
   posts:
     output: true

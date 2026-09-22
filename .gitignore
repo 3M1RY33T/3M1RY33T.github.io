@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # graphify build output, never committed
 graphify-out/
+Gemfile.lock
+.jekyll-cache/
+vendor/
