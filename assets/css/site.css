@@ -2501,11 +2501,10 @@ body { line-height: 1.7; }
   .hero-avatar { width: 64px; height: 64px; }
 }
 
-/* Icon buttons on the cta row, aligned to its right end. */
+/* Icon buttons on the cta row, flowing left beside the buttons. */
 .hero-social {
   display: inline-flex;
   gap: 0.5rem;
-  margin-left: auto;
 }
 .hero-social a {
   display: inline-flex;
