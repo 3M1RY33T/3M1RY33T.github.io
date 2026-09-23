@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="/assets/css/site.css?v={{ site.time | date: '%s' }}" />
   </head>
   <body>
-    <header class="site-header">
+    <header class="site-header"{% if page.accent %} data-project-hue style="--p: {{ page.accent }};"{% endif %}>
       <div class="container header-inner">
         <input class="nav-toggle" type="checkbox" id="nav-toggle" aria-label="Toggle navigation menu">
         <label class="nav-toggle-label" for="nav-toggle" aria-hidden="true">
