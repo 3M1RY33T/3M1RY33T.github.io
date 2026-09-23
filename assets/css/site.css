@@ -2985,6 +2985,8 @@ body { line-height: 1.7; }
 :root[data-theme="light"] .pd-detail-title,
 :root[data-theme="light"] .pd-play,
 :root[data-theme="light"] .pd-step:hover,
+:root[data-theme="light"] .project-terminal-prompt,
+:root[data-theme="light"] .project-writeup :not(pre) > code,
 :root[data-theme="light"] .pd-facts li {
   color: color-mix(in srgb, var(--p, var(--accent)) 55%, #1e2a44);
 }
@@ -3526,6 +3528,27 @@ body { line-height: 1.7; }
   .project-diagram { padding: 1rem; }
   .pd-node { min-width: 7rem; padding: 0.55rem 0.75rem; }
   .pd-stage { gap: 1.75rem; }
+}
+
+/* The command-line surfaces (the terminal session, the quickstart
+   command and any code block in a write-up) leave the fixed dark panel in
+   light mode too. Their rules read the panel tokens, so re-pointing those
+   inside each one turns it light without touching a component rule: a
+   white window, a pale title bar, dark commands, slate output. */
+:root[data-theme="light"] .project-terminal,
+:root[data-theme="light"] .project-install,
+:root[data-theme="light"] .project-writeup pre {
+  --panel: #ffffff;
+  --panel-2: #f1f5f9;
+  --panel-ink: #0f172a;
+  --panel-ink-muted: #475569;
+  --border: #e2e8f0;
+}
+:root[data-theme="light"] .project-terminal {
+  box-shadow: 0 22px 55px rgba(15, 23, 42, 0.08), 0 0 60px -36px var(--p, var(--accent));
+}
+:root[data-theme="light"] .project-install {
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 
 /* In light mode the schematic leaves the fixed dark panel the terminals
