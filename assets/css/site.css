@@ -2439,7 +2439,15 @@ body { line-height: 1.7; }
 .site-wordmark:focus-visible { outline: 3px solid var(--accent-ring); outline-offset: 3px; border-radius: 4px; }
 
 .site-nav { margin: 0; }
-.site-nav a { color: var(--ink-muted); font-size: 0.92rem; }
+/* The nav speaks the same mono as the wordmark beside it and the rest of
+   the site chrome (eyebrow, chips, activity log), lowercase like both. */
+.site-nav a {
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+}
 .site-nav a:hover { background: var(--accent-a08); color: var(--ink-deep); }
 
 /* --- hero ------------------------------------------------------------------ */
