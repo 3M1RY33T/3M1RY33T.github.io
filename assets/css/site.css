@@ -556,6 +556,7 @@ textarea {
 :root:not([data-theme="light"]) .skills-grid img[src="/assets/svg/mysql.svg"] { content: url("/assets/svg/mysql-white.svg"); }
 :root:not([data-theme="light"]) .skills-grid img[src="/assets/svg/react-native.svg"] { content: url("/assets/svg/react-native-white.svg"); }
 :root:not([data-theme="light"]) .skills-grid img[src="/assets/svg/aws.svg"] { content: url("/assets/svg/aws-white.svg"); }
+:root:not([data-theme="light"]) .skills-grid img[src="/assets/svg/rust.svg"] { content: url("/assets/svg/rust-white.svg"); }
 
 .skills-grid::after {
   content: "";

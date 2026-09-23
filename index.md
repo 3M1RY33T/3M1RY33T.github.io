@@ -163,6 +163,10 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
       <h3 class="skill-header">Go</h3>
     </div>
     <div>
+      <img class="icon" src="/assets/svg/rust.svg" width="100" height="100">
+      <h3 class="skill-header">Rust</h3>
+    </div>
+    <div>
       <img class="cropped-icon" src="/assets/svg/kotlin.svg" width="180" height="100">
       <h3 class="skill-header">Kotlin</h3>
     </div>
