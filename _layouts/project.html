@@ -37,6 +37,11 @@ layout: default
       <p class="project-install-note">{{ page.install_note }}</p>
       {% endif %}{% endunless %}
     </div>
+    {% if page.icon %}
+    <div class="project-hero-icon" aria-hidden="true">
+      <img class="{% if page.icon_rounded %}is-rounded{% endif %}" src="{{ page.icon }}" alt="" width="200" height="200">
+    </div>
+    {% endif %}
   </header>
 
   {% if page.hero.media %}

@@ -2331,7 +2331,8 @@ textarea {
 .project-rail-back { align-self: start; font-weight: 600; }
 
 @media (min-width: 900px) {
-  .project-hero { grid-template-columns: 1fr; }
+  /* the icon takes the space beside the copy */
+  .project-hero { grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 3rem; }
   .project-metrics dl { gap: 2rem; }
 }
 
@@ -2650,6 +2651,33 @@ body { line-height: 1.7; }
 .project-tagline { font-size: 1.3rem; color: var(--ink-soft); }
 .project-summary { color: var(--ink-muted); }
 
+/* The project's own mark, sitting in the hero's second column on
+   desktop and leading the page on narrow screens. Decorative: the h1
+   beside it already names the project. */
+.project-hero-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  order: -1;
+}
+.project-hero-icon img {
+  width: 88px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 34px rgba(0, 0, 0, 0.5));
+}
+.project-hero-icon img.is-rounded { border-radius: 22%; }
+
+@media (min-width: 900px) {
+  .project-hero-icon {
+    order: 0;
+    padding: 1.5rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, var(--p-wash, var(--accent-a16)), transparent 70%);
+  }
+  .project-hero-icon img { width: clamp(150px, 16vw, 210px); }
+}
+
 .project-page .project-chips li {
   background: var(--p-wash, var(--accent-a08));
   color: var(--p, var(--accent));
@@ -2878,6 +2906,9 @@ body { line-height: 1.7; }
 }
 :root[data-theme="light"] .project-tile:hover .project-tile-icon {
   filter: drop-shadow(0 8px 20px var(--p-wash, var(--accent-a16)));
+}
+:root[data-theme="light"] .project-hero-icon img {
+  filter: drop-shadow(0 10px 26px rgba(15, 23, 42, 0.18));
 }
 /* The hover lift too: half-black under a card reads as a hole on white,
    so it becomes a light slate lift with the hue bloom washed down. */
