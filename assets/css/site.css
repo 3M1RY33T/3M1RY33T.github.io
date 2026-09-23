@@ -2355,7 +2355,8 @@ textarea {
 .project-tiles::-webkit-scrollbar-thumb { background: var(--accent-a65); border-radius: var(--radius-pill); }
 .project-tile { scroll-snap-align: start; }
 .project-tile {
-  display: flex; flex-direction: column; text-decoration: none; color: inherit;
+  display: flex; flex-direction: column; gap: 0.7rem; text-decoration: none; color: inherit;
+  padding: 1.25rem;
   border: 1px solid var(--border-soft); border-radius: var(--radius-card);
   overflow: hidden; background: var(--surface-sunken);
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
@@ -2367,18 +2368,17 @@ textarea {
 }
 .project-tile:focus-visible { outline: 3px solid var(--accent-ring); outline-offset: 3px; }
 
-.project-tile-media {
-  display: flex; align-items: center; justify-content: center;
-  aspect-ratio: 16 / 9; overflow: hidden;
-  background: linear-gradient(135deg, var(--accent-a16), var(--accent-a08));
-  border-bottom: 1px solid var(--border-soft);
-}
-.project-tile-media img { width: 100%; height: 100%; object-fit: cover; }
+/* App-style head: the logo sits beside the name and tagline. */
+.project-tile-head { display: flex; align-items: center; gap: 0.9rem; }
+.project-tile-icon { width: 56px; height: 56px; object-fit: contain; flex: none; }
+.project-tile-icon.is-rounded { border-radius: 22%; }
+.project-tile-title { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
 .project-tile-monogram {
-  font-size: 3rem; font-weight: 700; color: var(--accent-strong); line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  width: 56px; height: 56px; flex: none;
+  font-size: 2rem; font-weight: 700; color: var(--accent-strong); line-height: 1;
 }
 
-.project-tile-body { display: flex; flex-direction: column; flex: 1; gap: 0.5rem; padding: 1.1rem 1.25rem 1.25rem; }
 .project-tile-name { font-size: 1.15rem; }
 .project-tile-tagline { color: var(--ink-muted); font-size: 0.95rem; }
 .project-tile .project-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0; }
@@ -2586,7 +2586,9 @@ body { line-height: 1.7; }
 
 
 .project-tile {
-  background: var(--surface);
+  background:
+    radial-gradient(ellipse 130% 100% at 0% 0%, var(--p-wash, var(--accent-a08)), transparent 55%),
+    var(--surface);
   border-color: var(--border-soft);
 }
 .project-tile:hover {
@@ -2594,31 +2596,9 @@ body { line-height: 1.7; }
   box-shadow: 0 18px 50px rgba(0,0,0,0.5), 0 0 40px -18px var(--p, var(--accent));
 }
 
-.project-tile-media {
-  aspect-ratio: 21 / 9;
-  background:
-    radial-gradient(ellipse 90% 120% at 50% 130%, var(--p-wash, var(--accent-a16)), transparent),
-    var(--panel);
-  border-bottom: 1px solid var(--border-softer);
-}
-.project-tile-media img.project-tile-icon {
-  width: auto;
-  height: 84px;
-  max-width: 60%;
-  object-fit: contain;
-  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.45));
-}
-.project-tile-media img.project-tile-icon.is-rounded { border-radius: 22%; }
-.project-tile:hover .project-tile-media img.project-tile-icon { filter: drop-shadow(0 10px 28px var(--p-wash, var(--accent-a16))); }
-
-.project-tile-wordmark {
-  font-family: var(--font-display);
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--p, var(--accent));
-  text-shadow: 0 0 34px var(--p-wash, var(--accent-a16));
-}
+.project-tile-icon { filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35)); }
+.project-tile:hover .project-tile-icon { filter: drop-shadow(0 8px 20px var(--p-wash, var(--accent-a16))); }
+.project-tile-monogram { color: var(--p, var(--accent)); font-family: var(--font-display); }
 
 .project-tile-name { font-family: var(--font-display); color: var(--ink-deep); }
 .project-tile-tagline { font-size: 0.92rem; }
@@ -2879,19 +2859,13 @@ body { line-height: 1.7; }
 :root[data-theme="light"] .project-rail-back {
   color: color-mix(in srgb, var(--p, var(--accent)) 55%, #1e2a44);
 }
-/* The tile's media band drops the fixed dark panel on white: the same
-   per-project glow sits on a light slate ground instead, and the icon's
-   shadow lightens with it. */
-:root[data-theme="light"] .project-tile-media {
-  background:
-    radial-gradient(ellipse 90% 120% at 50% 130%, var(--p-wash, var(--accent-a16)), transparent),
-    var(--surface-2);
+/* On white the tile logo casts slate, not black, and the hover keeps
+   the project hue. */
+:root[data-theme="light"] .project-tile-icon {
+  filter: drop-shadow(0 5px 12px rgba(15, 23, 42, 0.16));
 }
-:root[data-theme="light"] .project-tile-media img.project-tile-icon {
-  filter: drop-shadow(0 8px 18px rgba(15, 23, 42, 0.18));
-}
-:root[data-theme="light"] .project-tile:hover .project-tile-media img.project-tile-icon {
-  filter: drop-shadow(0 10px 28px var(--p-wash, var(--accent-a16)));
+:root[data-theme="light"] .project-tile:hover .project-tile-icon {
+  filter: drop-shadow(0 8px 20px var(--p-wash, var(--accent-a16)));
 }
 
 :root[data-theme="light"] .project-page .button {

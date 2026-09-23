@@ -2,26 +2,26 @@
   {% assign tiles = site.projects | sort: "order" %}
   {% for p in tiles %}
   <a class="project-tile" href="{{ p.url }}"{% if p.accent %} style="--p: {{ p.accent }}; --p-wash: {{ p.accent_wash }};"{% endif %}>
-    <span class="project-tile-media">
+    <span class="project-tile-head">
       {% if p.icon %}
-        <img class="project-tile-icon{% if p.icon_rounded %} is-rounded{% endif %}" src="{{ p.icon }}" alt="" loading="lazy">
+        <img class="project-tile-icon{% if p.icon_rounded %} is-rounded{% endif %}" src="{{ p.icon }}" alt="" loading="lazy" width="56" height="56">
       {% else %}
-        <span class="project-tile-wordmark">{{ p.title }}</span>
+        <span class="project-tile-monogram">{{ p.title | slice: 0 }}</span>
       {% endif %}
-    </span>
-    <span class="project-tile-body">
-      <strong class="project-tile-name">{{ p.title }}</strong>
-      <span class="project-tile-tagline">{{ p.tagline }}</span>
-      {% if p.stack %}
-      <span class="project-chips">
-        {% for s in p.stack limit: 3 %}<span>{{ s }}</span>{% endfor %}
+      <span class="project-tile-title">
+        <strong class="project-tile-name">{{ p.title }}</strong>
+        <span class="project-tile-tagline">{{ p.tagline }}</span>
       </span>
-      {% endif %}
-      {% if p.metrics and p.metrics.size > 1 %}
-      <span class="project-tile-stats">{{ p.metrics[0].value | escape }} {{ p.metrics[0].label | downcase }} &middot; {{ p.metrics[1].value | escape }} {{ p.metrics[1].label | downcase }}</span>
-      {% endif %}
-      <span class="project-tile-cta">View project &rarr;</span>
     </span>
+    {% if p.stack %}
+    <span class="project-chips">
+      {% for s in p.stack limit: 3 %}<span>{{ s }}</span>{% endfor %}
+    </span>
+    {% endif %}
+    {% if p.metrics and p.metrics.size > 1 %}
+    <span class="project-tile-stats">{{ p.metrics[0].value | escape }} {{ p.metrics[0].label | downcase }} &middot; {{ p.metrics[1].value | escape }} {{ p.metrics[1].label | downcase }}</span>
+    {% endif %}
+    <span class="project-tile-cta">View project &rarr;</span>
   </a>
   {% endfor %}
 </div>
