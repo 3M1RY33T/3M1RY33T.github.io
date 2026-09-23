@@ -33,6 +33,96 @@ install_note: >
   the schema and deploys the Worker. Teardown undoes all of it.
 
 metrics_verified: 2026-09-22
+diagrams:
+  - id: runtime
+    title: One Worker, two audiences
+    nodes:
+      - id: reader
+        label: "a reader's browser"
+        meta: "likes.js, comments.js"
+        row: 0
+        detail: >
+          A stranger on the site. Everything they can do either reads an aggregate or writes something invisible until a human approves it.
+      - id: owner
+        label: "the owner's browser"
+        meta: "web/dashboard.js"
+        row: 0
+        detail: >
+          The dashboard, a static file on a third origin, authenticated with the owner's own admin key.
+      - id: worker
+        label: "src/worker.js"
+        meta: "CORS · CSRF · auth · rate limits"
+        row: 1
+        detail: >
+          One Worker serves both audiences on one origin. Every request passes the same four gates before anything reaches the database, which is why the security argument is all on this side.
+      - id: d1
+        label: "Cloudflare D1"
+        meta: "8 tables"
+        row: 2
+        detail: >
+          Your own D1 instance in your own Cloudflare account. Nothing routes through infrastructure belonging to anyone else.
+    edges:
+      - [reader, worker]
+      - [owner, worker]
+      - [worker, d1]
+    steps: [reader, owner, worker, d1]
+    ascii: |
+          a reader's browser                 the owner's browser
+          likes.js, comments.js              web/dashboard.js
+                  │                                  │
+                  │  GET/POST /likes                 │  POST /admin/session
+                  │  GET/POST /comments              │  GET  /admin/comments
+                  │  GET/POST /comments/like         │  POST /admin/comments/approve
+                  │                                  │  GET  /admin/stats
+                  ▼                                  ▼
+          ┌───────────────────────────────────────────────────┐
+          │  src/worker.js                                    │
+          │    CORS policy      exact origins, no wildcard    │
+          │                     ever on /admin/*              │
+          │    CSRF check       every admin mutation          │
+          │    auth             cookie session, or bearer key │
+          │    rate limits      D1-backed, per IP             │
+          └───────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+                          Cloudflare D1 (SQLite)
+                          8 tables
+
+tabs:
+  - id: overview
+    label: Overview
+    bands: [problem, capabilities, quickstart]
+  - id: runtime
+    label: Runtime
+    heading: One Worker, two audiences
+    lede: >
+      A reader and the owner hit the same origin and the same handler. Step
+      through what a request passes on its way to the database.
+    diagram: runtime
+    notes:
+      - title: The owner is not an operator
+        body: >
+          The person running this installed a package; they are not a
+          platform engineer. So the defaults are the security policy,
+          because a default is what almost every install will actually run.
+      - title: Two refusals, because they fail differently
+        body: >
+          The CLI refuses to store a wildcard origin and the Worker refuses
+          to honour one. A control implemented only in the tool that writes
+          the config is a control that a hand-edit removes.
+      - title: A signed token made revocable on purpose
+        body: >
+          The sessions table exists purely to make a stateless token
+          stateful. A signed stateless token cannot be revoked; a signed
+          token with a row behind it can.
+  - id: measured
+    label: Measured
+    heading: Numbers that came from commands
+    bands: [metrics, showcase]
+  - id: depth
+    label: In depth
+    bands: [writeup]
+
 metrics:
   - { label: Tests, value: "229", detail: "passed in 444ms, 0 skipped" }
   - { label: Runtime deps, value: "0", detail: "WebCrypto, fetch, D1, node builtins" }

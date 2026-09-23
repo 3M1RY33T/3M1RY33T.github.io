@@ -145,6 +145,42 @@ Dir.glob(File.join(SITE, "projects", "**", "*.html")).each do |file|
   fail!("em or en dash in #{rel}") if html =~ /[\u2013\u2014]/
 end
 
+
+# --- tabbed sections and schematics ---------------------------------------
+# A tab whose band list drops a band silently loses that content, and a
+# diagram that ships without its ASCII fallback is blank without JS. Both
+# failed exactly once during the rebuild, so both are checked here.
+%w[assets/js/project-tabs.js assets/js/project-diagram.js].each do |asset|
+  fail!("missing script: #{asset}") unless File.file?(File.join(SITE, asset))
+end
+
+TABBED = { "loci" => 4, "delroy" => 5, "urthreads" => 4, "tensor-serve" => 5, "brewery" => 3 }.freeze
+TABBED.each do |slug, count|
+  html = page("projects/#{slug}/index.html")
+  next if html.nil?
+  tabs = html.scan(/data-tab="/).size
+  fail!("#{slug} has #{tabs} tabs, expected #{count}") unless tabs == count
+  panels = html.scan(/class="project-panel"/).size
+  fail!("#{slug} has #{panels} panels for #{tabs} tabs") unless panels == tabs
+  fail!("#{slug} tab bar is not a tablist") unless html.include?('role="tablist"')
+end
+
+# Every schematic carries its data and a fallback drawing.
+%w[loci delroy urthreads tensor-serve].each do |slug|
+  html = page("projects/#{slug}/index.html")
+  next if html.nil?
+  fail!("#{slug} has no schematic data") unless html.include?("data-diagram-data")
+  fail!("#{slug} schematic has no ascii fallback") unless html.include?("project-diagram-ascii")
+end
+
+# The install button points into a panel, so that id has to exist.
+%w[loci tensor-serve urthreads].each do |slug|
+  html = page("projects/#{slug}/index.html")
+  next if html.nil?
+  next unless html.include?('href="#quickstart"')
+  fail!("#{slug} links #quickstart but never renders it") unless html.include?('id="quickstart"')
+end
+
 if $failures.empty?
   puts "verify_build: OK"
   exit 0

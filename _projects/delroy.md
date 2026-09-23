@@ -26,10 +26,189 @@ links:
   document: /assets/Delroy-Project-Document.pdf
 
 metrics_verified: 2026-09-22
+diagrams:
+  - id: surfaces
+    title: Four surfaces, one runtime
+    nodes:
+      - id: desktop
+        label: "Desktop"
+        meta: "native pywebview"
+        row: 0
+        detail: >
+          One of four surfaces. Each is a client of the same local server rather than its own implementation.
+      - id: web
+        label: "Web"
+        meta: "workspace"
+        row: 0
+        detail: >
+          The browser workspace, talking to the same endpoints as everything else.
+      - id: cli
+        label: "CLI"
+        meta: "delroy"
+        row: 0
+        detail: >
+          The terminal surface. Same runtime, same policy, same nine levels.
+      - id: glasses
+        label: "Even G2"
+        meta: "glasses companion"
+        row: 0
+        detail: >
+          A voice command spoken into smart glasses enters here and is answered by the same runtime as a typed one.
+      - id: server
+        label: "local HTTP server"
+        meta: "NDJSON streaming, bearer + cookie auth"
+        row: 1
+        detail: >
+          The single point every surface goes through. Nothing bypasses it, which is why a feature added once appears on all four.
+      - id: runtime
+        label: "agent runtime"
+        meta: "tool loop, 16 tools"
+        row: 2
+        detail: >
+          The tool loop, with concurrent and async delegation. This is what actually runs a turn.
+      - id: pipeline
+        label: "pipeline engine"
+        meta: "stages · lanes · gates · rework"
+        row: 2
+        detail: >
+          Calls into the agent runtime once per stage rather than bypassing it, so a pipeline stage and a chat turn obey the same rules.
+      - id: subsystems
+        label: "subsystems"
+        meta: "backlog · automations · MCP · voice · browser"
+        row: 2
+        detail: >
+          The reach: everything the harness is wired into, sharing the runtime rather than reimplementing it.
+      - id: policy
+        label: "policy layer"
+        meta: "run_policy · permission_rules · sensitive_paths"
+        row: 3
+        detail: >
+          May never import the runtime or the server. The import graph enforces the layering rather than a convention asking politely.
+      - id: providers
+        label: "model providers"
+        meta: "local and hosted"
+        row: 4
+        detail: >
+          The bottom of the stack. Which one answers is a configuration detail, not an architectural one.
+    edges:
+      - [desktop, server]
+      - [web, server]
+      - [cli, server]
+      - [glasses, server]
+      - [server, runtime]
+      - [server, pipeline]
+      - [server, subsystems]
+      - [pipeline, runtime]
+      - [runtime, policy]
+      - [policy, providers]
+    steps: [desktop, web, cli, glasses, server, runtime, pipeline, subsystems, policy, providers]
+    ascii: |
+         ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌────────────┐
+         │  Desktop  │  │    Web    │  │    CLI    │  │  Even G2   │
+         │  (native  │  │ workspace │  │  (delroy) │  │  glasses   │
+         │  pywebview│  │           │  │           │  │  companion │
+         └─────┬─────┘  └─────┬─────┘  └─────┬─────┘  └─────┬──────┘
+               │              │              │              │
+               └──────────────┴──────┬───────┴──────────────┘
+                                     │
+                        ┌────────────▼─────────────┐
+                        │   Local HTTP server      │
+                        │   NDJSON streaming,      │
+                        │   bearer + cookie auth   │
+                        └────────────┬─────────────┘
+                                     │
+               ┌─────────────────────┼─────────────────────┐
+         ┌─────▼──────┐    ┌─────────▼────────┐   ┌────────▼────────┐
+         │   Agent    │    │    Pipeline      │   │  Subsystems     │
+         │  runtime   │◄───┤    engine        │   │  backlog,       │
+         │ 16 tools   │    │  stages · lanes  │   │  automations,   │
+         │ concurrent │    │  gates · rework  │   │  MCP, voice,    │
+         │ + async    │    │                  │   │  browser        │
+         └─────┬──────┘    └──────────────────┘   └─────────────────┘
+               │
+         ┌─────▼──────────────────────────────────────────┐
+         │  Policy layer: run_policy, permission_rules,   │
+         │  sensitive_paths, untrusted_content,           │
+         │  lane_ownership, write_claims                  │
+         └──────────────────────┬─────────────────────────┘
+                                │
+         ┌──────────────────────▼─────────────────────────┐
+         │  model providers, local and hosted             │
+         └────────────────────────────────────────────────┘
+
+tabs:
+  - id: overview
+    label: Overview
+    bands: [problem, capabilities]
+  - id: architecture
+    label: Architecture
+    heading: Four surfaces, one runtime
+    lede: >
+      A desktop app, a browser workspace, a CLI and a pair of smart glasses
+      are four clients of the same local server, not four implementations.
+      Step down the stack, or click any layer.
+    diagram: surfaces
+    notes:
+      - title: The layering is enforced by the import graph
+        body: >
+          The policy layer may never import the runtime or the server. That
+          rule is written into the modules themselves with its reason
+          attached, and the import graph obeys it, which makes it a property
+          of the build rather than a convention asking politely.
+      - title: Concurrency, not parallelism
+        body: >
+          An isolated worktree per lane was built, shipped behind a flag and
+          then deleted, because the isolation caused the failure: agents that
+          cannot see each other's work invent it, and the inventions collide
+          at merge. Ownership on first write replaced it.
+      - title: Ownership is taken, not declared
+        body: >
+          A partitioner cannot know the split in advance for ad-hoc
+          delegation, so a lane claims a file the first time it writes one.
+          Exclusion alone leaves a lost-update window, so a staleness check
+          guards it alongside.
+  - id: effort
+    label: Effort
+    heading: How hard should this try?
+    lede: >
+      Almost every agent tool asks you to choose a model. Delroy asks a
+      different question and derives everything else from the answer.
+    notes:
+      - title: One dial became two axes
+        body: >
+          A single level answered two questions at once, so "fan out across
+          twelve lanes but think cheaply in each" could not be expressed.
+          The reasoning rung and the orchestration shape are now separate,
+          and the fused ladder survives as a wire format rather than an
+          architecture.
+        evidence: EFFORT_LEVELS · ORCHESTRATION_LEVELS none · subagents · extended · ultra
+      - title: The name is the value
+        body: >
+          A reasoning rung is not translated on the way to the provider: the
+          level's name is literally what gets sent. An earlier vocabulary of
+          light, standard and deep was deleted because it was a second name
+          for something the provider had already named.
+      - title: The rename had to be a migration
+        body: >
+          Two of the old names survived with different meanings, so a stored
+          value was not self-describing. A read-time alias would have made
+          the new meaning permanently unreachable, which turns a lookup
+          table into a single UPDATE with a CASE.
+  - id: measured
+    label: Measured
+    heading: Numbers that came from commands
+    lede: >
+      Every figure below was produced by a command against the repository,
+      and the appendix of the project document carries the raw output.
+    bands: [metrics, terminal]
+  - id: depth
+    label: In depth
+    bands: [writeup]
+
 metrics:
   - { label: Tests, value: "7,503", detail: "collected across 9 tiers" }
   - { label: Default tier, value: "5,895", detail: "passed, 0 failed, 0 skipped" }
-  - { label: HTTP surface, value: "225", detail: "endpoints, 19 SQLite tables" }
+  - { label: HTTP surface, value: "250", detail: "endpoints, 19 SQLite tables" }
   - { label: Commits, value: "564", detail: "since 18 June 2026" }
 
 capabilities:

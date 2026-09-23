@@ -29,6 +29,35 @@ install_note: >
   once. Homebrew itself must already be installed.
 
 metrics_verified: 2026-09-22
+tabs:
+  - id: overview
+    label: Overview
+    bands: [problem, capabilities]
+    notes:
+      - title: The graph is built once, then walked both ways
+        body: >
+          Both adjacency maps are built at load from a single
+          "brew info --json=v2 --installed" call, so asking what depends on
+          a package costs a dictionary hit rather than another shell out.
+          Every entry is clickable, so the graph walks in either direction.
+      - title: Nothing runs until you read it
+        body: >
+          Install, upgrade, uninstall and cleanup all stop at a sheet that
+          prints the exact brew command. It is a rule of the app rather
+          than a preference you can switch off.
+      - title: Logic and interface are separate targets
+        body: >
+          The dependency graph and the JSON parsing live in a headless
+          target, which is why the whole suite runs without launching any
+          UI at all.
+        evidence: 45 tests in 0.044s, no UI
+  - id: look
+    label: A look at it
+    bands: [showcase]
+  - id: measured
+    label: Measured
+    bands: [metrics]
+
 metrics:
   - { label: Release, value: "v1.0.0", detail: "27 commits since 1 June" }
   - { label: Source, value: "5,499", detail: "lines of Swift, 32 files" }
