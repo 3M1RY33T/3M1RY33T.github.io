@@ -89,18 +89,22 @@ capabilities:
 
 showcase_title: The three pages
 showcase:
-  - image: /assets/img/brewery-browse.png
+  - image: /assets/img/brewery-browse-dark.png
+    image_light: /assets/img/brewery-browse-light.png
     caption: "Browse: a Most Installed carousel, category tiles, and Top Charts drawn from Homebrew's install analytics."
-    alt: Brewery's browse page showing a carousel and category tiles
-  - image: /assets/img/brewery-library.png
+    alt: "Brewery's Browse page: a Most Installed carousel with app icons, a grid of category tiles such as AI, Developer Tools and Security, and Top Charts for casks and formulae"
+  - image: /assets/img/brewery-library-dark.png
+    image_light: /assets/img/brewery-library-light.png
     caption: "Library: what is installed, outdated first, with dependents beside the Uninstall button."
-    alt: Brewery's library page listing installed packages
-  - image: /assets/img/brewery-confirm.png
+    alt: "Brewery's Library page with cmake selected: installed casks as cards, formulae as a list with their pending versions, and a detail pane showing versions, tap, caveats, dependencies and dependents"
+  - image: /assets/img/brewery-confirm-dark.png
+    image_light: /assets/img/brewery-confirm-light.png
     caption: Every mutating command is shown in full and confirmed before it runs.
-    alt: A confirmation sheet showing the exact brew command to be run
-  - image: /assets/img/brewery-diagnostics.png
+    alt: "A confirmation sheet titled Uninstall expat, showing the exact command brew uninstall expat with Cancel and Run Command buttons"
+  - image: /assets/img/brewery-diagnostics-dark.png
+    image_light: /assets/img/brewery-diagnostics-light.png
     caption: "Diagnostics: Homebrew's own health checks, plus the command log."
-    alt: Brewery's diagnostics page showing health check results
+    alt: "Brewery's Diagnostics page showing Homebrew version and configuration above the command log"
 
 post_match: [brewery]
 ---

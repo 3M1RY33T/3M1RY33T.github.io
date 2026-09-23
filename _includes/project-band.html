@@ -62,7 +62,7 @@ its `tabs` front matter instead of taking a fixed template.
     {% if is_gallery %}<div class="project-shots" data-post-slider aria-label="{{ page.title }} screenshots" tabindex="0">{% endif %}
     {% for shot in page.showcase %}
     <figure class="project-shot">
-      <img src="{{ shot.image }}" alt="{{ shot.alt | default: shot.caption }}"{% if shot.caption %} data-caption="{{ shot.caption | escape }}"{% endif %} loading="lazy">
+      <img src="{{ shot.image }}" alt="{{ shot.alt | default: shot.caption }}"{% if shot.caption %} data-caption="{{ shot.caption | escape }}"{% endif %}{% if shot.image_light %} data-src-dark="{{ shot.image }}" data-src-light="{{ shot.image_light }}"{% endif %} loading="lazy">
       {% if shot.caption %}<figcaption>{{ shot.caption }}</figcaption>{% endif %}
     </figure>
     {% endfor %}

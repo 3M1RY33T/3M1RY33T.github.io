@@ -82,6 +82,13 @@
           toggle.setAttribute("aria-label", label);
           toggle.title = label;
           if (themeColor) themeColor.content = next === "light" ? "#111827" : "#0A0C12";
+          // Screenshots captured in both themes follow the site's theme,
+          // which is a toggle rather than the system setting, so a
+          // <picture> media query cannot choose between them.
+          document.querySelectorAll("img[data-src-light]").forEach(function (img) {
+            const want = next === "light" ? img.dataset.srcLight : img.dataset.srcDark;
+            if (want && img.getAttribute("src") !== want) img.setAttribute("src", want);
+          });
           try {
             window.localStorage.setItem("theme", next);
           } catch (error) {}

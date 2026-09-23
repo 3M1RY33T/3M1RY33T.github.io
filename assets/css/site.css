@@ -3544,6 +3544,25 @@ body { line-height: 1.7; }
   .pd-stage { gap: 1.75rem; }
 }
 
+/* Project screenshots sit on a light frame in the light theme, so a
+   light capture's transparent margin and window shadow land on white
+   rather than on the dark panel. The slider's arrows turn dark and their
+   hover scrims light, the dark treatment inverted. */
+:root[data-theme="light"] .project-showcase {
+  --panel: #ffffff;
+  --panel-2: #f8fafc;
+  --panel-ink: #0f172a;
+  --panel-ink-muted: #475569;
+  --border-softer: #e2e8f0;
+}
+:root[data-theme="light"] .project-showcase .post-slider-control { color: #0f172a; }
+:root[data-theme="light"] .project-showcase .post-slider-media::before {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0));
+}
+:root[data-theme="light"] .project-showcase .post-slider-media::after {
+  background: linear-gradient(270deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0));
+}
+
 /* The command-line surfaces (the terminal session, the quickstart
    command and any code block in a write-up) leave the fixed dark panel in
    light mode too. Their rules read the panel tokens, so re-pointing those

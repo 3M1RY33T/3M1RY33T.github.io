@@ -199,6 +199,17 @@ require "json"
   end
 end
 
+# A screenshot with a light variant names both files in data attributes,
+# which the asset check above does not read. A missing one would only show
+# as a broken image after someone toggled the theme.
+Dir.glob(File.join(SITE, "projects", "*", "index.html")).each do |file|
+  File.read(file).scan(/data-src-(?:light|dark)="(\/[^"]+)"/).flatten.uniq.each do |asset|
+    fail!("#{file.sub(SITE + "/", "")} names missing themed image #{asset}") unless File.file?(File.join(SITE, asset))
+  end
+end
+brewery_themed = page("projects/brewery/index.html").to_s.scan(/data-src-light=/).size
+fail!("brewery has #{brewery_themed} light screenshots, expected 4") unless brewery_themed == 4
+
 if $failures.empty?
   puts "verify_build: OK"
   exit 0
