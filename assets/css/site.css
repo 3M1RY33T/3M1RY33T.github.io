@@ -2867,6 +2867,11 @@ body { line-height: 1.7; }
 :root[data-theme="light"] .project-tile:hover .project-tile-icon {
   filter: drop-shadow(0 8px 20px var(--p-wash, var(--accent-a16)));
 }
+/* The hover lift too: half-black under a card reads as a hole on white,
+   so it becomes a light slate lift with the hue bloom washed down. */
+:root[data-theme="light"] .project-tile:hover {
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12), 0 0 40px -18px var(--p-wash, var(--accent-a16));
+}
 
 :root[data-theme="light"] .project-page .button {
   background: color-mix(in srgb, var(--p, var(--accent)) 65%, #1f2937);
