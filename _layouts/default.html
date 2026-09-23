@@ -34,9 +34,9 @@
         <a class="site-wordmark" href="/" aria-label="Home">yigit<span>.dev</span></a>
         <nav class="site-nav">
           <a href="/">Home</a>
+          <a href="/blog/">Blog</a>
           <a href="/#projects">Projects</a>
           <a href="/#skills">Skills</a>
-          <a href="/blog/">Blog</a>
           <a href="/#contact">Contact</a>
         </nav>
         <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch to light theme" title="Switch to light theme">
@@ -70,6 +70,25 @@
         const toggle = document.querySelector("[data-theme-toggle]");
         if (!toggle) return;
         const themeColor = document.querySelector('meta[name="theme-color"]');
+        const header = document.querySelector(".site-header");
+
+        // Scrolling past either end of the page bounces it and shows the
+        // root's background colour in the gap. In light mode that is the
+        // near-white page, which read as a white band above the dark
+        // header, so in the top half of the page the gap takes the
+        // header's colour instead. The page itself is painted by an image
+        // layer in the stylesheet, so this colour shows only in the gap.
+        let overscrollColor = null;
+        function paintOverscroll() {
+          const root = document.documentElement;
+          const bottom = root.scrollHeight - window.innerHeight;
+          const color = root.dataset.theme === "light" && header && window.scrollY <= bottom / 2
+            ? getComputedStyle(header).getPropertyValue("--header-solid").trim()
+            : "";
+          if (color === overscrollColor) return;
+          overscrollColor = color;
+          root.style.backgroundColor = color;
+        }
 
         function applyTheme(theme) {
           const next = theme === "light" ? "light" : "dark";
@@ -92,9 +111,14 @@
           try {
             window.localStorage.setItem("theme", next);
           } catch (error) {}
+          overscrollColor = null;
+          paintOverscroll();
         }
 
         if (document.documentElement.dataset.theme === "light") applyTheme("light");
+        paintOverscroll();
+        window.addEventListener("scroll", paintOverscroll, { passive: true });
+        window.addEventListener("resize", paintOverscroll);
 
         toggle.addEventListener("click", function () {
           applyTheme(document.documentElement.dataset.theme === "light" ? "dark" : "light");

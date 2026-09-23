@@ -7,7 +7,23 @@
 (function () {
   "use strict";
 
+  // The tab bar sticks beneath the site header, whose height changes with
+  // the breakpoint, the fonts and an open menu, so measure it rather than
+  // trust the stylesheet's estimate.
+  function trackHeaderHeight() {
+    var header = document.querySelector(".site-header");
+    if (!header) return;
+    var root = document.documentElement;
+    function sync() {
+      root.style.setProperty("--header-h", header.getBoundingClientRect().height + "px");
+    }
+    sync();
+    if (window.ResizeObserver) new ResizeObserver(sync).observe(header);
+    else window.addEventListener("resize", sync);
+  }
+
   function init() {
+    trackHeaderHeight();
     var nav = document.querySelector("[data-project-tabs]");
     if (!nav) return;
 
