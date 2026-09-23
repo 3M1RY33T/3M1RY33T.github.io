@@ -106,7 +106,6 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
 
 <section id="projects" class="section">
   <h2>Projects</h2>
-  <p class="section-intro">Five shipped products. Each has its own page.</p>
   {% include project-tiles.html %}
 
   <div class="earlier-work">
