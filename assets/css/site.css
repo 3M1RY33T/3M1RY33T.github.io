@@ -2290,7 +2290,7 @@ textarea {
 .project-metrics-date { font-size: 0.78rem; color: var(--ink-subtle); margin: 1.25rem 0 0; }
 
 .project-problem { margin-bottom: 2.5rem; }
-.project-problem p { font-size: 1.2rem; line-height: 1.7; max-width: 60ch; color: var(--ink-soft); }
+.project-problem p { font-size: 1.2rem; line-height: 1.7; color: var(--ink-soft); }
 
 .project-capabilities { margin-bottom: 2.5rem; }
 .project-capability-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
