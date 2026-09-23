@@ -301,6 +301,12 @@
 
         const mediaItems = [];
         const hiddenMediaElements = new Set();
+        // A screenshot captured in both themes keeps its pair on the copy,
+        // or the theme toggle can no longer find it once it is rebuilt here.
+        const keepThemedSources = (image, item) => {
+          if (item.srcDark) image.dataset.srcDark = item.srcDark;
+          if (item.srcLight) image.dataset.srcLight = item.srcLight;
+        };
         const isSliderImage = (image) => {
           const source = image.currentSrc || image.src || image.getAttribute("src") || "";
           const path = source.split("?")[0].split("#")[0].toLowerCase();
@@ -315,6 +321,8 @@
             alt: image.alt || "",
             caption: image.getAttribute("title") || image.dataset.caption || "",
             src: image.currentSrc || image.src || image.getAttribute("src") || "",
+            srcDark: image.dataset.srcDark || "",
+            srcLight: image.dataset.srcLight || "",
           });
 
           const slider = image.closest("[data-post-slider]");
@@ -345,6 +353,7 @@
           image.src = item.src;
           image.alt = item.alt;
           image.loading = "lazy";
+          keepThemedSources(image, item);
           mediaFrame.append(image);
           media.append(mediaFrame);
 
@@ -368,6 +377,7 @@
             image.src = item.src;
             image.alt = item.alt;
             image.loading = "lazy";
+            keepThemedSources(image, item);
             if (item.caption) image.title = item.caption;
             media.append(image);
           });

@@ -39,7 +39,7 @@ It shells out to your existing `brew` for everything it does. It does not reimpl
 
 This is a GUI that runs destructive commands on your machine, so the design rule was that it never surprises you.
 
-![Brewery confirmation sheet](/assets/img/brewery-confirm.png "The exact brew command, shown before anything runs")
+<img src="/assets/img/brewery-confirm-dark.png" data-src-dark="/assets/img/brewery-confirm-dark.png" data-src-light="/assets/img/brewery-confirm-light.png" alt="Brewery's confirmation sheet for uninstalling expat, showing the exact command brew uninstall expat above Cancel and Run Command" title="The exact brew command, shown before anything runs">
 
 Update, install, upgrade, uninstall and cleanup all stop and show you the literal command first. Output streams into the log at the bottom of the window while it runs, so you are watching `brew` work rather than watching a spinner and hoping.
 
@@ -47,7 +47,7 @@ Update, install, upgrade, uninstall and cleanup all stop and show you the litera
 
 The other half is an App Store style browse view over the official formula and cask catalog, with category filters and search.
 
-![Brewery catalog browser](/assets/img/brewery-browse.png "Browsing the official Homebrew catalog")
+<img src="/assets/img/brewery-browse-dark.png" data-src-dark="/assets/img/brewery-browse-dark.png" data-src-light="/assets/img/brewery-browse-light.png" alt="Brewery's Browse page: a Most Installed carousel, category tiles and Top Charts for casks and formulae" title="Browsing the official Homebrew catalog">
 
 The catalog is cached locally after the first fetch. When a refresh fails, it opens the cache instead of showing an error, because an offline package browser that refuses to open is worse than a slightly stale one.
 
