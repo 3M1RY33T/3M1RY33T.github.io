@@ -92,6 +92,20 @@
       target.scrollIntoView({ block: "start", behavior: "smooth" });
     });
 
+    // A hash typed into the address bar, or a link that only changes the
+    // hash, is a navigation within this document: nothing reloads, so
+    // the tab has to follow it here as well as on first load.
+    window.addEventListener("hashchange", function () {
+      var id = location.hash.slice(1);
+      if (!id || activate(id, { hash: false })) return;
+      var target = document.getElementById(id);
+      var owner = target ? panelOf(target) : null;
+      if (owner && owner !== current) {
+        activate(owner, { hash: false });
+        target.scrollIntoView({ block: "start" });
+      }
+    });
+
     var fromHash = location.hash.slice(1);
     if (!(fromHash && activate(fromHash, { hash: false }))) {
       if (fromHash) {

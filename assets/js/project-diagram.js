@@ -186,6 +186,12 @@
     inner.appendChild(facts);
     detail.appendChild(progress);
     detail.appendChild(inner);
+
+    function updateMore() {
+      detail.classList.toggle("has-more", inner.scrollTop + inner.clientHeight < inner.scrollHeight - 4);
+    }
+    inner.addEventListener("scroll", updateMore, { passive: true });
+    if (window.ResizeObserver) new ResizeObserver(updateMore).observe(inner);
     aside.appendChild(detail);
 
     // --- controls ----------------------------------------------------
@@ -291,6 +297,7 @@
       (n.facts || []).forEach(function (f) { facts.appendChild(el("li", null, f)); });
       facts.hidden = !(n.facts && n.facts.length);
       inner.scrollTop = 0;
+      updateMore();
       paint();
     }
 

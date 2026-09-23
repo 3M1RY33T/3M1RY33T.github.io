@@ -3363,17 +3363,35 @@ body { line-height: 1.7; }
   background: var(--panel-2);
   border: 1px solid var(--border-softer);
 }
-/* Capped to what is left of the viewport under the sticky header, tab
-   bar and the controls below it, so the controls never leave the screen. */
+/* One fixed height for every stage, so the controls below never move and
+   Next stays under the pointer. 38rem fits 30 of the 41 descriptions whole
+   at desktop width; the rest scroll inside it. On a short screen it gives
+   way to what is left under the header, tab bar and controls. Scroll
+   chaining is left on: once the text is at its end the wheel moves the
+   page, rather than the box swallowing it. */
+.pd { --pd-detail-h: min(38rem, calc(100vh - var(--header-h) - 13.5rem)); }
 .pd-detail-inner {
-  max-height: calc(100vh - var(--header-h) - 13.5rem);
+  height: var(--pd-detail-h);
   overflow-y: auto;
-  overscroll-behavior: contain;
   scrollbar-width: thin;
   padding: 1.35rem 1.35rem 1.25rem;
 }
+/* A fade on the bottom edge while more text sits below it, since overlay
+   scrollbars stay hidden until someone scrolls. */
+.pd-detail::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3rem;
+  border-radius: 0 0 0.8rem 0.8rem;
+  background: linear-gradient(to bottom, transparent, var(--panel-2));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+.pd-detail.has-more::after { opacity: 1; }
 @media (max-width: 960px) {
-  .pd-detail-inner { max-height: none; overflow: visible; }
+  .pd { --pd-detail-h: min(36rem, 68vh); }
 }
 /* Time left on this stage while the tour runs. */
 .pd-progress {
