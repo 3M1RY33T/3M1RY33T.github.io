@@ -19,7 +19,7 @@ icon: "/assets/img/projects/loci.svg"
 order: 1
 date: 2026-08-27
 status: active
-stack: [Python, Rust, SQLite]
+stack: [Python, Rust, NumPy]
 platforms: [macOS, Linux]
 
 links:
@@ -41,6 +41,173 @@ metrics:
   - { label: Routing, value: "<1ms", detail: "flat from 25 to 100 scopes" }
   - { label: Source, value: "10,234", detail: "lines, Python and Rust" }
   - { label: Releases, value: "6", detail: "across 99 commits" }
+
+diagrams:
+  - id: routing
+    title: A question entering the pipeline
+    query: loci ask "why was the session cookie dropped on localhost?"
+    query_label: asked
+    nodes:
+      - id: ask
+        label: "loci ask \"…\""
+        meta: "the question, cwd, --group"
+        row: 0
+        detail: >
+          The question as typed, plus the directory you are standing in and any --group flag. --scope NAME jumps past routing straight to the fan-out, and drops the episode gate with it: that gate exists to stop an answer arriving from the wrong scope, and you have just named the right one.
+      - id: confinement
+        label: "confinement"
+        meta: "groups.py"
+        row: 1
+        detail: >
+          Reads the registry and groups.json. Never the index, never a model. With --group X the eligible set is the members of that group, in all three modes; otherwise it is the strictest group of the scope you are standing in.
+      - id: route
+        label: "route"
+        meta: "router.py"
+        row: 2
+        detail: >
+          Reads scope_index.json, a map from token to {scope: node_df}. One dictionary lookup per query token, deterministic, sub-millisecond, and no model call anywhere in it.
+      - id: abstain
+        label: "ABSTAIN"
+        meta: "out_of_group · deictic · no_evidence"
+        row: 3
+        kind: refusal
+        detail: >
+          The other way out of route, and a first-class outcome rather than an error. It names the cause, lists the scopes with a claim on the question and what each one holds, names the flag that would fix it, and queries nothing at all.
+      - id: scopes
+        label: "selected scopes"
+        meta: "at most 3"
+        row: 3
+        detail: >
+          One thread each. Neither store is ever queried across a scope boundary, so isolation is a property of the fan-out rather than a filter applied to the results afterwards.
+      - id: expand
+        label: "expand the question"
+        meta: "against this scope's postings"
+        row: 4
+        detail: >
+          Query expansion runs against this scope's own postings, a dictionary lookup, so a token the scope does not hold cannot enter its query. That is what makes the isolation structural rather than cosmetic.
+      - id: structure
+        label: "structure store"
+        meta: "graphify"
+        row: 5
+        detail: >
+          What calls what, answered with file and line citations.
+      - id: episode
+        label: "episode store"
+        meta: "BM25 + char 3-5 gram + embeddings"
+        row: 5
+        detail: >
+          What happened and why, from READMEs, commit bodies and docstrings. The three signals are fused, then gated.
+      - id: answer
+        label: "merged, cited answer"
+        meta: "one block per scope"
+        row: 6
+        detail: >
+          One block per scope, each carrying its own citations, so an answer drawn from two projects never reads as one voice.
+    edges:
+      - [ask, confinement]
+      - [confinement, route]
+      - [route, abstain]
+      - [route, scopes]
+      - [scopes, expand]
+      - [expand, structure]
+      - [expand, episode]
+      - [structure, answer]
+      - [episode, answer]
+    steps: [ask, confinement, route, abstain, scopes, expand, structure, episode, answer]
+    ascii: |
+      loci ask "why was the session cookie dropped on localhost?"
+        │
+        │   --scope NAME jumps past routing to the fan-out, and drops the episode
+        │   gate with it: that gate exists to stop an answer arriving from the
+        │   wrong scope, and you have just named the right one.
+        ▼
+      confinement                                                       groups.py
+        │   reads the registry and groups.json. Never the index, never a model.
+        │     --group X  ─▶  eligible = members of X, in ALL THREE modes
+        │     else cwd   ─▶  the strictest group of the scope you are standing in
+        ▼
+      route                                                             router.py
+        │   reads scope_index.json: token ─▶ {scope: node_df}. One dict lookup per
+        │   query token. Deterministic, sub-millisecond, no model call.
+        │
+        ├──▶ ABSTAIN, naming the cause, listing the scopes with a claim on the
+        │             question and what each one holds, naming the flag that
+        │             fixes it, and querying nothing. An outcome, not an error.
+        ▼
+      selected scopes, at most 3        one thread each; neither store is ever
+        │                               queried across a scope boundary
+        ├─── scope ─── scope ─── scope
+        │      │
+        │      │  expand the question against THIS scope's postings, a dict lookup,
+        │      │  so a token the scope does not have cannot be invented
+        │      │
+        │      ├─ structure store   graphify query, what calls what, with file:line
+        │      │
+        │      └─ episode store     BM25 + char 3-5 gram + embeddings, fused, gated
+        ▼
+      merged, cited answer, one block per scope
+
+tabs:
+  - id: overview
+    label: Overview
+    bands: [problem, capabilities, quickstart]
+  - id: routing
+    label: Routing
+    heading: How a question gets routed
+    lede: >
+      Everything above the fan-out is one function. It scores every scope in
+      the corpus, then asks three refusal questions in a fixed order. Step
+      through it, or click any stage.
+    diagram: routing
+    notes:
+      - title: Both stages refuse independently
+        body: >
+          The router can decline to select a scope at all, and a scope it did
+          select can still hand back nothing. Those are different failures
+          with different fixes, and collapsing them into one "no results"
+          would hide which happened.
+      - title: Weight is not usefulness
+        body: >
+          Naming the project outright is worth 6.0 and standing inside its
+          tree is worth 4.0, yet cwd is the signal that carries most real
+          questions, because most real questions name no project at all.
+        evidence: ALIAS_BOOST 6.0 · CWD_BOOST 4.0 · RECENCY 0.15
+      - title: The penalty lands before the boosts
+        body: >
+          A demoted scope is halved first, then boosted. A group penalty
+          applied after a 6.0 alias boost is a rounding error; applied
+          before, it does what it was written to do.
+        evidence: GROUP_PENALTY 0.5
+  - id: evidence
+    label: Measured
+    heading: What was measured
+    lede: >
+      Every number here came from a command run against the repository, and
+      the ones that moved the design are the ones that contradicted it.
+    bands: [metrics, terminal]
+    notes:
+      - title: The merged index fails in only one direction
+        body: >
+          Against a merged graph of ten real repositories, one question
+          returned 18% on-topic nodes and another 2%, while a third scored
+          98% purely because the answer happened to live in the largest
+          corpus. The same index looks excellent and is badly broken.
+        evidence: 18% · 2% · 98% on three real questions
+      - title: Deixis detection, measured
+        body: >
+          Questions that point at a subject they never name ("how does this
+          handle retries") took abstention from 37.5% to 100% once deixis
+          was detected rather than scored.
+        evidence: 37.5% to 100%
+      - title: Reranking was measured and shipped off
+        body: >
+          A cross-encoder moved precision@1 from 2/6 to 3/6 and cost about
+          96ms a query, with two small regressions alongside the gain. It
+          ships behind a flag rather than on.
+        evidence: ~96ms per query
+  - id: depth
+    label: In depth
+    bands: [writeup]
 
 capabilities:
   - title: Routes before it searches

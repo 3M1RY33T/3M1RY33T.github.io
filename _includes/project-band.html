@@ -1,0 +1,90 @@
+{%- comment -%}
+One band of a project page, selected by name. The layout composes these
+into tabs, so a project can order its own page by listing band names in
+its `tabs` front matter instead of taking a fixed template.
+{%- endcomment -%}
+{%- case include.band -%}
+
+{%- when "terminal" -%}
+  {% if page.terminal %}
+  <div class="project-terminal" role="img" aria-label="Terminal session using {{ page.title }}">
+    <div class="project-terminal-bar" aria-hidden="true"><span></span><span></span><span></span></div>
+    <pre>{% for line in page.terminal %}<span class="project-terminal-cmd">{% if line.cwd %}<span class="project-terminal-cwd" aria-hidden="true">{{ line.cwd }}</span>
+{% endif %}<span class="project-terminal-prompt" aria-hidden="true">$</span> {{ line.cmd }}</span>
+<span class="project-terminal-out">{{ line.out | strip }}</span>
+{% endfor %}</pre>
+  </div>
+  {% endif %}
+
+{%- when "metrics" -%}
+  {% if page.metrics %}
+  <section class="project-metrics" aria-label="Verified metrics">
+    <dl>
+      {% for m in page.metrics %}
+      <div><dt>{{ m.label }}</dt><dd><span class="project-metric-value">{{ m.value | escape }}</span>{% if m.detail %}<span class="project-metric-detail">{{ m.detail }}</span>{% endif %}</dd></div>
+      {% endfor %}
+    </dl>
+    {% if page.metrics_verified %}
+    <p class="project-metrics-date">Measured from the repository on {{ page.metrics_verified | date: "%-d %B %Y" }}</p>
+    {% endif %}
+  </section>
+  {% endif %}
+
+{%- when "problem" -%}
+  {% if page.problem %}
+  <section class="project-problem">
+    <h2>{{ page.problem_title | default: "The problem" }}</h2>
+    <p>{{ page.problem }}</p>
+  </section>
+  {% endif %}
+
+{%- when "capabilities" -%}
+  {% if page.capabilities %}
+  <section class="project-capabilities">
+    <h2>{{ page.capabilities_title | default: "What it does" }}</h2>
+    <div class="project-capability-grid">
+      {% for c in page.capabilities %}
+      <article class="project-capability">
+        <h3>{{ c.title }}</h3>
+        <p>{{ c.body }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+{%- when "showcase" -%}
+  {% if page.showcase %}
+  <section class="project-showcase">
+    <h2>{{ page.showcase_title | default: "A look at it" }}</h2>
+    {% assign is_gallery = false %}
+    {% if page.showcase.size > 1 %}{% assign is_gallery = true %}{% endif %}
+    {% if is_gallery %}<div class="project-shots" data-post-slider aria-label="{{ page.title }} screenshots" tabindex="0">{% endif %}
+    {% for shot in page.showcase %}
+    <figure class="project-shot">
+      <img src="{{ shot.image }}" alt="{{ shot.alt | default: shot.caption }}"{% if shot.caption %} data-caption="{{ shot.caption | escape }}"{% endif %} loading="lazy">
+      {% if shot.caption %}<figcaption>{{ shot.caption }}</figcaption>{% endif %}
+    </figure>
+    {% endfor %}
+    {% if is_gallery %}</div>{% endif %}
+  </section>
+  {% endif %}
+
+{%- when "writeup" -%}
+  {% assign writeup = content | strip %}
+  {% if writeup != "" %}
+  <section class="project-writeup">
+    {{ content }}
+  </section>
+  {% endif %}
+
+{%- when "quickstart" -%}
+  {% if page.install %}
+  <section class="project-quickstart" id="quickstart">
+    <h2>Quickstart</h2>
+    <pre class="project-install"><code>{{ page.install }}</code></pre>
+    {% if page.install_note %}<p class="project-install-note">{{ page.install_note }}</p>{% endif %}
+  </section>
+  {% endif %}
+
+{%- endcase -%}

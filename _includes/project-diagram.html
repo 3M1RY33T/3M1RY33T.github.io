@@ -1,0 +1,12 @@
+{%- comment -%}
+An interactive schematic. The node and edge data is emitted as JSON and
+drawn by assets/js/project-diagram.js, which also runs the step-through.
+The verbatim ASCII diagram from the project document is the fallback and
+shows whenever the script does not run.
+{%- endcomment -%}
+{%- assign d = include.diagram -%}
+<figure class="project-diagram" data-diagram>
+  <script type="application/json" data-diagram-data>{{ d | jsonify }}</script>
+  {% if d.title %}<figcaption class="project-diagram-title">{{ d.title }}</figcaption>{% endif %}
+  {% if d.ascii %}<pre class="project-diagram-ascii" aria-label="{{ d.title | default: 'Architecture diagram' }}">{{ d.ascii | escape }}</pre>{% endif %}
+</figure>

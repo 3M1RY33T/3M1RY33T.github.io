@@ -55,85 +55,57 @@ layout: default
   <figure class="project-hero-media">
     <img src="{{ page.hero.media }}" alt="{{ page.hero.alt | default: page.title }}">
   </figure>
-  {% elsif page.terminal %}
-  <div class="project-terminal" role="img" aria-label="Terminal session using {{ page.title }}">
-    <div class="project-terminal-bar" aria-hidden="true"><span></span><span></span><span></span></div>
-    <pre>{% for line in page.terminal %}<span class="project-terminal-cmd">{% if line.cwd %}<span class="project-terminal-cwd" aria-hidden="true">{{ line.cwd }}</span>
-{% endif %}<span class="project-terminal-prompt" aria-hidden="true">$</span> {{ line.cmd }}</span>
-<span class="project-terminal-out">{{ line.out | strip }}</span>
-{% endfor %}</pre>
-  </div>
   {% endif %}
 
-  {% if page.metrics %}
-  <section class="project-metrics" aria-label="Verified metrics">
-    <dl>
-      {% for m in page.metrics %}
-      <div><dt>{{ m.label }}</dt><dd><span class="project-metric-value">{{ m.value | escape }}</span>{% if m.detail %}<span class="project-metric-detail">{{ m.detail }}</span>{% endif %}</dd></div>
+  {%- comment -%}
+    Sections are tabs when a project defines them, so a page is about one
+    screen per view instead of a single long scroll. Every panel is in the
+    markup and visible until project-tabs.js hides the inactive ones, so
+    without JavaScript this is the long page it always was and the tabs
+    behave as jump links. A project that defines no tabs keeps the
+    original order.
+  {%- endcomment -%}
+  {% if page.tabs %}
+  <nav class="project-tabs" data-project-tabs aria-label="Sections of this page">
+    <div class="project-tabs-scroll" role="tablist">
+      {% for t in page.tabs %}
+      <a class="project-tab{% if forloop.first %} is-active{% endif %}"
+         data-tab="{{ t.id }}" id="tab-{{ t.id }}" href="#{{ t.id }}"
+         role="tab" aria-controls="{{ t.id }}"
+         aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">{{ t.label }}</a>
       {% endfor %}
-    </dl>
-    {% if page.metrics_verified %}
-    <p class="project-metrics-date">Measured from the repository on {{ page.metrics_verified | date: "%-d %B %Y" }}</p>
-    {% endif %}
-  </section>
-  {% endif %}
+    </div>
+  </nav>
 
-  {% if page.problem %}
-  <section class="project-problem">
-    <h2>The problem</h2>
-    <p>{{ page.problem }}</p>
-  </section>
-  {% endif %}
-
-  {% if page.capabilities %}
-  <section class="project-capabilities">
-    <h2>What it does</h2>
-    <div class="project-capability-grid">
-      {% for c in page.capabilities %}
-      <article class="project-capability">
-        <h3>{{ c.title }}</h3>
-        <p>{{ c.body }}</p>
+  {% for t in page.tabs %}
+  <section class="project-panel" id="{{ t.id }}" role="tabpanel" aria-labelledby="tab-{{ t.id }}">
+    {% if t.heading %}<h2 class="project-panel-heading">{{ t.heading }}</h2>{% endif %}
+    {% if t.lede %}<p class="project-panel-lede">{{ t.lede }}</p>{% endif %}
+    {% if t.diagram %}{% for d in page.diagrams %}{% if d.id == t.diagram %}{% include project-diagram.html diagram=d %}{% endif %}{% endfor %}{% endif %}
+    {% for b in t.bands %}{% include project-band.html band=b %}{% endfor %}
+    {% if t.notes %}
+    <div class="project-notes">
+      {% for n in t.notes %}
+      <article class="project-note">
+        <h3>{{ n.title }}</h3>
+        <p>{{ n.body }}</p>
+        {% if n.evidence %}<p class="project-note-evidence">{{ n.evidence }}</p>{% endif %}
       </article>
       {% endfor %}
     </div>
+    {% endif %}
+    {% if t.closing %}<p class="project-panel-closing">{{ t.closing }}</p>{% endif %}
   </section>
-  {% endif %}
+  {% endfor %}
 
-  {% if page.showcase %}
-  <section class="project-showcase">
-    <h2>{{ page.showcase_title | default: "A look at it" }}</h2>
-    {% comment %}
-      More than one shot goes into the same slider the blog uses: the script
-      in the default layout picks up any [data-post-slider], builds the
-      controls from the images inside it, and takes each caption from
-      data-caption. The figures below are what shows if it never runs.
-    {% endcomment %}
-    {% assign is_gallery = false %}
-    {% if page.showcase.size > 1 %}{% assign is_gallery = true %}{% endif %}
-    {% if is_gallery %}<div class="project-shots" data-post-slider aria-label="{{ page.title }} screenshots" tabindex="0">{% endif %}
-    {% for shot in page.showcase %}
-    <figure class="project-shot">
-      <img src="{{ shot.image }}" alt="{{ shot.alt | default: shot.caption }}"{% if shot.caption %} data-caption="{{ shot.caption | escape }}"{% endif %} loading="lazy">
-      {% if shot.caption %}<figcaption>{{ shot.caption }}</figcaption>{% endif %}
-    </figure>
-    {% endfor %}
-    {% if is_gallery %}</div>{% endif %}
-  </section>
-  {% endif %}
-
-  {% assign writeup = content | strip %}
-  {% if writeup != "" %}
-  <section class="project-writeup">
-    {{ content }}
-  </section>
-  {% endif %}
-
-  {% if page.install %}
-  <section class="project-quickstart" id="quickstart">
-    <h2>Quickstart</h2>
-    <pre class="project-install"><code>{{ page.install }}</code></pre>
-    {% if page.install_note %}<p class="project-install-note">{{ page.install_note }}</p>{% endif %}
-  </section>
+  {% else %}
+  {% include project-band.html band="terminal" %}
+  {% include project-band.html band="metrics" %}
+  {% include project-band.html band="problem" %}
+  {% include project-band.html band="capabilities" %}
+  {% include project-band.html band="showcase" %}
+  {% include project-band.html band="writeup" %}
+  {% include project-band.html band="quickstart" %}
   {% endif %}
 
   <footer class="project-rail">
@@ -186,3 +158,6 @@ layout: default
   </footer>
 
 </article>
+
+<script src="/assets/js/project-tabs.js" defer></script>
+<script src="/assets/js/project-diagram.js" defer></script>

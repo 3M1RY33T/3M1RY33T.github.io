@@ -3116,3 +3116,285 @@ body { line-height: 1.7; }
 :root[data-theme="light"] .featured-post {
   box-shadow: 0 22px 55px rgba(15, 23, 42, 0.08);
 }
+
+/* ==========================================================================
+   Project page sections and schematics
+   ========================================================================== */
+
+:root { --header-h: 62px; }
+
+/* --- section tabs ---------------------------------------------------------- */
+
+.project-tabs {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 10;
+  margin: 0 0 2rem;
+  padding: 0.5rem 0;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-soft);
+}
+.project-tabs-scroll {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.project-tabs-scroll::-webkit-scrollbar { display: none; }
+.project-tab {
+  flex: none;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+  color: var(--ink-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 160ms ease, background 160ms ease;
+}
+.project-tab:hover { color: var(--ink-deep); background: var(--p-wash, var(--accent-a08)); }
+.project-tab.is-active {
+  color: var(--p, var(--accent));
+  background: var(--p-wash, var(--accent-a16));
+  font-weight: 600;
+}
+.project-tab:focus-visible { outline: 2px solid var(--p, var(--accent-ring)); outline-offset: 2px; }
+
+.project-panel { margin-bottom: 2.5rem; }
+.project-panel[hidden] { display: none; }
+.project-panel-heading {
+  font-size: clamp(1.7rem, 2.2vw, 2.1rem);
+  letter-spacing: -0.03em;
+  margin: 0 0 0.75rem;
+}
+.project-panel-lede {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  margin: 0 0 2rem;
+}
+.project-panel-closing {
+  margin: 2rem 0 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-softer);
+  color: var(--ink-muted);
+  font-size: 0.98rem;
+}
+
+/* Notes: the per-project points that a generic template would lose. */
+.project-notes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+.project-note {
+  padding: 1.25rem;
+  border: 1px solid var(--border-soft);
+  border-left: 2px solid var(--p, var(--accent));
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
+  background: var(--surface);
+}
+.project-note h3 {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+  color: var(--ink-deep);
+}
+.project-note p { margin: 0; color: var(--ink-muted); font-size: 0.95rem; line-height: 1.65; }
+.project-note-evidence {
+  margin-top: 0.7rem !important;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--p, var(--accent));
+}
+
+/* --- schematics ------------------------------------------------------------ */
+
+.project-diagram {
+  margin: 0 0 2.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-card);
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, var(--p-wash, var(--accent-a08)), transparent 70%),
+    var(--panel);
+}
+.project-diagram-title {
+  margin: 0 0 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--p, var(--accent));
+}
+.project-diagram-ascii {
+  margin: 0;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--panel-ink-muted);
+}
+
+.pd:focus-visible { outline: 2px solid var(--p, var(--accent-ring)); outline-offset: 6px; border-radius: 0.75rem; }
+
+.pd-query {
+  margin: 0 0 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+.pd-query-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--panel-ink-muted);
+}
+.pd-query code {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--panel-ink);
+  background: var(--panel-2);
+  border: 1px solid var(--border-softer);
+  border-radius: 0.5rem;
+  padding: 0.3rem 0.6rem;
+}
+
+.pd-stage { position: relative; display: flex; flex-direction: column; gap: 2.25rem; }
+.pd-edges {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  color: var(--p, var(--accent));
+  overflow: visible;
+}
+.pd-edge {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1.5;
+  transition: stroke 260ms ease, opacity 260ms ease;
+  opacity: 0.55;
+}
+.pd-edge.is-lit { stroke: var(--p, var(--accent)); opacity: 0.85; }
+.pd-edge.is-active { stroke: var(--p, var(--accent)); opacity: 1; stroke-width: 2.25; }
+
+.pd-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  position: relative;
+  z-index: 1;
+}
+.pd-node {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 8.5rem;
+  max-width: 15rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  background: var(--panel-2);
+  color: var(--panel-ink-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 200ms ease, color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+}
+.pd-node-label { font-family: var(--font-mono); font-size: 0.82rem; font-weight: 600; }
+.pd-node-meta { font-family: var(--font-mono); font-size: 0.66rem; opacity: 0.7; }
+.pd-node:hover { border-color: var(--p, var(--accent)); color: var(--panel-ink); }
+.pd-node.is-done { color: var(--panel-ink); border-color: color-mix(in srgb, var(--p, var(--accent)) 40%, transparent); }
+.pd-node.is-active {
+  color: var(--panel-ink);
+  border-color: var(--p, var(--accent));
+  box-shadow: 0 0 0 1px var(--p, var(--accent)), 0 10px 30px var(--p-wash, var(--accent-a16));
+  transform: translateY(-1px);
+}
+.pd-node-refusal { border-style: dashed; }
+.pd-node-refusal.is-active { border-style: solid; }
+.pd-node:focus-visible { outline: 2px solid var(--p, var(--accent-ring)); outline-offset: 3px; }
+
+.pd-detail {
+  margin-top: 1.75rem;
+  padding: 1rem 1.15rem;
+  border-radius: 0.7rem;
+  background: var(--panel-2);
+  border: 1px solid var(--border-softer);
+  min-height: 5.5rem;
+}
+.pd-detail-title {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--p, var(--accent));
+}
+.pd-detail-body { margin: 0; color: var(--panel-ink-muted); font-size: 0.92rem; line-height: 1.6; }
+
+.pd-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+.pd-play, .pd-step {
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--panel-ink);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+.pd-play { border-color: var(--p, var(--accent)); color: var(--p, var(--accent)); }
+.pd-play:hover, .pd-step:hover { background: var(--p-wash, var(--accent-a08)); }
+.pd-play:focus-visible, .pd-step:focus-visible, .pd-dot:focus-visible {
+  outline: 2px solid var(--p, var(--accent-ring)); outline-offset: 2px;
+}
+.pd-dots { display: flex; gap: 0.3rem; margin-left: 0.25rem; }
+.pd-dot {
+  width: 0.5rem; height: 0.5rem; padding: 0;
+  border: 0; border-radius: var(--radius-pill);
+  background: var(--border);
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+}
+.pd-dot.is-done { background: color-mix(in srgb, var(--p, var(--accent)) 45%, transparent); }
+.pd-dot.is-active { background: var(--p, var(--accent)); transform: scale(1.35); }
+.pd-counter {
+  margin: 0 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--panel-ink-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pd-node, .pd-edge, .pd-dot { transition: none; }
+}
+
+@media (max-width: 700px) {
+  .project-diagram { padding: 1rem; }
+  .pd-node { min-width: 7rem; padding: 0.55rem 0.75rem; }
+  .pd-stage { gap: 1.75rem; }
+}
+
+/* The light theme keeps the schematic on its dark panel, so the controls
+   and body copy stay on panel tokens rather than page ink. */
+:root[data-theme="light"] .project-diagram {
+  border-color: var(--border);
+}
+
+/* Anchors land below the header and the tab bar, not under them. */
+.project-panel, .project-quickstart, .project-diagram { scroll-margin-top: calc(var(--header-h) + 4rem); }
