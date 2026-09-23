@@ -2979,7 +2979,8 @@ body { line-height: 1.7; }
 :root[data-theme="light"] .project-note-evidence,
 :root[data-theme="light"] .project-diagram-title,
 :root[data-theme="light"] .pd-detail-title,
-:root[data-theme="light"] .pd-play {
+:root[data-theme="light"] .pd-play,
+:root[data-theme="light"] .pd-facts li {
   color: color-mix(in srgb, var(--p, var(--accent)) 55%, #1e2a44);
 }
 /* On white the tile logo casts slate, not black, and the hover keeps
@@ -3244,6 +3245,28 @@ body { line-height: 1.7; }
   color: var(--panel-ink-muted);
 }
 
+/* Chart on the left, the selected stage's description on the right. The
+   description sticks under the header and tab bar so it stays beside a
+   tall chart while the reader scrolls it. */
+.pd {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 2rem;
+  align-items: start;
+}
+.pd-chart { min-width: 0; }
+.pd-aside {
+  position: sticky;
+  top: calc(var(--header-h) + 4.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+@media (max-width: 960px) {
+  .pd { grid-template-columns: minmax(0, 1fr); }
+  .pd-aside { position: static; }
+}
+
 .pd:focus-visible { outline: 2px solid var(--p, var(--accent-ring)); outline-offset: 6px; border-radius: 0.75rem; }
 
 .pd-query {
@@ -3270,7 +3293,7 @@ body { line-height: 1.7; }
   padding: 0.3rem 0.6rem;
 }
 
-.pd-stage { position: relative; display: flex; flex-direction: column; gap: 2.25rem; }
+.pd-stage { position: relative; display: flex; flex-direction: column; gap: 1.6rem; }
 .pd-edges {
   position: absolute;
   inset: 0;
@@ -3302,9 +3325,9 @@ body { line-height: 1.7; }
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  min-width: 8.5rem;
+  min-width: 8rem;
   max-width: 15rem;
-  padding: 0.7rem 1rem;
+  padding: 0.55rem 0.9rem;
   border: 1px solid var(--border);
   border-radius: 0.7rem;
   background: var(--panel-2);
@@ -3329,28 +3352,101 @@ body { line-height: 1.7; }
 .pd-node:focus-visible { outline: 2px solid var(--p, var(--accent-ring)); outline-offset: 3px; }
 
 .pd-detail {
-  margin-top: 1.75rem;
-  padding: 1rem 1.15rem;
-  border-radius: 0.7rem;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.8rem;
   background: var(--panel-2);
   border: 1px solid var(--border-softer);
-  min-height: 5.5rem;
 }
-.pd-detail-title {
-  margin: 0 0 0.4rem;
+/* Capped to what is left of the viewport under the sticky header, tab
+   bar and the controls below it, so the controls never leave the screen. */
+.pd-detail-inner {
+  max-height: calc(100vh - var(--header-h) - 13.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding: 1.35rem 1.35rem 1.25rem;
+}
+@media (max-width: 960px) {
+  .pd-detail-inner { max-height: none; overflow: visible; }
+}
+/* Time left on this stage while the tour runs. */
+.pd-progress {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: var(--border-softer);
+}
+.pd-progress-bar {
+  display: block;
+  height: 100%;
+  background: var(--p, var(--accent));
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.pd:not(.is-auto) .pd-progress-bar { opacity: 0; }
+@keyframes pd-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+.pd-detail-eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.6rem;
+  margin: 0 0 0.35rem;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.68rem;
+  color: var(--panel-ink-muted);
+}
+/* Only the step count is set as a label: the meta is file and constant
+   names, which upper case would misspell. */
+.pd-eyebrow-step { letter-spacing: 0.08em; text-transform: uppercase; }
+.pd-eyebrow-meta::before { content: "·"; margin-right: 0.6rem; }
+.pd-detail-title {
+  margin: 0 0 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
   font-weight: 600;
   color: var(--p, var(--accent));
 }
-.pd-detail-body { margin: 0; color: var(--panel-ink-muted); font-size: 0.92rem; line-height: 1.6; }
+.pd-detail-body p {
+  margin: 0 0 0.8rem;
+  color: var(--panel-ink-muted);
+  font-size: 0.9rem;
+  line-height: 1.64;
+}
+.pd-detail-body p:last-child { margin-bottom: 0; }
+.pd-detail-body code {
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  padding: 0.05em 0.35em;
+  border-radius: 0.3rem;
+  background: var(--panel);
+  border: 1px solid var(--border-softer);
+  color: var(--panel-ink);
+  overflow-wrap: anywhere;
+}
+.pd-facts {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+.pd-facts li {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  line-height: 1.4;
+  padding: 0.25rem 0.55rem;
+  border-radius: 0.4rem;
+  background: var(--p-wash, var(--accent-a08));
+  color: var(--p, var(--accent));
+}
 
 .pd-controls {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.6rem;
-  margin-top: 1rem;
 }
 .pd-play, .pd-step {
   padding: 0.45rem 0.9rem;
@@ -3363,12 +3459,12 @@ body { line-height: 1.7; }
   cursor: pointer;
   transition: border-color 160ms ease, background 160ms ease;
 }
-.pd-play { border-color: var(--p, var(--accent)); color: var(--p, var(--accent)); }
+.pd-play { min-width: 4.6rem; border-color: var(--p, var(--accent)); color: var(--p, var(--accent)); }
 .pd-play:hover, .pd-step:hover { background: var(--p-wash, var(--accent-a08)); }
 .pd-play:focus-visible, .pd-step:focus-visible, .pd-dot:focus-visible {
   outline: 2px solid var(--p, var(--accent-ring)); outline-offset: 2px;
 }
-.pd-dots { display: flex; gap: 0.3rem; margin-left: 0.25rem; }
+.pd-dots { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-left: 0.25rem; }
 .pd-dot {
   width: 0.5rem; height: 0.5rem; padding: 0;
   border: 0; border-radius: var(--radius-pill);
@@ -3378,10 +3474,11 @@ body { line-height: 1.7; }
 }
 .pd-dot.is-done { background: color-mix(in srgb, var(--p, var(--accent)) 45%, transparent); }
 .pd-dot.is-active { background: var(--p, var(--accent)); transform: scale(1.35); }
-.pd-counter {
-  margin: 0 0 0 auto;
+.pd-status {
+  flex-basis: 100%;
+  margin: 0;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   color: var(--panel-ink-muted);
 }
 

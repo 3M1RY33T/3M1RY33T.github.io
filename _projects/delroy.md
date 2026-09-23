@@ -28,68 +28,127 @@ links:
 metrics_verified: 2026-09-22
 diagrams:
   - id: surfaces
-    title: Four surfaces, one runtime
+    title: "Four surfaces, one runtime"
     nodes:
       - id: desktop
         label: "Desktop"
         meta: "native pywebview"
         row: 0
-        detail: >
-          One of four surfaces. Each is a client of the same local server rather than its own implementation.
+        detail:
+          - "The desktop shell is a native window built with pywebview, pointed at the same local HTTP server every other surface talks to. It carries a cookie handoff for authentication rather than the bearer token the CLI and extension use, because a native embedded browser engine does not fit that model cleanly."
+          - "Whether that cookie is honoured depends on a header the embedded engine emits, Sec-Fetch-Site, which cannot be unit-tested since it depends on the real engine rather than Delroy's own code. That is why the native smoke test is the one manual gate in an otherwise automated release checklist, and why every failure mode is written to fail closed: no header falls back to a loopback check and is allowed; a spurious one produces a loud 403 rather than a silent bypass."
+        facts:
+          - "pywebview"
+          - "Sec-Fetch-Site check"
+          - "one manual release gate"
       - id: web
         label: "Web"
         meta: "workspace"
         row: 0
-        detail: >
-          The browser workspace, talking to the same endpoints as everything else.
+        detail:
+          - "The web workspace is the browser client under client/static, with 64 test files of its own. Like the desktop shell, the CLI and the glasses app, it is a consumer of the local HTTP server's NDJSON event stream rather than a second implementation of the agent loop."
+          - "That separation is what lets the same run, a workflow, a fanned stage, a delegated sub-turn, be watched from any surface at once: the server does not know which client is reading, and a slow client simply misses events rather than corrupting shared state."
+        facts:
+          - "client/static"
+          - "64 test files"
+          - "consumes the NDJSON stream"
       - id: cli
         label: "CLI"
         meta: "delroy"
         row: 0
-        detail: >
-          The terminal surface. Same runtime, same policy, same nine levels.
+        detail:
+          - "delroy is the command-line entry point, client/cli.py, 5,157 lines. It is the surface every headless invocation goes through: a run started with --print exits the process the moment the turn ends, which is the exact constraint that shaped how delegated sub-turns are kept alive elsewhere in the runtime."
+          - "It speaks the same request path as every other surface: no separate agent loop, no separate provider integration, just a thinner rendering of the NDJSON stream the server already produces for everyone."
+        facts:
+          - "client/cli.py, 5,157 lines"
       - id: glasses
         label: "Even G2"
         meta: "glasses companion"
         row: 0
-        detail: >
-          A voice command spoken into smart glasses enters here and is answered by the same runtime as a typed one.
+        detail:
+          - "The Even G2 companion is a TypeScript app of 59 modules rendering chat, effort selection and spoken answers onto a monochrome display. Its firmware font covers a small, undocumented subset of Unicode: the phone panel is a WebView using the phone's own fonts, so a glyph the glasses cannot draw looks correct until tested on real hardware."
+          - "On-glass probing found exactly four non-ASCII characters that draw, U+25B6, U+00B7, U+25CF, U+25BC, against thirteen probed in the same row that do not, including the smaller or hollow variant of each surviving shape: never infer a related glyph renders because a similar one does."
+          - "Two layers enforce ASCII-plus-four elsewhere: a test parsing every module that fails the build on a non-ASCII literal, and a safeText() call at the display boundary catching text nobody authored. glyphs.ts is the one file allowed the four."
+        facts:
+          - "59 TypeScript modules"
+          - "4 safe glyphs of 17 probed"
+          - "glasses/src/ui/glyphs.ts"
       - id: server
         label: "local HTTP server"
         meta: "NDJSON streaming, bearer + cookie auth"
         row: 1
-        detail: >
-          The single point every surface goes through. Nothing bypasses it, which is why a feature added once appears on all four.
+        detail:
+          - "client/server.py is the local HTTP server every surface talks to: 250 routed endpoints, streaming NDJSON so a client renders a run event by event rather than waiting on one response. It authenticates two ways: a bearer token for programmatic clients, and a cookie handoff for the native shell, with every cross-site failure mode written to fail closed."
+          - "Approvals resolve over this same surface, POST /api/approvals/{id}, which lets the desktop, a phone, the CLI and a paired set of glasses all answer one card, but that also means an approval is no longer a keypress in the window that drew the diff. Each card carries a blake2b digest over the tool, the preview and the suggested rule; a surface that never rendered the card cannot reproduce it, so approving something unseen stops being possible."
+        facts:
+          - "250 endpoints"
+          - "NDJSON streaming"
+          - "bearer + cookie auth"
+          - "blake2b card digest"
       - id: runtime
         label: "agent runtime"
         meta: "tool loop, 16 tools"
         row: 2
-        detail: >
-          The tool loop, with concurrent and async delegation. This is what actually runs a turn.
+        detail:
+          - "client/agent_runtime.py, 9,544 lines, is the streaming tool-calling loop for one agent's turn: 16 development tools plus MCP, computer use and delegation. It runs on concurrency, not parallelism: a turn is almost entirely waiting, on a model reply, then a shell command, so several sub-turns in flight are sockets held open, not cores doing arithmetic. The fan-out limit is a legibility, not a hardware, ceiling."
+          - "Delegation runs three ways: sequential (dispatch one, wait), concurrent (up to MAX_PARALLEL_DELEGATIONS = 4), asynchronous (up to MAX_BACKGROUND_SUBTASKS = 8, receipt, carry on). Depth caps at 1, raised to 2 only by the top level, and every branch draws one shared DelegationLedger rather than a fresh budget."
+          - "Sub-turns sharing one tree own files without declaring them first: write_claims.py grants a path to whoever writes it first, refuses a live sibling, releases in a finally block. stale_text's mtime check closes the gap a release opens."
+        facts:
+          - "16 built-in tools"
+          - "agent_runtime.py, 9,544 lines"
+          - "MAX_PARALLEL_DELEGATIONS = 4"
+          - "MAX_BACKGROUND_SUBTASKS = 8"
       - id: pipeline
         label: "pipeline engine"
         meta: "stages · lanes · gates · rework"
         row: 2
-        detail: >
-          Calls into the agent runtime once per stage rather than bypassing it, so a pipeline stage and a chat turn obey the same rules.
+        detail:
+          - "client/pipeline.py, 7,607 lines, builds multi-stage workflows: a routing prompt shapes the stages, and the draft passes through two pure functions, materialize_workflow_plan and lint_stage_plan: two to eight stages, last always a gate, never staffed by whoever did the work. classify_shape substitutes a curated skeleton when no model answers, a stated floor, not an understanding."
+          - "The top level lets a stage discover its own width at runtime: a stage that has read the repository publishes a work-list, and widen_stage_explained fans a later stage one lane per item, refusing rather than guessing where unusable."
+          - "This replaced a deleted design, a git worktree per lane: a lane needing a sibling's class wrote its own stub, and two stubs at one path caused a merge conflict that rolled the run back. One run spent 44% of total cost after that first failure and landed one file. The replacement is one shared tree, declared lane ownership."
+        facts:
+          - "pipeline.py, 7,607 lines"
+          - "2-8 stages, gate always last"
+          - "44% of spend after 1st merge fail"
+          - "widen_stage_explained"
       - id: subsystems
         label: "subsystems"
         meta: "backlog · automations · MCP · voice · browser"
         row: 2
-        detail: >
-          The reach: everything the harness is wired into, sharing the runtime rather than reimplementing it.
+        detail:
+          - "The backlog is a cross-project to-do list with dependencies and a fail-closed judge; task effort is restricted to high, extended or ultra at creation, since headless work nobody is watching should not run a thin pass. Automations are scheduled prompts modelled as a synthetic single-stage pipeline, one runtime rather than a second execution path."
+          - "MCP keeps a local registry searchable in roughly 12ms, and sessions now survive past one turn in mcp_pool.py, keyed on command, environment and directory, checked for liveness, reaped when idle. Voice runs locally, whisper.cpp for recognition and piper for speech, with spoken approvals and a silence gate."
+          - "Browser control reversed architecture: a headless DevTools-Protocol driver was deleted for a Chrome MV3 extension in the user's own profile, where sessions and logins already live. A canvas fixture exposed a gap in its accessibility-tree reading, generalised into a rule: grade a run on what the page says."
+        facts:
+          - "backlog: high/extended/ultra only"
+          - "MCP registry search ~12ms"
+          - "whisper.cpp + piper"
+          - "MV3 extension, real profile"
       - id: policy
         label: "policy layer"
         meta: "run_policy · permission_rules · sensitive_paths"
         row: 3
-        detail: >
-          May never import the runtime or the server. The import graph enforces the layering rather than a convention asking politely.
+        detail:
+          - "Five permission modes gate mutation: auto (full access, explicit opt-in), ask (default, mutating tools pause), accept-edits (edits go through, else asks), read (no mutation) and plan (read-only, cannot submit without asking a question or declaring its own decisions). permission_rules.py layers strings like run_shell(npm *), evaluated after the mode filters."
+          - "sensitive_paths.py is one credential blocklist shared by both file-tool implementations: a guard built inside only one of two executors protects only one path, and it was first built in the less dangerous branch while an in-project .env went straight through the other. Untrusted web and MCP output are fenced by untrusted_content.py."
+          - "lane_ownership.py, which enforces write ownership on a shared tree, is a leaf both pipeline and agent_runtime import, so a path spelled one way cannot be checked another. This layer may never import the runtime or server, a rule stated in run_policy.py and held by the import graph."
+        facts:
+          - "5 modes: auto/ask/accept-edits/read/plan"
+          - "permission_rules.py"
+          - "sensitive_paths.py, 1 blocklist"
+          - "untrusted_content.py fencing"
       - id: providers
         label: "model providers"
-        meta: "local and hosted"
+        meta: "10 · local and hosted"
         row: 4
-        detail: >
-          The bottom of the stack. Which one answers is a configuration detail, not an architectural one.
+        detail:
+          - "The registry in providers.py lists ten providers: ollama, openrouter, openai, anthropic, google, deepseek, ollama_cloud, lmstudio, vllm and llamacpp. llama.cpp was the most recent addition, landed in the shared provider layer so every surface picked it up at once."
+          - "Seven of the ten share one OpenAI-compatible request path: OpenAI, Gemini, DeepSeek, Ollama Cloud and the three local servers. Anthropic stays on its own Messages API. The local three, lmstudio, vllm and llamacpp, differ in exactly two ways: the base URL is configuration rather than a constant, and a missing key is normal, since a local server usually serves unauthenticated."
+          - "Provider choice stays independent of where Delroy runs: the server binds locally and nothing leaves the machine except the model call itself, so local execution constrains the deployment, not which provider a run may call."
+        facts:
+          - "10 providers"
+          - "7 on the OpenAI-compatible path"
+          - "LOCAL_COMPAT_PROVIDERS: 3"
     edges:
       - [desktop, server]
       - [web, server]
@@ -103,39 +162,38 @@ diagrams:
       - [policy, providers]
     steps: [desktop, web, cli, glasses, server, runtime, pipeline, subsystems, policy, providers]
     ascii: |
-         ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌────────────┐
-         │  Desktop  │  │    Web    │  │    CLI    │  │  Even G2   │
-         │  (native  │  │ workspace │  │  (delroy) │  │  glasses   │
-         │  pywebview│  │           │  │           │  │  companion │
-         └─────┬─────┘  └─────┬─────┘  └─────┬─────┘  └─────┬──────┘
-               │              │              │              │
-               └──────────────┴──────┬───────┴──────────────┘
-                                     │
-                        ┌────────────▼─────────────┐
-                        │   Local HTTP server      │
-                        │   NDJSON streaming,      │
-                        │   bearer + cookie auth   │
-                        └────────────┬─────────────┘
-                                     │
-               ┌─────────────────────┼─────────────────────┐
-         ┌─────▼──────┐    ┌─────────▼────────┐   ┌────────▼────────┐
-         │   Agent    │    │    Pipeline      │   │  Subsystems     │
-         │  runtime   │◄───┤    engine        │   │  backlog,       │
-         │ 16 tools   │    │  stages · lanes  │   │  automations,   │
-         │ concurrent │    │  gates · rework  │   │  MCP, voice,    │
-         │ + async    │    │                  │   │  browser        │
-         └─────┬──────┘    └──────────────────┘   └─────────────────┘
-               │
-         ┌─────▼──────────────────────────────────────────┐
-         │  Policy layer: run_policy, permission_rules,   │
-         │  sensitive_paths, untrusted_content,           │
-         │  lane_ownership, write_claims                  │
-         └──────────────────────┬─────────────────────────┘
-                                │
-         ┌──────────────────────▼─────────────────────────┐
-         │  model providers, local and hosted             │
-         └────────────────────────────────────────────────┘
-
+      ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌────────────┐
+      │  Desktop  │  │    Web    │  │    CLI    │  │  Even G2   │
+      │  (native  │  │ workspace │  │  (delroy) │  │  glasses   │
+      │  pywebview│  │           │  │           │  │  companion │
+      └─────┬─────┘  └─────┬─────┘  └─────┬─────┘  └─────┬──────┘
+            │              │              │              │
+            └──────────────┴──────┬───────┴──────────────┘
+                                  │
+                     ┌────────────▼─────────────┐
+                     │   Local HTTP server      │
+                     │   NDJSON streaming,      │
+                     │   bearer + cookie auth   │
+                     └────────────┬─────────────┘
+                                  │
+            ┌─────────────────────┼─────────────────────┐
+      ┌─────▼──────┐    ┌─────────▼────────┐   ┌────────▼────────┐
+      │   Agent    │    │    Pipeline      │   │  Subsystems     │
+      │  runtime   │◄───┤    engine        │   │  backlog,       │
+      │ 16 tools   │    │  stages · lanes  │   │  automations,   │
+      │ concurrent │    │  gates · rework  │   │  MCP, voice,    │
+      │ + async    │    │                  │   │  browser        │
+      └─────┬──────┘    └──────────────────┘   └─────────────────┘
+            │
+      ┌─────▼──────────────────────────────────────────┐
+      │  Policy layer: run_policy, permission_rules,   │
+      │  sensitive_paths, untrusted_content,           │
+      │  lane_ownership, write_claims                  │
+      └──────────────────────┬─────────────────────────┘
+                             │
+      ┌──────────────────────▼─────────────────────────┐
+      │  model providers, local and hosted             │
+      └────────────────────────────────────────────────┘
 tabs:
   - id: overview
     label: Overview
@@ -146,7 +204,8 @@ tabs:
     lede: >
       A desktop app, a browser workspace, a CLI and a pair of smart glasses
       are four clients of the same local server, not four implementations.
-      Step down the stack, or click any layer.
+      The chart walks down the stack on its own; choose any layer to stay on
+      it.
     diagram: surfaces
     notes:
       - title: The layering is enforced by the import graph

@@ -35,59 +35,80 @@ install_note: >
 metrics_verified: 2026-09-22
 diagrams:
   - id: runtime
-    title: One Worker, two audiences
+    title: "One Worker, two audiences"
     nodes:
       - id: reader
         label: "a reader's browser"
         meta: "likes.js, comments.js"
         row: 0
-        detail: >
-          A stranger on the site. Everything they can do either reads an aggregate or writes something invisible until a human approves it.
+        detail:
+          - "A reader's browser talks to the Worker through two small embeddable scripts, client/likes.js (171 lines) and client/comments.js (429 lines), neither needing an account: the public endpoints either return an aggregate, a like count, or write something invisible until the owner approves it, a pending comment. That is the whole authorisation model on this side."
+          - "likes.js uses localStorage to stop the same browser liking a page twice; comments.js posts a draft comment or reply and renders back only the approved, non-hidden thread for that path. Every write lands as a status-pending row, so nothing a stranger submits is visible to another stranger until a human acts on it."
+        facts:
+          - "client/likes.js, 171 lines"
+          - "client/comments.js, 429 lines"
+          - "no account needed"
       - id: owner
         label: "the owner's browser"
         meta: "web/dashboard.js"
         row: 0
-        detail: >
-          The dashboard, a static file on a third origin, authenticated with the owner's own admin key.
+        detail:
+          - "The owner's browser runs web/dashboard.js (1,919 lines), the only surface that authenticates: it posts the admin key once to /admin/session in exchange for a cookie, then drives session lifecycle, moderation, stats and the audit log over the remaining admin endpoints."
+          - "Before that key is sent, canAttemptCookieSession checks the configured worker origin and refuses anything plain-http except localhost, 127.0.0.1 or [::1]; the check runs ahead of the request specifically because a check running after would have already leaked the key. The dashboard's own HTML ships a strict Content-Security-Policy, default-src 'none' with script-src and style-src both 'self', plus a no-referrer policy, on the reasoning that a UI rendering untrusted comment text has to assume it will one day render something hostile."
+        facts:
+          - "web/dashboard.js, 1,919 lines"
+          - "canAttemptCookieSession()"
+          - "CSP: default-src 'none'"
       - id: worker
         label: "src/worker.js"
         meta: "CORS · CSRF · auth · rate limits"
         row: 1
-        detail: >
-          One Worker serves both audiences on one origin. Every request passes the same four gates before anything reaches the database, which is why the security argument is all on this side.
+        detail:
+          - "src/worker.js (2,204 lines, 20 endpoints) serves both audiences, gated by four checks on its admin half. CORS is exact-string origins only: no Access-Control-Allow-Origin is emitted for a wildcard-only config on /admin/*. Authentication accepts a signed __Host- session cookie, carrying a jti the admin_sessions table can revoke, or a bearer key."
+          - "checkCsrf runs on every admin mutation, comparing Origin against the worker's own origin and ALLOWED_ORIGINS; a mismatch is refused. No Origin at all is allowed: a browser always attaches Origin to a cross-site POST, so an absent header marks a non-browser client such as curl, not a disguised attack."
+          - "Rate limiting has no shared memory, Workers are isolates, so both limiters live in D1: one row per bucket per window, upserted so a burst increments one row rather than racing. Constants: 5 failed logins per 15 minutes, 5 comments and 30 likes per minute, keyed on CF-Connecting-IP alone, never X-Forwarded-For."
+        facts:
+          - "src/worker.js, 2,204 lines, 20 endpoints"
+          - "5 logins / 15 min"
+          - "5 comments, 30 likes / min"
+          - "key: CF-Connecting-IP only"
       - id: d1
         label: "Cloudflare D1"
         meta: "8 tables"
         row: 2
-        detail: >
-          Your own D1 instance in your own Cloudflare account. Nothing routes through infrastructure belonging to anyone else.
+        detail:
+          - "The schema is eight tables and nine indexes, all created with CREATE TABLE IF NOT EXISTS and no migration runner: every change has to be additive, and the Worker runs idempotent ensure* DDL for the rate-limit and denied-keyword tables (ensureAuthAttemptsTable, ensurePublicRateLimitsTable, ensureDeniedKeywordsTable) so a pre-existing install acquires a new table on the next request."
+          - "admin_sessions exists purely to make a signed, stateless cookie revocable: one row per issued session, keyed on jti, with an expires_at and a revoked flag, since a signed token with no row cannot be logged out before it expires. Constraints live in the schema rather than in the Worker's own logic, CHECK (count >= 0) on post_likes, CHECK (status IN ('pending','approved','rejected')) on post_comments, so a bug in the application code cannot write an invalid row regardless of which path reached the database."
+        facts:
+          - "8 tables, 9 indexes"
+          - "admin_sessions: jti, revoked"
+          - "no migration runner"
     edges:
       - [reader, worker]
       - [owner, worker]
       - [worker, d1]
     steps: [reader, owner, worker, d1]
     ascii: |
-          a reader's browser                 the owner's browser
-          likes.js, comments.js              web/dashboard.js
-                  │                                  │
-                  │  GET/POST /likes                 │  POST /admin/session
-                  │  GET/POST /comments              │  GET  /admin/comments
-                  │  GET/POST /comments/like         │  POST /admin/comments/approve
-                  │                                  │  GET  /admin/stats
-                  ▼                                  ▼
-          ┌───────────────────────────────────────────────────┐
-          │  src/worker.js                                    │
-          │    CORS policy      exact origins, no wildcard    │
-          │                     ever on /admin/*              │
-          │    CSRF check       every admin mutation          │
-          │    auth             cookie session, or bearer key │
-          │    rate limits      D1-backed, per IP             │
-          └───────────────────────────────────────────────────┘
-                                  │
-                                  ▼
-                          Cloudflare D1 (SQLite)
-                          8 tables
-
+      a reader's browser                 the owner's browser
+      likes.js, comments.js              web/dashboard.js
+              │                                  │
+              │  GET/POST /likes                 │  POST /admin/session
+              │  GET/POST /comments              │  GET  /admin/comments
+              │  GET/POST /comments/like         │  POST /admin/comments/approve
+              │                                  │  GET  /admin/stats
+              ▼                                  ▼
+      ┌───────────────────────────────────────────────────┐
+      │  src/worker.js                                    │
+      │    CORS policy      exact origins, no wildcard    │
+      │                     ever on /admin/*              │
+      │    CSRF check       every admin mutation          │
+      │    auth             cookie session, or bearer key │
+      │    rate limits      D1-backed, per IP             │
+      └───────────────────────────────────────────────────┘
+                              │
+                              ▼
+                      Cloudflare D1 (SQLite)
+                      8 tables
 tabs:
   - id: overview
     label: Overview
@@ -96,8 +117,9 @@ tabs:
     label: Runtime
     heading: One Worker, two audiences
     lede: >
-      A reader and the owner hit the same origin and the same handler. Step
-      through what a request passes on its way to the database.
+      A reader and the owner hit the same origin and the same handler. The
+      chart walks what a request passes on its way to the database; choose
+      any stage to stay on it.
     diagram: runtime
     notes:
       - title: The owner is not an operator

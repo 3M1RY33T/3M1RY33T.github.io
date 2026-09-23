@@ -181,6 +181,24 @@ end
   fail!("#{slug} links #quickstart but never renders it") unless html.include?('id="quickstart"')
 end
 
+# Every stage of every schematic carries an in-depth description: the side
+# panel is the point of the chart, and a stage with one line or none leaves
+# it empty while the tour sits on that stage.
+require "json"
+%w[loci delroy urthreads tensor-serve].each do |slug|
+  html = page("projects/#{slug}/index.html")
+  next if html.nil?
+  html.scan(%r{<script type="application/json" data-diagram-data>(.*?)</script>}m).each do |(raw)|
+    data = JSON.parse(raw) rescue (fail!("#{slug} schematic data is not valid JSON"); next)
+    Array(data["nodes"]).each do |n|
+      paras = Array(n["detail"])
+      words = paras.join(" ").split.size
+      fail!("#{slug}/#{data["id"]}/#{n["id"]} description is #{words} words") if words < 60
+      fail!("#{slug}/#{data["id"]}/#{n["id"]} has no facts") if Array(n["facts"]).empty?
+    end
+  end
+end
+
 if $failures.empty?
   puts "verify_build: OK"
   exit 0

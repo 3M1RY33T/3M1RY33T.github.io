@@ -44,65 +44,116 @@ metrics:
 
 diagrams:
   - id: routing
-    title: A question entering the pipeline
-    query: loci ask "why was the session cookie dropped on localhost?"
-    query_label: asked
+    title: "A question entering the pipeline"
+    query: "loci ask \"why was the session cookie dropped on localhost?\""
+    query_label: "asked"
     nodes:
       - id: ask
         label: "loci ask \"…\""
         meta: "the question, cwd, --group"
         row: 0
-        detail: >
-          The question as typed, plus the directory you are standing in and any --group flag. --scope NAME jumps past routing straight to the fan-out, and drops the episode gate with it: that gate exists to stop an answer arriving from the wrong scope, and you have just named the right one.
+        detail:
+          - "`loci ask \"<question>\"` takes three inputs: the question text, the working directory (read with `os.getcwd()` unless `--no-cwd` or `--cwd` overrides it), and an optional `--group` naming a policy group to confine to. cwd is resolved to the deepest scope whose root contains it, and that same resolution is what both the router's cwd boost and the confinement stage key off."
+          - "`--scope NAME`, repeatable, skips confinement and routing entirely: it sets the scope list directly, marks the result as forced with no score, and also turns off the episode store's two-tier gate for those scopes, on the reasoning that a gate meant to stop an answer arriving from the wrong scope has nothing to check once the user has named the right one. When both `--scope` and `--group` are given, `--scope` wins and a note is printed saying so."
+        facts:
+          - "cwd via os.getcwd()"
+          - "--scope bypasses routing"
+          - "gate=not force_scopes"
+          - "--group confines via groups.json"
       - id: confinement
         label: "confinement"
         meta: "groups.py"
         row: 1
-        detail: >
-          Reads the registry and groups.json. Never the index, never a model. With --group X the eligible set is the members of that group, in all three modes; otherwise it is the strictest group of the scope you are standing in.
+        detail:
+          - "`groups.confinement()` reads two files on disk: the scope registry (`scopes.json`, via `load_scopes`) and group policy (`groups.json`, via `load_policy`). It never touches `scope_index.json` and calls no model; it turns policy plus an anchor into two optional sets, `eligible` and `demoted`, that `route` consumes."
+          - "Named with `--group X`, all three modes, explicit, soft and hard, confine to X's members; only the mode decides what happens when the best answer is outside them. Reached through cwd instead, the anchor is the scope containing cwd, and its groups are resolved to whichever is tied for strictest (`STRICTNESS`: explicit below soft below hard). `hard` sets `eligible` and `strict=True`, `soft` sets `demoted` to everyone outside the group, `explicit` sets neither."
+        facts:
+          - "groups.py: confinement()"
+          - "reads scopes.json + groups.json"
+          - "STRICTNESS: explicit < soft < hard"
+          - "--group X confines in all 3 modes"
       - id: route
         label: "route"
         meta: "router.py"
         row: 2
-        detail: >
-          Reads scope_index.json, a map from token to {scope: node_df}. One dictionary lookup per query token, deterministic, sub-millisecond, and no model call anywhere in it.
+        detail:
+          - "`router.route()` reads `scope_index.json` (token to `{scope: node_df}`) and scores every scope: `contrib = scope_idf(t) * (1 + log1p(node_df/size * 1000))`, summed over query tokens, divided by token count and `size**SIZE_PRIOR` (0.15). A demoted scope (soft group) is penalised by `GROUP_PENALTY` 0.5 before any boost, so the penalty can never invert one. Boosts follow: `ALIAS_BOOST` 6.0 if the question names the project, `CWD_BOOST` 4.0 to the deepest containing scope only, `RECENCY_BOOST` 0.15 as a tiebreak."
+          - "Three refusal checks run in a fixed order: `out_of_group` (the corpus-wide winner sits outside a hard/named group and would itself have routed), `deictic` (the question points at its subject without naming it, and nothing forced the scope), `no_evidence` (none of three OR'd gates clears: summed evidence at or above `EVIDENCE_FLOOR` 7.6, `MIN_MATCHED` 4 tokens matched, or a token held by at most 2 scopes). An alias or cwd hit is `forced` and skips the last two checks."
+        facts:
+          - "ALIAS_BOOST=6.0, CWD_BOOST=4.0"
+          - "RECENCY_BOOST=0.15, SIZE_PRIOR=0.15"
+          - "EVIDENCE_FLOOR=7.6, MIN_MATCHED=4"
+          - "one dict lookup per token, sub-ms"
       - id: abstain
         label: "ABSTAIN"
         meta: "out_of_group · deictic · no_evidence"
         row: 3
         kind: refusal
-        detail: >
-          The other way out of route, and a first-class outcome rather than an error. It names the cause, lists the scopes with a claim on the question and what each one holds, names the flag that would fix it, and queries nothing at all.
+        detail:
+          - "Three named causes. `out_of_group`: the best-scoring scope across the whole corpus sits outside a hard or named group, and would itself have routed unconfined, so answering with the in-group runner-up would be a confident answer from the wrong project. `deictic`: the question points at its subject (`this`, `it`, `here`, `the project`) without naming it, and neither an alias nor cwd resolved what it points at. `no_evidence`: none of the three evidence gates clears the floor."
+          - "Every abstention queries nothing: `ask()` empties the selected scope list before any store is called. It still hands back a shortlist, in score order: every eligible scope holding a distinctive term, one that at most half the corpus holds, listed with up to three of those terms. `_advice()` then names the flag that fixes it: `--scope <name>` when cwd already tried and failed, `loci doctor` when no scope holds a distinctive term at all."
+        facts:
+          - "out_of_group / deictic / no_evidence"
+          - "CANDIDATE_SHARE=0.5, CANDIDATE_TERMS=3"
+          - "selected = [] on abstain"
+          - "_advice() names the fixing flag"
       - id: scopes
         label: "selected scopes"
         meta: "at most 3"
         row: 3
-        detail: >
-          One thread each. Neither store is ever queried across a scope boundary, so isolation is a property of the fan-out rather than a filter applied to the results afterwards.
+        detail:
+          - "The router hands back at most `MAX_SCOPES` (3) for an ordinary question, widened from the top score by `WIDEN_RATIO` (0.85) and with every concentrated-token holder forced in; a question detected as enumerative instead keeps every scope that clears its own discounted floor, up to `MAX_SET_SCOPES` (8)."
+          - "Each selected scope is queried in its own thread inside a `ThreadPoolExecutor`, and neither store is ever queried across a scope boundary: the structure call is handed only that scope's own `graphify-out/graph.json`, and the episode call is handed only the chunks `chunks_for(store, sid)` returns for that scope id. Before the fan-out, `warm_up()` pays the embedding model's one-off native initialisation on a single thread first, because constructing it from two threads at once has caused a segfault or hang on macOS."
+        facts:
+          - "MAX_SCOPES=3, MAX_SET_SCOPES=8"
+          - "ThreadPoolExecutor per selected scope"
+          - "one graph.json / chunk list per scope"
       - id: expand
         label: "expand the question"
         meta: "against this scope's postings"
         row: 4
-        detail: >
-          Query expansion runs against this scope's own postings, a dictionary lookup, so a token the scope does not hold cannot enter its query. That is what makes the isolation structural rather than cosmetic.
+        detail:
+          - "`expand_for_scope()` tokenises the question and keeps only the tokens present in this scope's own postings, `scope_index.json`'s token to `{scope: node_df}` map: a dict lookup, so a token the scope's index does not hold cannot be invented into a query. `semantic_symbols()` then appends the tokens of the `SEMANTIC_SYMBOL_LABELS` (2) nearest embedded symbol labels, when embeddings are available, because graphify seeds its traversal by lexical similarity to a label and a question phrased in behaviour rather than identifiers otherwise expands to nothing."
+          - "Both run, not either: the lexical half anchors terms the user actually typed, the semantic half reaches code the question described rather than named. The combined token list is what is handed to the structure query and printed in the answer as `expanded:`."
+        facts:
+          - "ask.py: expand_for_scope()"
+          - "SEMANTIC_SYMBOL_LABELS=2"
+          - "lexical postings lookup + 2 nearest labels"
       - id: structure
         label: "structure store"
         meta: "graphify"
         row: 5
-        detail: >
-          What calls what, answered with file and line citations.
+        detail:
+          - "`GraphifyBackend.query()` shells out to `graphify query <expanded tokens> --graph <this scope's graph.json> --budget <per-scope budget>`, one subprocess per graph source that has at least `MIN_SOURCE_NODES` (20) nodes, with a 60 second timeout. The graph read is `<scope root>/graphify-out/graph.json`, written only by `loci graphs` or `loci setup`; loci never writes anywhere else inside a repository."
+          - "The result text, with `file:line` citations, comes back verbatim from graphify's own output; a failure or timeout is captured as `ok=False` with the stderr rather than raised. The same adapter's `vocabulary()` method, counting each token once per node, is what builds the `node_df` figures the routing stage reads."
+        facts:
+          - "graphify query --graph <path> --budget N"
+          - "MIN_SOURCE_NODES=20, 60s timeout"
+          - "<scope>/graphify-out/graph.json"
       - id: episode
         label: "episode store"
         meta: "BM25 + char 3-5 gram + embeddings"
         row: 5
-        detail: >
-          What happened and why, from READMEs, commit bodies and docstrings. The three signals are fused, then gated.
+        detail:
+          - "`BuiltinEpisodeBackend.search()` fuses three rankers over one scope's chunks: BM25, char 3 to 5 gram TF-IDF, and local `bge-small` embeddings when enabled, weighted 0.20 / 0.20 / 0.60 with a 0.05 recency term, renormalised over whichever signals scored. The lexical rankers are fitted once and cached to `rankers/<scope>.lex`, mmapped rather than unpickled, so a cached scope opens in microseconds instead of refitting."
+          - "A hit must clear a two-tier gate: lexically grounded (`MIN_GROUNDED` 2 matched tokens, or `MIN_GROUNDED_FRAC` 25%) OR semantically confident (cosine at or above `SEMANTIC_FLOOR` 0.57), plus an absolute `SCORE_FLOOR` of 0.12. The gate exists because embeddings alone give every chunk a nonzero score, which would stop an absolute floor firing; an AND of the two conditions would reject exactly the meaning-without-shared-words matches embeddings exist to catch, so they are OR'd. Gate, fusion and sort run in the Rust extension."
+        facts:
+          - "weights: BM25 .20 / char .20 / embed .60"
+          - "SCORE_FLOOR=0.12, SEMANTIC_FLOOR=0.57"
+          - "MIN_GROUNDED=2 / MIN_GROUNDED_FRAC=0.25"
+          - "rankers cached as <scope>.lex, mmapped"
       - id: answer
         label: "merged, cited answer"
         meta: "one block per scope"
         row: 6
-        detail: >
-          One block per scope, each carrying its own citations, so an answer drawn from two projects never reads as one voice.
+        detail:
+          - "`ask.render()` prints one block per selected scope, headed `ROUTED` or `ENUMERATED`, the scope name, and the tokens the expand stage produced. Inside each block: structure hits with their `file:line` citations, then episode hits with a fused score, the chunk's source and heading, and a text snippet. When a scope's structure query and episode query both come back empty, the block reads `no evidence in this scope` rather than being silently omitted, so an empty answer is visible as empty and not indistinguishable from a scope that was never asked."
+          - "A relational question (an edge between two projects) answers outside this shape entirely: a `USES ->` list of resolved edges, each a fact with its own `file:line` citation and no score, because there is no ranking to fall back on for a registry fact."
+        facts:
+          - "ask.py: render()"
+          - "note = \"no evidence in this scope\""
+          - "verb: ROUTED or ENUMERATED"
+          - "edges print as USES -> with file:line"
     edges:
       - [ask, confinement]
       - [confinement, route]
@@ -146,7 +197,6 @@ diagrams:
         │      └─ episode store     BM25 + char 3-5 gram + embeddings, fused, gated
         ▼
       merged, cited answer, one block per scope
-
 tabs:
   - id: overview
     label: Overview
@@ -156,8 +206,9 @@ tabs:
     heading: How a question gets routed
     lede: >
       Everything above the fan-out is one function. It scores every scope in
-      the corpus, then asks three refusal questions in a fixed order. Step
-      through it, or click any stage.
+      the corpus, then asks three refusal questions in a fixed order. The
+      chart walks through each stage on its own; choose any stage to stay on
+      it.
     diagram: routing
     notes:
       - title: Both stages refuse independently

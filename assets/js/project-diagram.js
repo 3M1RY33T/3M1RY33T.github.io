@@ -1,9 +1,14 @@
 /* Interactive schematics for project pages.
  *
  * Each [data-diagram] figure carries its nodes and edges as JSON. This
- * draws them as real elements with the edges painted on an SVG beneath,
- * so the labels theme, wrap and read like the rest of the page, then
- * steps a query through the pipeline one stage at a time.
+ * draws the chart on the left, as real elements with the edges painted on
+ * an SVG beneath, and the selected stage's description on the right.
+ *
+ * The chart tours itself: it cycles through the stages, always showing
+ * one description, and holds while the pointer or keyboard focus is on
+ * the diagram so text does not change under a reader. Choosing a stage
+ * ends the tour; it resumes after three minutes without interaction,
+ * but not while the pointer is still over the diagram.
  *
  * If this never runs, the verbatim ASCII diagram from the project
  * document stays on the page, which is why it is in the markup.
@@ -12,7 +17,18 @@
   "use strict";
 
   var SVGNS = "http://www.w3.org/2000/svg";
-  var PLAY_MS = 2000;
+  var IDLE_RESUME_MS = 3 * 60 * 1000;
+  // Dwell scales with the length of the description, within bounds.
+  var DWELL_MIN = 7000;
+  var DWELL_MAX = 15000;
+  var DWELL_PER_WORD = 120;
+
+  var STATUS = {
+    auto: "Touring the stages · hover to hold, click one to choose",
+    held: "Holding while you read",
+    manual: "Showing your choice · the tour resumes after 3 minutes idle",
+    paused: "Paused"
+  };
 
   function el(tag, cls, text) {
     var n = document.createElement(tag);
@@ -23,8 +39,29 @@
 
   function svgEl(tag, attrs) {
     var n = document.createElementNS(SVGNS, tag);
-    for (var k in attrs) if (attrs.hasOwnProperty(k)) n.setAttribute(k, attrs[k]);
+    for (var k in attrs) if (Object.prototype.hasOwnProperty.call(attrs, k)) n.setAttribute(k, attrs[k]);
     return n;
+  }
+
+  function paragraphs(detail) {
+    if (!detail) return [];
+    if (Array.isArray(detail)) return detail.filter(Boolean);
+    return String(detail).split(/\n\s*\n/).map(function (s) { return s.trim(); }).filter(Boolean);
+  }
+
+  // Descriptions mark code with backticks. Built as text and code nodes,
+  // never as HTML, so front matter cannot inject markup.
+  function richParagraph(text) {
+    var p = document.createElement("p");
+    String(text).split("`").forEach(function (part, i) {
+      if (!part) return;
+      p.appendChild(i % 2 ? el("code", null, part) : document.createTextNode(part));
+    });
+    return p;
+  }
+
+  function isKeyboardFocus(node) {
+    try { return node.matches(":focus-visible"); } catch (err) { return true; }
   }
 
   function build(figure) {
@@ -40,12 +77,22 @@
     var byId = {};
     nodes.forEach(function (n) { byId[n.id] = n; });
 
-    // The step order defaults to the order the nodes are declared in.
     var steps = (data.steps && data.steps.length ? data.steps : nodes.map(function (n) { return n.id; }))
       .filter(function (id) { return byId[id]; });
     if (!steps.length) return;
 
     var root = el("div", "pd");
+    var chart = el("div", "pd-chart");
+    var aside = el("div", "pd-aside");
+
+    // --- chart -------------------------------------------------------
+    if (data.query) {
+      var q = el("p", "pd-query");
+      q.appendChild(el("span", "pd-query-label", data.query_label || "input"));
+      q.appendChild(el("code", null, data.query));
+      chart.appendChild(q);
+    }
+
     var stage = el("div", "pd-stage");
     var svg = svgEl("svg", { "class": "pd-edges", "aria-hidden": "true", preserveAspectRatio: "none" });
     var defs = svgEl("defs");
@@ -59,15 +106,6 @@
     svg.appendChild(defs);
     stage.appendChild(svg);
 
-    // Query line: the thing actually entering the pipeline.
-    if (data.query) {
-      var q = el("p", "pd-query");
-      q.appendChild(el("span", "pd-query-label", data.query_label || "input"));
-      q.appendChild(el("code", null, data.query));
-      root.appendChild(q);
-    }
-
-    // Rows of nodes.
     var rows = [];
     nodes.forEach(function (n) {
       var r = Number(n.row) || 0;
@@ -84,36 +122,44 @@
         b.type = "button";
         b.dataset.node = n.id;
         if (n.kind) b.classList.add("pd-node-" + n.kind);
-        var label = el("span", "pd-node-label", n.label || n.id);
-        b.appendChild(label);
+        b.appendChild(el("span", "pd-node-label", n.label || n.id));
         if (n.meta) b.appendChild(el("span", "pd-node-meta", n.meta));
         b.addEventListener("click", function () {
-          stop();
           var i = steps.indexOf(n.id);
-          show(i >= 0 ? i : 0);
+          select(i >= 0 ? i : 0);
         });
         rowEl.appendChild(b);
         buttons[n.id] = b;
       });
       stage.appendChild(rowEl);
     });
-    root.appendChild(stage);
+    chart.appendChild(stage);
 
-    // Detail panel, written on every step.
+    // --- description -------------------------------------------------
     var detail = el("div", "pd-detail");
-    var detailTitle = el("p", "pd-detail-title");
-    var detailBody = el("p", "pd-detail-body");
-    detail.appendChild(detailTitle);
-    detail.appendChild(detailBody);
-    detail.setAttribute("aria-live", "polite");
-    root.appendChild(detail);
+    var progress = el("div", "pd-progress");
+    var bar = el("span", "pd-progress-bar");
+    progress.appendChild(bar);
+    progress.setAttribute("aria-hidden", "true");
+    var eyebrow = el("p", "pd-detail-eyebrow");
+    var title = el("p", "pd-detail-title");
+    var body = el("div", "pd-detail-body");
+    var facts = el("ul", "pd-facts");
+    // The text scrolls inside its own box so a long description never
+    // pushes the controls off screen; the progress bar sits outside it.
+    var inner = el("div", "pd-detail-inner");
+    inner.appendChild(eyebrow);
+    inner.appendChild(title);
+    inner.appendChild(body);
+    inner.appendChild(facts);
+    detail.appendChild(progress);
+    detail.appendChild(inner);
+    aside.appendChild(detail);
 
-    // Controls.
+    // --- controls ----------------------------------------------------
     var controls = el("div", "pd-controls");
     var playBtn = el("button", "pd-play");
     playBtn.type = "button";
-    var playLabel = el("span", "pd-play-text", "Play");
-    playBtn.appendChild(playLabel);
     var prevBtn = el("button", "pd-step", "Back");
     prevBtn.type = "button";
     var nextBtn = el("button", "pd-step", "Next");
@@ -122,18 +168,21 @@
     var dotEls = steps.map(function (id, i) {
       var d = el("button", "pd-dot");
       d.type = "button";
-      d.setAttribute("aria-label", "Step " + (i + 1) + ": " + ((byId[id] && byId[id].label) || id));
-      d.addEventListener("click", function () { stop(); show(i); });
+      d.setAttribute("aria-label", "Stage " + (i + 1) + ": " + ((byId[id] && byId[id].label) || id));
+      d.addEventListener("click", function () { select(i); });
       dots.appendChild(d);
       return d;
     });
-    var counter = el("p", "pd-counter");
+    var status = el("p", "pd-status");
     controls.appendChild(playBtn);
     controls.appendChild(prevBtn);
     controls.appendChild(nextBtn);
     controls.appendChild(dots);
-    controls.appendChild(counter);
-    root.appendChild(controls);
+    controls.appendChild(status);
+    aside.appendChild(controls);
+
+    root.appendChild(chart);
+    root.appendChild(aside);
 
     var ascii = figure.querySelector(".project-diagram-ascii");
     if (ascii) ascii.hidden = true;
@@ -150,8 +199,10 @@
       if (!box.width) return;
       svg.setAttribute("viewBox", "0 0 " + box.width + " " + box.height);
       edges.forEach(function (edge) {
-        var from = buttons[edge[0] || edge.from];
-        var to = buttons[edge[1] || edge.to];
+        var fromId = edge[0] || edge.from;
+        var toId = edge[1] || edge.to;
+        var from = buttons[fromId];
+        var to = buttons[toId];
         if (!from || !to) return;
         var a = from.getBoundingClientRect();
         var b = to.getBoundingClientRect();
@@ -166,17 +217,16 @@
           d: "M " + x1 + " " + y1 + " C " + x1 + " " + mid + ", " + x2 + " " + mid + ", " + x2 + " " + y2,
           "marker-end": "url(#" + markerId + ")"
         });
-        path.dataset.from = edge[0] || edge.from;
-        path.dataset.to = edge[1] || edge.to;
+        path.dataset.from = fromId;
+        path.dataset.to = toId;
         svg.appendChild(path);
         edgeEls.push(path);
       });
       paint();
     }
 
-    // --- state -------------------------------------------------------
+    // --- what is shown -----------------------------------------------
     var index = 0;
-    var timer = null;
 
     function paint() {
       var activeId = steps[index];
@@ -202,53 +252,186 @@
     function show(i) {
       index = (i + steps.length) % steps.length;
       var n = byId[steps[index]];
-      detailTitle.textContent = n.label || n.id;
-      detailBody.textContent = n.detail || "";
-      counter.textContent = (index + 1) + " of " + steps.length;
+      eyebrow.replaceChildren(el("span", "pd-eyebrow-step", "Stage " + (index + 1) + " of " + steps.length));
+      if (n.meta) eyebrow.appendChild(el("span", "pd-eyebrow-meta", n.meta));
+      title.textContent = n.label || n.id;
+      body.replaceChildren();
+      paragraphs(n.detail).forEach(function (p) { body.appendChild(richParagraph(p)); });
+      facts.replaceChildren();
+      (n.facts || []).forEach(function (f) { facts.appendChild(el("li", null, f)); });
+      facts.hidden = !(n.facts && n.facts.length);
+      inner.scrollTop = 0;
       paint();
     }
 
-    function stop() {
-      if (timer) { clearInterval(timer); timer = null; }
-      root.classList.remove("is-playing");
-      playLabel.textContent = "Play";
-      playBtn.setAttribute("aria-label", "Play the sequence");
+    // --- the tour ------------------------------------------------------
+    // mode: "auto" tours; "manual" shows the reader's choice and resumes
+    // after IDLE_RESUME_MS; "paused" waits for the Play button.
+    var mode = steps.length > 1 ? "auto" : "paused";
+    var hovering = false;
+    var focused = false;
+    var visible = false;
+    var dwellTimer = null;
+    var dwellLeft = 0;
+    var dwellStart = 0;
+    var dwellRunning = false;
+    var idleTimer = null;
+    var resumeOnLeave = false;
+
+    function dwellFor(n) {
+      var words = paragraphs(n.detail).join(" ").split(/\s+/).filter(Boolean).length;
+      return Math.max(DWELL_MIN, Math.min(DWELL_MAX, words * DWELL_PER_WORD));
     }
 
-    function play() {
-      stop();
-      root.classList.add("is-playing");
-      playLabel.textContent = "Pause";
-      playBtn.setAttribute("aria-label", "Pause the sequence");
-      timer = setInterval(function () {
-        if (index >= steps.length - 1) { stop(); return; }
-        show(index + 1);
-      }, PLAY_MS);
+    function canRun() {
+      return mode === "auto" && visible && !hovering && !focused && !document.hidden;
+    }
+
+    function restartBar(ms) {
+      bar.style.animation = "none";
+      void bar.offsetWidth;
+      bar.style.animation = "pd-fill " + ms + "ms linear forwards";
+      bar.style.animationPlayState = "paused";
+    }
+
+    function startDwell() {
+      clearTimeout(dwellTimer);
+      dwellRunning = false;
+      dwellLeft = dwellFor(byId[steps[index]]);
+      restartBar(dwellLeft);
+      sync();
+    }
+
+    function sync() {
+      var run = canRun();
+      if (run && !dwellRunning && dwellLeft > 0) {
+        dwellStart = Date.now();
+        dwellRunning = true;
+        dwellTimer = setTimeout(function () {
+          dwellRunning = false;
+          dwellLeft = 0;
+          show(index + 1);
+          startDwell();
+        }, dwellLeft);
+      } else if (!run && dwellRunning) {
+        clearTimeout(dwellTimer);
+        dwellRunning = false;
+        dwellLeft = Math.max(0, dwellLeft - (Date.now() - dwellStart));
+      }
+      bar.style.animationPlayState = run ? "running" : "paused";
+
+      root.classList.toggle("is-auto", mode === "auto");
+      var held = mode === "auto" && !run;
+      status.textContent = mode === "auto" ? (held ? STATUS.held : STATUS.auto) : STATUS[mode];
+      playBtn.textContent = mode === "auto" ? "Pause" : "Play";
+      playBtn.setAttribute("aria-label", mode === "auto" ? "Pause the tour" : "Play the tour");
+      // A live region that speaks every few seconds is noise; announce
+      // only what the reader chose.
+      detail.setAttribute("aria-live", mode === "auto" ? "off" : "polite");
+    }
+
+    function armIdle() {
+      clearTimeout(idleTimer);
+      resumeOnLeave = false;
+      if (mode !== "manual") return;
+      idleTimer = setTimeout(function () {
+        if (hovering || focused) { resumeOnLeave = true; return; }
+        resume(true);
+      }, IDLE_RESUME_MS);
+    }
+
+    function resume(advance) {
+      clearTimeout(idleTimer);
+      resumeOnLeave = false;
+      mode = "auto";
+      if (advance) show(index + 1);
+      startDwell();
+    }
+
+    function select(i) {
+      show(i);
+      mode = "manual";
+      clearTimeout(dwellTimer);
+      dwellRunning = false;
+      dwellLeft = 0;
+      armIdle();
+      sync();
     }
 
     playBtn.addEventListener("click", function () {
-      if (timer) { stop(); return; }
-      if (index >= steps.length - 1) show(0);
-      play();
+      if (mode === "auto") {
+        mode = "paused";
+        clearTimeout(idleTimer);
+        resumeOnLeave = false;
+        clearTimeout(dwellTimer);
+        dwellRunning = false;
+        sync();
+      } else {
+        resume(false);
+      }
     });
-    prevBtn.addEventListener("click", function () { stop(); show(index - 1); });
-    nextBtn.addEventListener("click", function () { stop(); show(index + 1); });
+    prevBtn.addEventListener("click", function () { select(index - 1); });
+    nextBtn.addEventListener("click", function () { select(index + 1); });
 
     root.tabIndex = 0;
+    root.setAttribute("aria-label", (data.title || "Schematic") + ". Use the arrow keys to move between stages.");
     root.addEventListener("keydown", function (e) {
-      if (e.key === "ArrowRight") { stop(); show(index + 1); e.preventDefault(); }
-      else if (e.key === "ArrowLeft") { stop(); show(index - 1); e.preventDefault(); }
+      if (e.key === "ArrowRight") { select(index + 1); e.preventDefault(); }
+      else if (e.key === "ArrowLeft") { select(index - 1); e.preventDefault(); }
     });
 
-    // Pause when scrolled away, so a diagram is not animating unseen.
+    // Reading is activity: moving over the diagram restarts the idle
+    // clock, at most once a second.
+    var lastActivity = 0;
+    function activity() {
+      var now = Date.now();
+      if (mode === "manual" && now - lastActivity > 1000) { lastActivity = now; armIdle(); }
+    }
+    root.addEventListener("pointermove", activity);
+    root.addEventListener("wheel", activity, { passive: true });
+    root.addEventListener("keydown", activity);
+
+    function leftArea() {
+      if (resumeOnLeave && !hovering && !focused) { resume(true); return; }
+      sync();
+    }
+    root.addEventListener("pointerenter", function (e) {
+      if (e.pointerType === "touch") return;
+      hovering = true;
+      sync();
+    });
+    root.addEventListener("pointerleave", function (e) {
+      if (e.pointerType === "touch") return;
+      hovering = false;
+      leftArea();
+    });
+    // Only keyboard focus holds the tour. A clicked button keeps focus in
+    // most browsers, and treating that as reading would stop the tour
+    // from ever resuming once the pointer had left.
+    root.addEventListener("focusin", function (e) {
+      focused = isKeyboardFocus(e.target);
+      sync();
+    });
+    root.addEventListener("focusout", function (e) {
+      if (e.relatedTarget && root.contains(e.relatedTarget)) return;
+      focused = false;
+      leftArea();
+    });
+
     if (window.IntersectionObserver) {
       new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) { if (!entry.isIntersecting) stop(); });
+        visible = entries[entries.length - 1].isIntersecting;
+        sync();
       }, { threshold: 0.2 }).observe(root);
+    } else {
+      visible = true;
     }
+    document.addEventListener("visibilitychange", sync);
 
     show(0);
     drawEdges();
+    if (mode === "auto") startDwell(); else sync();
+
     if (window.ResizeObserver) {
       new ResizeObserver(drawEdges).observe(stage);
     } else {
