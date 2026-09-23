@@ -43,6 +43,38 @@
     return n;
   }
 
+  // Control icons on a 24 unit grid. Play and pause are filled, as media
+  // controls conventionally are, with round joins softening the corners;
+  // the step chevrons are strokes, like the rest of the site's icons.
+  var ICONS = {
+    play: [["path", { d: "M8 5.5v13l10.5-6.5z" }]],
+    pause: [["rect", { x: "6.5", y: "5", width: "3.5", height: "14", rx: "1" }],
+            ["rect", { x: "14", y: "5", width: "3.5", height: "14", rx: "1" }]],
+    prev: [["path", { d: "M14.5 6l-6 6 6 6" }]],
+    next: [["path", { d: "M9.5 6l6 6-6 6" }]]
+  };
+
+  function icon(name) {
+    var filled = name === "play" || name === "pause";
+    var node = svgEl("svg", {
+      viewBox: "0 0 24 24", "aria-hidden": "true", focusable: "false",
+      fill: filled ? "currentColor" : "none", stroke: "currentColor",
+      "stroke-width": filled ? "1.5" : "2.25",
+      "stroke-linecap": "round", "stroke-linejoin": "round"
+    });
+    ICONS[name].forEach(function (part) { node.appendChild(svgEl(part[0], part[1])); });
+    return node;
+  }
+
+  function iconButton(cls, name, label) {
+    var b = el("button", cls);
+    b.type = "button";
+    b.setAttribute("aria-label", label);
+    b.dataset.label = label;
+    b.appendChild(icon(name));
+    return b;
+  }
+
   function paragraphs(detail) {
     if (!detail) return [];
     if (Array.isArray(detail)) return detail.filter(Boolean);
@@ -158,12 +190,10 @@
 
     // --- controls ----------------------------------------------------
     var controls = el("div", "pd-controls");
-    var playBtn = el("button", "pd-play");
-    playBtn.type = "button";
-    var prevBtn = el("button", "pd-step", "Back");
-    prevBtn.type = "button";
-    var nextBtn = el("button", "pd-step", "Next");
-    nextBtn.type = "button";
+    var playBtn = iconButton("pd-play", "pause", "Pause the tour");
+    var playIcon = "pause";
+    var prevBtn = iconButton("pd-step", "prev", "Previous stage");
+    var nextBtn = iconButton("pd-step", "next", "Next stage");
     var dots = el("div", "pd-dots");
     var dotEls = steps.map(function (id, i) {
       var d = el("button", "pd-dot");
@@ -323,8 +353,14 @@
       root.classList.toggle("is-auto", mode === "auto");
       var held = mode === "auto" && !run;
       status.textContent = mode === "auto" ? (held ? STATUS.held : STATUS.auto) : STATUS[mode];
-      playBtn.textContent = mode === "auto" ? "Pause" : "Play";
-      playBtn.setAttribute("aria-label", mode === "auto" ? "Pause the tour" : "Play the tour");
+      var want = mode === "auto" ? "pause" : "play";
+      if (want !== playIcon) {
+        playIcon = want;
+        playBtn.replaceChildren(icon(want));
+        var label = want === "pause" ? "Pause the tour" : "Play the tour";
+        playBtn.setAttribute("aria-label", label);
+        playBtn.dataset.label = label;
+      }
       // A live region that speaks every few seconds is noise; announce
       // only what the reader chose.
       detail.setAttribute("aria-live", mode === "auto" ? "off" : "polite");

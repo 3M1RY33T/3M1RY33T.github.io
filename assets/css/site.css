@@ -2713,7 +2713,8 @@ body { line-height: 1.7; }
   height: 1.35rem;
   display: block;
 }
-.project-cta .button::after {
+.project-cta .button::after,
+.pd-controls button[data-label]::after {
   content: attr(data-label);
   position: absolute;
   top: calc(100% + 0.5rem);
@@ -2738,13 +2739,16 @@ body { line-height: 1.7; }
   transition: opacity 110ms ease, transform 110ms ease;
 }
 .project-cta .button:hover::after,
-.project-cta .button:focus-visible::after {
+.project-cta .button:focus-visible::after,
+.pd-controls button[data-label]:hover::after,
+.pd-controls button[data-label]:focus-visible::after {
   opacity: 1;
   transform: translateY(0);
   transition-delay: 40ms;
 }
 @media (prefers-reduced-motion: reduce) {
-  .project-cta .button::after { transition: opacity 110ms ease; transform: translateY(0); }
+  .project-cta .button::after,
+  .pd-controls button[data-label]::after { transition: opacity 110ms ease; transform: translateY(0); }
 }
 
 .project-terminal {
@@ -2980,6 +2984,7 @@ body { line-height: 1.7; }
 :root[data-theme="light"] .project-diagram-title,
 :root[data-theme="light"] .pd-detail-title,
 :root[data-theme="light"] .pd-play,
+:root[data-theme="light"] .pd-step:hover,
 :root[data-theme="light"] .pd-facts li {
   color: color-mix(in srgb, var(--p, var(--accent)) 55%, #1e2a44);
 }
@@ -3448,19 +3453,32 @@ body { line-height: 1.7; }
   align-items: center;
   gap: 0.6rem;
 }
+/* Round icon buttons, sized like the theme toggle. Play and pause is the
+   primary control, so it carries the project hue; the steps stay quiet
+   until hovered. */
 .pd-play, .pd-step {
-  padding: 0.45rem 0.9rem;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border);
   background: transparent;
   color: var(--panel-ink);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
   cursor: pointer;
-  transition: border-color 160ms ease, background 160ms ease;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
 }
-.pd-play { min-width: 4.6rem; border-color: var(--p, var(--accent)); color: var(--p, var(--accent)); }
-.pd-play:hover, .pd-step:hover { background: var(--p-wash, var(--accent-a08)); }
+.pd-play svg, .pd-step svg { display: block; width: 1rem; height: 1rem; }
+.pd-play {
+  border-color: var(--p, var(--accent));
+  color: var(--p, var(--accent));
+  background: var(--p-wash, var(--accent-a08));
+}
+.pd-step:hover { border-color: var(--p, var(--accent)); color: var(--p, var(--accent)); background: var(--p-wash, var(--accent-a08)); }
+.pd-play:hover { background: color-mix(in srgb, var(--p, var(--accent)) 22%, transparent); }
 .pd-play:focus-visible, .pd-step:focus-visible, .pd-dot:focus-visible {
   outline: 2px solid var(--p, var(--accent-ring)); outline-offset: 2px;
 }
