@@ -92,7 +92,7 @@ must_have_assets("projects/urthreads/index.html")
 
 # --- Task 7: Tensor ------------------------------------------------------
 must_render("projects/tensor-serve/index.html")
-must_contain("projects/tensor-serve/index.html", "passed, 17 skipped, in 13.1s")
+must_contain("projects/tensor-serve/index.html", "168 passed, 1 skipped, in 10.6s")
 must_have_assets("projects/tensor-serve/index.html")
 
 # --- Task 8: Brewery, product half only ----------------------------------

@@ -33,8 +33,261 @@ install_note: >
   OpenAI-compatible client needs only its base URL changed.
 
 metrics_verified: 2026-09-22
+diagrams:
+  - id: query
+    title: A request passing through the proxy
+    query: "POST /v1/chat/completions"
+    query_label: received
+    nodes:
+      - id: message
+        label: "user message"
+        row: 0
+        detail: >
+          A chat request arrives on the OpenAI-compatible endpoint. The client talks to Tensor exactly as it would talk to the model directly, so any tool that speaks the OpenAI API gains the documentation without knowing Tensor exists.
+      - id: analyze
+        label: "needs retrieval?"
+        meta: "QueryAnalyzer"
+        row: 1
+        detail: >
+          Simple or self-contained questions are forwarded untouched. Retrieval that fires on every message is retrieval that pollutes most of them.
+      - id: cache
+        label: "seen this query before?"
+        meta: "search cache"
+        row: 2
+        detail: >
+          A hit skips straight to injection with the chunks that were already retrieved and already gated, so a repeated question costs nothing.
+      - id: mode
+        label: "pick search mode"
+        meta: "hybrid · faiss · bm25"
+        row: 3
+        detail: >
+          The analyzer chooses which backends to run rather than always running all of them.
+      - id: faiss
+        label: "FAISS"
+        meta: "cosine similarity"
+        row: 4
+        detail: >
+          Dense vectors. Finds the passage that means the same thing in different words.
+      - id: bm25
+        label: "BM25"
+        meta: "postings lookup"
+        row: 4
+        detail: >
+          Sparse keyword scoring over the postings built at ingest. This is the half that got the Rust extension, and it is 0.85ms at 80,000 chunks.
+      - id: web
+        label: "web search"
+        meta: "optional, time-sensitive only"
+        row: 4
+        detail: >
+          Off unless the question is time-sensitive. An archive cannot answer what happened this morning.
+      - id: rrf
+        label: "Reciprocal Rank Fusion"
+        meta: "score = sum 1/(60+rank)"
+        row: 5
+        detail: >
+          Candidates keep their own scores through the fusion rather than being flattened into one ranking, which is what leaves the gate something to measure.
+      - id: gate
+        label: "abstention gate"
+        meta: "two tiers, either is enough"
+        row: 6
+        detail: >
+          The decision this whole project is built around: whether the corpus has anything worth injecting at all.
+      - id: forward
+        label: "forward unchanged"
+        meta: "nothing injected"
+        row: 7
+        kind: refusal
+        detail: >
+          The abstention outcome. The request goes upstream with no added context, which is strictly better than laundering a guess into something that looks cited.
+      - id: rerank
+        label: "cross-encoder rerank"
+        meta: "optional"
+        row: 7
+        detail: >
+          Reorders what passed. Measured at roughly 96ms a query, so it ships behind a flag.
+      - id: inject
+        label: "inject as system context"
+        meta: "with a source footer"
+        row: 8
+        detail: >
+          The surviving chunks go in as system context, and the answer comes back naming what it read.
+      - id: up
+        label: "upstream model"
+        meta: "Ollama · LM Studio · any OpenAI API"
+        row: 9
+        detail: >
+          Whatever model the client was already pointed at. Tensor sits in front of it rather than replacing it.
+    edges:
+      - [message, analyze]
+      - [analyze, cache]
+      - [analyze, forward]
+      - [cache, mode]
+      - [cache, inject]
+      - [mode, faiss]
+      - [mode, bm25]
+      - [mode, web]
+      - [faiss, rrf]
+      - [bm25, rrf]
+      - [web, rrf]
+      - [rrf, gate]
+      - [gate, forward]
+      - [gate, rerank]
+      - [rerank, inject]
+      - [inject, up]
+      - [forward, up]
+    steps: [message, analyze, cache, mode, faiss, bm25, web, rrf, gate, forward, rerank, inject, up]
+    ascii: |
+      user message
+        │
+        ▼
+      needs retrieval? ──no──▶ forward unchanged ───────────┐
+        │ yes                                               │
+        ▼                                                   │
+      seen this query before? ──hit──▶ inject context ───┐  │
+        │ miss                                           │  │
+        ▼                                                │  │
+      pick search mode                                   │  │
+        ├─▶ FAISS   cosine similarity                    │  │
+        ├─▶ BM25    postings lookup                      │  │
+        └─▶ web     optional, time-sensitive only        │  │
+        ▼                                                │  │
+      Reciprocal Rank Fusion, candidates keep their      │  │
+      scores                                             │  │
+        ▼                                                │  │
+      abstention gate ──nothing passes──▶ forward ───────┼──┤
+        │ candidates pass                                │  │
+        ▼                                                │  │
+      cross-encoder rerank, optional                     │  │
+        ▼                                                │  │
+      inject as system context ──────────────────────────┘  │
+        ▼                                                   │
+      upstream model ◀──────────────────────────────────────┘
+  - id: gate
+    title: The abstention gate
+    nodes:
+      - id: candidates
+        label: "fused candidates"
+        meta: "with their scores"
+        row: 0
+        detail: >
+          What came out of the fusion, each still carrying the score its backend gave it.
+      - id: lexical
+        label: "lexically grounded?"
+        meta: "sum of IDF ≥ 1.0"
+        row: 1
+        detail: >
+          Are the query's own words in the corpus at all? Summed IDF evidence goes to exactly 0.00 for invented words, which is the separation cosine could not give.
+      - id: semantic
+        label: "semantically confident?"
+        meta: "best cosine ≥ 0.45"
+        row: 2
+        detail: >
+          The second chance, for a real question asked in words the corpus does not use. This is the tier embeddings were added for.
+      - id: answer
+        label: "answer"
+        meta: "inject the chunks"
+        row: 3
+        detail: >
+          Either tier alone is enough. Requiring both would reject exactly the questions embeddings were added for.
+      - id: abstain
+        label: "abstain"
+        meta: "inject nothing, forward the question"
+        row: 3
+        kind: refusal
+        detail: >
+          Only when both tiers fail. Requiring neither is how the pipeline came to answer invented words with confident documentation.
+    edges:
+      - [candidates, lexical]
+      - [lexical, answer]
+      - [lexical, semantic]
+      - [semantic, answer]
+      - [semantic, abstain]
+    steps: [candidates, lexical, semantic, answer, abstain]
+    ascii: |
+      fused candidates, with their scores
+        │
+        ▼
+      lexically grounded?            ──yes──▶ answer, inject the chunks
+        sum of IDF of query terms                 ▲
+        present in the corpus ≥ 1.0               │
+        │ no, the words are not in the corpus     │
+        ▼                                         │
+      semantically confident?        ──yes────────┘
+        best cosine ≥ 0.45
+        │ no
+        ▼
+      abstain, inject nothing, forward the question
+
+tabs:
+  - id: overview
+    label: Overview
+    bands: [problem, capabilities, quickstart]
+  - id: pipeline
+    label: Pipeline
+    heading: What happens to a request
+    lede: >
+      Tensor sits in front of a model rather than replacing it, so every
+      request either arrives upstream enriched or arrives untouched. Step
+      through the path, or click any stage.
+    diagram: query
+    notes:
+      - title: Retrieval is native already
+        body: >
+          Profiling put 81% of a query inside PyTorch and 4% inside FAISS,
+          so there was little for a compiled language to win there. Building
+          the keyword index was the exception, and that is the only part
+          that went to Rust.
+        evidence: 2.8x faster index build, byte-identical output
+      - title: The backend is chosen per phase
+        body: >
+          ONNX answers a single query in 1.19ms against PyTorch's 4.00ms,
+          and loses badly on bulk ingestion at 127 chunks a second against
+          323. So the backend is selected by what the process is doing
+          rather than picked once.
+        evidence: 1.19ms vs 4.00ms · 127 vs 323 chunks/s
+      - title: Writes moved, they do not happen in place
+        body: >
+          Writing an index in place produced 34,704 torn reads out of 34,709
+          in a few seconds of concurrent access. Writing to a temporary file
+          and moving it into position produced none.
+        evidence: 34,704 of 34,709, then 0
+  - id: abstention
+    label: Abstention
+    heading: Knowing when to say nothing
+    lede: >
+      A retrieval proxy that always answers is worse than no retrieval at
+      all, because it launders a guess into something that looks cited.
+      Two tiers guard the injection, and either one alone is enough.
+    diagram: gate
+    notes:
+      - title: Why cosine alone could not do it
+        body: >
+          Real questions bottom out around 0.201 cosine while nonsense
+          reaches 0.381, so no threshold separates them. Summed IDF
+          evidence goes to exactly 0.00 for invented words, which is a
+          separation rather than a gradient.
+        evidence: real 0.201 · nonsense 0.381 · evidence 0.00
+      - title: Why both tiers are not required
+        body: >
+          Requiring both would reject exactly the questions embeddings were
+          added for, and requiring neither is how the pipeline came to
+          answer invented words with confident documentation.
+        evidence: floors 1.0 lexical · 0.45 cosine
+      - title: What it cost to add
+        body: >
+          Abstention on nonsense went from 0% to 100%, and recall@k,
+          precision@1 and MRR on the real question set did not move.
+        evidence: 0% to 100%, retrieval quality unchanged
+  - id: measured
+    label: Measured
+    heading: Numbers that came from commands
+    bands: [metrics, terminal]
+  - id: depth
+    label: In depth
+    bands: [writeup]
+
 metrics:
-  - { label: Tests, value: "152", detail: "passed, 17 skipped, in 13.1s" }
+  - { label: Tests, value: "169", detail: "168 passed, 1 skipped, in 10.6s" }
   - { label: Keyword latency, value: "0.85ms", detail: "at 80,000 chunks, from 104.86ms" }
   - { label: Torn reads, value: "0", detail: "was 34,704 of 34,709" }
   - { label: Releases, value: "4", detail: "across 68 commits" }
