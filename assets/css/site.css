@@ -2974,7 +2974,12 @@ body { line-height: 1.7; }
 :root[data-theme="light"] .project-metrics dt,
 :root[data-theme="light"] .project-crumb span:last-child,
 :root[data-theme="light"] .project-tile-cta,
-:root[data-theme="light"] .project-rail-back {
+:root[data-theme="light"] .project-rail-back,
+:root[data-theme="light"] .project-tab.is-active,
+:root[data-theme="light"] .project-note-evidence,
+:root[data-theme="light"] .project-diagram-title,
+:root[data-theme="light"] .pd-detail-title,
+:root[data-theme="light"] .pd-play {
   color: color-mix(in srgb, var(--p, var(--accent)) 55%, #1e2a44);
 }
 /* On white the tile logo casts slate, not black, and the hover keeps
@@ -3390,10 +3395,25 @@ body { line-height: 1.7; }
   .pd-stage { gap: 1.75rem; }
 }
 
-/* The light theme keeps the schematic on its dark panel, so the controls
-   and body copy stay on panel tokens rather than page ink. */
+/* In light mode the schematic leaves the fixed dark panel the terminals
+   use. Its rules all read the panel tokens, so re-pointing those inside
+   .project-diagram turns the whole drawing light without touching a
+   single component rule, and the terminals keep their dark panel. */
 :root[data-theme="light"] .project-diagram {
-  border-color: var(--border);
+  --panel: #ffffff;
+  --panel-2: #f8fafc;
+  --panel-ink: #0f172a;
+  --panel-ink-muted: #475569;
+  --border: #cbd5e1;
+  --border-softer: #e2e8f0;
+  border-color: var(--border-softer);
+  box-shadow: 0 22px 55px rgba(15, 23, 42, 0.08);
+}
+/* Unlit edges were tuned to sit back on a dark ground; on white they
+   need more weight to read as connections at all. */
+:root[data-theme="light"] .pd-edge { stroke: #94a3b8; opacity: 0.8; }
+:root[data-theme="light"] .pd-node.is-active {
+  box-shadow: 0 0 0 1px var(--p, var(--accent)), 0 10px 26px rgba(15, 23, 42, 0.10);
 }
 
 /* Anchors land below the header and the tab bar, not under them. */
