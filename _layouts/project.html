@@ -19,19 +19,26 @@ layout: default
       </ul>
       {% endif %}
       <p class="project-summary">{{ page.summary }}</p>
+      {% comment %}
+        Icon-only actions. Each carries its name in aria-label for assistive
+        tech and in data-label for the hover tooltip.
+      {% endcomment %}
       <div class="project-cta">
         {% if page.install %}
-          <a class="button" href="#quickstart">Install</a>
+          <a class="button" href="#quickstart" aria-label="Install" data-label="Install">{% include icon.html name="terminal" %}</a>
         {% elsif page.links.download %}
-          <a class="button" href="{{ page.links.download }}" target="_blank" rel="noopener noreferrer">Download for macOS</a>
+          <a class="button" href="{{ page.links.download }}" target="_blank" rel="noopener noreferrer" aria-label="Download for macOS" data-label="Download for macOS">{% include icon.html name="apple" %}</a>
         {% elsif page.links.document %}
-          <a class="button" href="{{ page.links.document }}" target="_blank" rel="noopener noreferrer">Read the project document</a>
+          <a class="button" href="{{ page.links.document }}" target="_blank" rel="noopener noreferrer" aria-label="Read the project document" data-label="Project document">{% include icon.html name="document" %}</a>
         {% elsif page.links.github %}
-          <a class="button" href="{{ page.links.github }}" target="_blank" rel="noopener noreferrer">View the source</a>
+          <a class="button" href="{{ page.links.github }}" target="_blank" rel="noopener noreferrer" aria-label="View the source on GitHub" data-label="Source">{% include icon.html name="github" %}</a>
         {% endif %}
-        {% if page.links.github %}<a class="button button-secondary" href="{{ page.links.github }}" target="_blank" rel="noopener noreferrer">GitHub</a>{% endif %}
-        {% if page.links.document and page.install %}<a class="button button-secondary" href="{{ page.links.document }}" target="_blank" rel="noopener noreferrer">Project document</a>{% endif %}
-        {% if page.links.package %}<a class="button button-secondary" href="{{ page.links.package }}" target="_blank" rel="noopener noreferrer">{{ page.links.package_label | default: "Package" }}</a>{% endif %}
+        {% if page.links.github %}<a class="button button-secondary" href="{{ page.links.github }}" target="_blank" rel="noopener noreferrer" aria-label="View the source on GitHub" data-label="GitHub">{% include icon.html name="github" %}</a>{% endif %}
+        {% if page.links.document and page.install %}<a class="button button-secondary" href="{{ page.links.document }}" target="_blank" rel="noopener noreferrer" aria-label="Read the project document" data-label="Project document">{% include icon.html name="document" %}</a>{% endif %}
+        {% if page.links.package %}
+          {% assign pkg = page.links.package_label | default: "Package" %}
+          <a class="button button-secondary" href="{{ page.links.package }}" target="_blank" rel="noopener noreferrer" aria-label="{{ pkg }} package" data-label="{{ pkg }}">{% if pkg == "npm" %}{% include icon.html name="npm" %}{% else %}{% include icon.html name="python" %}{% endif %}</a>
+        {% endif %}
       </div>
       {% unless page.install %}{% if page.install_note %}
       <p class="project-install-note">{{ page.install_note }}</p>

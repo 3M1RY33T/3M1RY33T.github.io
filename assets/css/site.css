@@ -239,6 +239,10 @@ textarea {
 .button:hover {
   transform: translateY(-1px);
   background: var(--accent-strong);
+  /* held against the generic a:hover, which ties on specificity and
+     would otherwise recolour the label (and any icon drawn in
+     currentColor) to the link accent */
+  color: var(--accent-ink);
 }
 
 .button-secondary {
@@ -249,6 +253,7 @@ textarea {
 
 .button-secondary:hover {
   background: var(--accent-wash);
+  color: var(--ink-deep);
 }
 
 .skills-grid div,
@@ -2691,6 +2696,57 @@ body { line-height: 1.7; }
 .project-page .button-secondary { background: transparent; }
 .project-page .button-secondary:hover { background: var(--accent-a08); }
 
+/* --- icon actions ---------------------------------------------------------- */
+/* The hero actions carry a mark instead of a label. The name lives in
+   aria-label for assistive tech and in data-label for the tooltip below,
+   which is drawn here rather than left to the browser's title attribute:
+   the native one waits about a second, too slow when the icon is the
+   only thing naming the link. */
+.project-cta { gap: 0.75rem; }
+.project-cta .button {
+  position: relative;
+  width: 3.2rem;
+  padding: 0;
+}
+.project-cta .button svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  display: block;
+}
+.project-cta .button::after {
+  content: attr(data-label);
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  /* anchored to the button's left edge, not centred on it: the first
+     button sits on the page gutter and a centred label would hang off it */
+  left: 0;
+  z-index: 3;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.5rem;
+  background: var(--panel-2);
+  color: var(--panel-ink);
+  border: 1px solid var(--border-soft);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(-0.25rem);
+  pointer-events: none;
+  transition: opacity 110ms ease, transform 110ms ease;
+}
+.project-cta .button:hover::after,
+.project-cta .button:focus-visible::after {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 40ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-cta .button::after { transition: opacity 110ms ease; transform: translateY(0); }
+}
+
 .project-terminal {
   border-color: var(--border);
   border-top: 2px solid color-mix(in srgb, var(--p, var(--accent)) 55%, transparent);
@@ -2916,10 +2972,13 @@ body { line-height: 1.7; }
   box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12), 0 0 40px -18px var(--p-wash, var(--accent-a16));
 }
 
-:root[data-theme="light"] .project-page .button {
+/* Darkened hue for the filled button only: without the :not, this beat
+   .project-page .button-secondary on specificity and painted the ghost
+   buttons like primaries. */
+:root[data-theme="light"] .project-page .button:not(.button-secondary) {
   background: color-mix(in srgb, var(--p, var(--accent)) 65%, #1f2937);
 }
-:root[data-theme="light"] .project-page .button:hover {
+:root[data-theme="light"] .project-page .button:not(.button-secondary):hover {
   filter: none;
   background: color-mix(in srgb, var(--p, var(--accent)) 78%, #1f2937);
 }
