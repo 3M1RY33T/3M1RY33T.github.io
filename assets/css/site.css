@@ -546,6 +546,17 @@ textarea {
   object-fit: contain;
 }
 
+/* Brand marks drawn in solid black (and aws's near-black letters)
+   disappear on the dark ground. Dark mode, the attribute-less default,
+   swaps in the white variants that sit next to the originals in
+   assets/svg; light mode keeps the black ones. */
+:root:not([data-theme="light"]) .skills-grid img[src="/assets/svg/apple.svg"] { content: url("/assets/svg/apple-white.svg"); }
+:root:not([data-theme="light"]) .skills-grid img[src="/assets/svg/dotnet.svg"] { content: url("/assets/svg/dotnet-white.svg"); }
+:root:not([data-theme="light"]) .skills-grid img[src="/assets/svg/mssql.svg"] { content: url("/assets/svg/mssql-white.svg"); }
+:root:not([data-theme="light"]) .skills-grid img[src="/assets/svg/mysql.svg"] { content: url("/assets/svg/mysql-white.svg"); }
+:root:not([data-theme="light"]) .skills-grid img[src="/assets/svg/react-native.svg"] { content: url("/assets/svg/react-native-white.svg"); }
+:root:not([data-theme="light"]) .skills-grid img[src="/assets/svg/aws.svg"] { content: url("/assets/svg/aws-white.svg"); }
+
 .skills-grid::after {
   content: "";
   position: absolute;
