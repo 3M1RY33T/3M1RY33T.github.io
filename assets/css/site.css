@@ -2306,7 +2306,7 @@ textarea {
 .project-shot img { width: 100%; border-radius: var(--radius-card); border: 1px solid var(--border); }
 .project-shot figcaption { font-size: 0.88rem; color: var(--ink-subtle); margin-top: 0.6rem; }
 
-.project-writeup { max-width: 68ch; margin-bottom: 2.5rem; }
+.project-writeup { margin-bottom: 2.5rem; }
 .project-writeup h2 { margin-top: 2.5rem; }
 .project-writeup pre {
   background: var(--panel); color: var(--panel-ink);
