@@ -2523,6 +2523,11 @@ body { line-height: 1.7; }
   font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 0.98;
+  /* The gradient is clipped to the text and paints only inside the box;
+     at this line-height the g's descender hangs below it, so the box is
+     extended under it and pulled back so layout does not move. */
+  padding-bottom: 0.15em;
+  margin-bottom: -0.15em;
   background: linear-gradient(135deg, var(--ink-deep) 55%, var(--accent-strong));
   -webkit-background-clip: text;
   background-clip: text;
