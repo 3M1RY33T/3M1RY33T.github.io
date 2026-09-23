@@ -2794,6 +2794,28 @@ body { line-height: 1.7; }
 .project-shot img { border-color: var(--border-soft); box-shadow: 0 24px 70px rgba(0,0,0,0.45); }
 .project-shot figcaption { font-family: var(--font-mono); font-size: 0.78rem; }
 
+/* --- showcase slider ------------------------------------------------------- */
+/* Reuses the blog slider. Two departures: the shots run from 1.46 to 1.75
+   wide, so they are fitted whole into the frame rather than cropped to
+   16/9, and the controls take the project's hue. */
+.project-showcase .post-slider img {
+  aspect-ratio: 16 / 10;
+  object-fit: contain;
+  background: var(--panel);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.project-showcase .post-slider figcaption {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  margin-top: 0;
+}
+.project-showcase .post-slider-dot.is-active { background: var(--p, var(--accent)); }
+.project-showcase .post-slider-status { color: var(--p, var(--accent)); }
+.project-showcase .post-slider-control:focus-visible,
+.project-showcase .post-slider-dot:focus-visible { outline-color: var(--p, var(--accent-ring)); }
+
 .project-writeup { font-size: 1.02rem; }
 .project-writeup strong { color: var(--ink-deep); }
 .project-writeup :not(pre) > code { background: var(--p-wash, var(--accent-a08)); color: var(--p, var(--accent-strong)); }
