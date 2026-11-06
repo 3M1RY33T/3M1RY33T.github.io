@@ -26,6 +26,13 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
         </a>
       </span>
     </div>
+    <a class="hero-call" href="tel:+12494985366">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.12.37 2.33.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8Z"/></svg>
+      <span>
+        <strong>+1 (249) 498-5366</strong>
+        Hiring? Call Delroy, my AI agent. It books a time with me.
+      </span>
+    </a>
   </div>
   {% include activity-panel.html %}
 </section>
@@ -274,6 +281,17 @@ excerpt: "A personal portfolio and blog by Yigit (Emir) Yildiz."
           </div>
         </div>
         <ul class="contact-details">
+          <li>
+            <a href="tel:+12494985366">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.12.37 2.33.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8Z"/>
+              </svg>
+              <span>
+                <strong>Call Delroy, my AI agent</strong>
+                +1 (249) 498-5366
+              </span>
+            </a>
+          </li>
           <li>
             <a href="mailto:yigitgl@gmail.com">
               <svg aria-hidden="true" viewBox="0 0 24 24">

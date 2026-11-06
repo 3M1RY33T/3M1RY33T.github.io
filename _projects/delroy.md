@@ -24,6 +24,8 @@ platforms: [macOS, Linux]
 
 links:
   document: /assets/Delroy-Project-Document.pdf
+  phone: "+12494985366"
+  phone_label: "+1 (249) 498-5366"
 
 metrics_verified: 2026-09-22
 diagrams:

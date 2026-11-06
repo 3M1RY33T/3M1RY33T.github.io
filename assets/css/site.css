@@ -2533,6 +2533,48 @@ body { line-height: 1.7; }
   height: 1.35rem;
 }
 
+/* Delroy's phone line, under the cta row. */
+.hero-call {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 1.25rem;
+  padding: 0.7rem 1.1rem 0.7rem 0.7rem;
+  border: 1px solid var(--border-softer);
+  border-radius: 1rem;
+  background: var(--surface);
+  color: var(--ink-muted);
+  font-size: 0.92rem;
+  line-height: 1.35;
+  text-decoration: none;
+  transition: border-color 180ms ease, color 180ms ease;
+}
+.hero-call:hover,
+.hero-call:focus-visible {
+  border-color: var(--accent-a28);
+  color: var(--ink-soft);
+}
+.hero-call:focus-visible {
+  outline: 3px solid var(--accent-ring);
+  outline-offset: 3px;
+}
+.hero-call svg {
+  flex-shrink: 0;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0.5rem;
+  border-radius: 0.8rem;
+  background: var(--accent-a16);
+  color: var(--accent);
+}
+.hero-call span { display: grid; }
+.hero-call strong {
+  color: var(--ink-deep);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
 .hero .eyebrow {
   font-family: var(--font-mono);
   font-size: 0.78rem;

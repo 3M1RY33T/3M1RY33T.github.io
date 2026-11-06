@@ -151,6 +151,7 @@ layout: default
         {% if page.links.document %}<li><a href="{{ page.links.document }}" target="_blank" rel="noopener noreferrer">Project document, PDF</a></li>{% endif %}
         {% if page.links.download %}<li><a href="{{ page.links.download }}" target="_blank" rel="noopener noreferrer">Download</a></li>{% endif %}
         {% if page.links.site %}<li><a href="{{ page.links.site }}" target="_blank" rel="noopener noreferrer">Live site</a></li>{% endif %}
+        {% if page.links.phone %}<li><a href="tel:{{ page.links.phone }}">Call its phone line, {{ page.links.phone_label }}</a></li>{% endif %}
       </ul>
     </div>
   </footer>
